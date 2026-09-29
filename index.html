@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PF Ramiro - Entrenamientos Personalizados</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Versión fija y estable en jsDelivr -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
@@ -71,11 +72,11 @@
     const SUPABASE_URL = 'https://zuwqfzncybtwvwzwlqmw.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_JNr-yY7bAtM8Sg4ioNXFcA_wMZOYuYq';
 
-    // Inicialización inmediata
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Instancia renombrada a 'sb' para evitar colisión con window.supabase
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Escuchar estado de sesión
-    supabase.auth.onAuthStateChange((event, session) => {
+    // 1. onAuthStateChange con sb
+    sb.auth.onAuthStateChange((event, session) => {
       if (session) {
         mostrarPanel(session.user);
       } else {
@@ -106,7 +107,8 @@
       mostrarMensaje("Verificando credenciales...");
 
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        // 2. signInWithPassword con sb
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
         if (error) {
           mostrarMensaje("Error: " + error.message, true);
         } else {
@@ -136,7 +138,8 @@
       mostrarMensaje("Creando cuenta...");
 
       try {
-        const { data, error } = await supabase.auth.signUp({ email, password });
+        // 3. signUp con sb
+        const { data, error } = await sb.auth.signUp({ email, password });
         if (error) {
           mostrarMensaje("Error: " + error.message, true);
         } else {
@@ -151,7 +154,8 @@
     }
 
     async function cerrarSesion() {
-      await supabase.auth.signOut();
+      // 4. signOut con sb
+      await sb.auth.signOut();
       mostrarLogin();
     }
 
@@ -178,7 +182,8 @@
 
     async function cargarRutinas(userId) {
       const contenedor = document.getElementById('lista-rutinas');
-      const { data, error } = await supabase
+      // 5. from('planificaciones') con sb
+      const { data, error } = await sb
         .from('planificaciones')
         .select('*')
         .order('created_at', { ascending: false });
@@ -208,7 +213,8 @@
       const url_video_ejemplo = document.getElementById('admin-video').value;
       const ejercicios = document.getElementById('admin-ejercicios').value;
 
-      const { error } = await supabase.from('planificaciones').insert([{
+      // 6. insert en planificaciones con sb
+      const { error } = await sb.from('planificaciones').insert([{
         alumno_id: alumno_id,
         semana: semana,
         dia: dia,
