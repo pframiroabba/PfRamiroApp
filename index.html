@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PF Ramiro - Entrenamientos Personalizados</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Versión fija y estable en jsDelivr -->
+  <!-- Versión estable de Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
@@ -70,12 +70,12 @@
 
   <script>
     const SUPABASE_URL = 'https://zuwqfzncybtwvwzwlqmw.supabase.co';
-    const SUPABASE_KEY = 'eyJeME09bwOlmmI4LoTBy2cUTg9+NL3y85oWs8IPzNbm+t6t2c6Sl00Z2WHzzC5CU0JzVddWs7Tdi+QrHNbQaFMrg==;'
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1d3FmemZuY3lidHd2endscW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2OTgzMTYsImV4cCI6MjEwNjI3NDMxNn0.B2NPB2q5Blni4KNcBoyvfp8yW70hC0KqOgm3O2q1gGI';
 
-    // Instancia renombrada a 'sb' para evitar colisión con window.supabase
+    // Instancia de Supabase con nombre sb para evitar colisión de variables globales
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // 1. onAuthStateChange con sb
+    // Escuchar estado de sesión
     sb.auth.onAuthStateChange((event, session) => {
       if (session) {
         mostrarPanel(session.user);
@@ -98,7 +98,7 @@
       const btn = document.getElementById('btn-login');
 
       if (!email || !password) {
-        mostrarMensaje("Ingresa correo y contraseña", true);
+        mostrarMensaje("Ingresá correo y contraseña", true);
         return;
       }
 
@@ -107,7 +107,6 @@
       mostrarMensaje("Verificando credenciales...");
 
       try {
-        // 2. signInWithPassword con sb
         const { data, error } = await sb.auth.signInWithPassword({ email, password });
         if (error) {
           mostrarMensaje("Error: " + error.message, true);
@@ -116,7 +115,7 @@
           mostrarPanel(data.user);
         }
       } catch (err) {
-        mostrarMensaje("Excepción: " + err.message, true);
+        mostrarMensaje("Error de red: " + err.message, true);
       } finally {
         btn.disabled = false;
         btn.innerText = "Iniciar Sesión";
@@ -129,7 +128,7 @@
       const btn = document.getElementById('btn-registro');
 
       if (!email || !password) {
-        mostrarMensaje("Ingresa correo y contraseña", true);
+        mostrarMensaje("Ingresá correo y contraseña", true);
         return;
       }
 
@@ -138,15 +137,14 @@
       mostrarMensaje("Creando cuenta...");
 
       try {
-        // 3. signUp con sb
         const { data, error } = await sb.auth.signUp({ email, password });
         if (error) {
           mostrarMensaje("Error: " + error.message, true);
         } else {
-          mostrarMensaje("Cuenta creada. Si Supabase requiere confirmación, revisa tu correo.");
+          mostrarMensaje("¡Cuenta creada con éxito! Ya podés iniciar sesión.");
         }
       } catch (err) {
-        mostrarMensaje("Excepción: " + err.message, true);
+        mostrarMensaje("Error de red: " + err.message, true);
       } finally {
         btn.disabled = false;
         btn.innerText = "Crear cuenta nueva";
@@ -154,7 +152,6 @@
     }
 
     async function cerrarSesion() {
-      // 4. signOut con sb
       await sb.auth.signOut();
       mostrarLogin();
     }
@@ -182,7 +179,6 @@
 
     async function cargarRutinas(userId) {
       const contenedor = document.getElementById('lista-rutinas');
-      // 5. from('planificaciones') con sb
       const { data, error } = await sb
         .from('planificaciones')
         .select('*')
@@ -213,7 +209,6 @@
       const url_video_ejemplo = document.getElementById('admin-video').value;
       const ejercicios = document.getElementById('admin-ejercicios').value;
 
-      // 6. insert en planificaciones con sb
       const { error } = await sb.from('planificaciones').insert([{
         alumno_id: alumno_id,
         semana: semana,
