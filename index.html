@@ -8,8 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
-</head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
+
   <!-- BARRA SUPERIOR -->
   <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
     <h1 class="text-xl font-bold tracking-wide text-emerald-400">⚡ PF Ramiro</h1>
@@ -71,34 +70,53 @@
   </main>
 
   <script>
-    // REEMPLAZAR ESTOS DOS VALORES CON LOS DE TU SUPABASE:
     const SUPABASE_URL = 'https://zuwqfzncybtwvwzwlqmw.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_JNr-yY7bAtM8Sg4ioNXFcA_wMZOYuYq';
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let supabase;
+    try {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Revisar si ya hay sesión iniciada al abrir la web
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        mostrarPanel(session.user);
-      } else {
-        mostrarLogin();
-      }
-    });
+      // Revisar si ya hay sesión iniciada al abrir la web
+      supabase.auth.onAuthStateChange((event, session) => {
+        if (session) {
+          mostrarPanel(session.user);
+        } else {
+          mostrarLogin();
+        }
+      });
+    } catch (err) {
+      alert("Error al inicializar la base de datos: " + err.message);
+    }
 
     async function iniciarSesion() {
-      const email = document.getElementById('email').value;
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        alert("Por favor ingresa correo y contraseña.");
+        return;
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) alert("Error al ingresar: " + error.message);
     }
 
     async function registrarse() {
-      const email = document.getElementById('email').value;
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        alert("Por favor ingresa correo y contraseña.");
+        return;
+      }
+
       const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) alert("Error al registrar: " + error.message);
-      else alert("Cuenta creada con éxito. Ya podés iniciar sesión.");
+      if (error) {
+        alert("Error al registrar: " + error.message);
+      } else {
+        alert("Cuenta creada con éxito. Ya podés iniciar sesión.");
+      }
     }
 
     async function cerrarSesion() {
