@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PF Ramiro - Entrenamientos Personalizados</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Versión estable de Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
@@ -72,10 +71,8 @@
     const SUPABASE_URL = 'https://zuwqfzncybtwvwzwlqmw.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1d3FmemZuY3lidHd2endscW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2OTgzMTYsImV4cCI6MjEwNjI3NDMxNn0.B2NPB2q5Blni4KNcBoyvfp8yW70hC0KqOgm3O2q1gGI';
 
-    // Instancia de Supabase con nombre sb para evitar colisión de variables globales
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Escuchar estado de sesión
     sb.auth.onAuthStateChange((event, session) => {
       if (session) {
         mostrarPanel(session.user);
