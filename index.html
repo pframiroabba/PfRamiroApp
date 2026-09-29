@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PF Ramiro - Entrenamientos Personalizados</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- CDN oficial de Supabase para navegador -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
@@ -33,10 +32,10 @@
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Contraseña</label>
         <input type="password" id="password" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="••••••••">
       </div>
-      <button type="button" onclick="iniciarSesion()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-lg transition active:scale-95">Iniciar Sesión</button>
-      <button type="button" onclick="registrarse()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-2.5 rounded-lg transition text-sm active:scale-95">Crear cuenta nueva</button>
+      <button type="button" id="btn-login" onclick="iniciarSesion()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-lg transition active:scale-95">Iniciar Sesión</button>
+      <button type="button" id="btn-registro" onclick="registrarse()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-2.5 rounded-lg transition text-sm active:scale-95">Crear cuenta nueva</button>
     </div>
-    <p id="auth-mensaje" class="text-center text-sm mt-4 text-emerald-400"></p>
+    <p id="auth-mensaje" class="text-center text-sm mt-4 text-emerald-400 font-semibold"></p>
   </main>
 
   <!-- PANTALLA 2: PANEL DEL ALUMNO / ADMIN -->
@@ -72,77 +71,95 @@
     const SUPABASE_URL = 'https://zuwqfzncybtwvwzwlqmw.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_JNr-yY7bAtM8Sg4ioNXFcA_wMZOYuYq';
 
-    let supabase;
+    // Inicialización inmediata
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    window.addEventListener('DOMContentLoaded', () => {
-      try {
-        if (!window.supabase) {
-          alert("Error: No se pudo cargar el script de Supabase. Revisa tu conexión a internet.");
-          return;
-        }
-
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        supabase.auth.onAuthStateChange((event, session) => {
-          if (session) {
-            mostrarPanel(session.user);
-          } else {
-            mostrarLogin();
-          }
-        });
-      } catch (err) {
-        alert("Error iniciando Supabase: " + err.message);
+    // Escuchar estado de sesión
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        mostrarPanel(session.user);
+      } else {
+        mostrarLogin();
       }
     });
+
+    function mostrarMensaje(txt, esError = false) {
+      const p = document.getElementById('auth-mensaje');
+      p.innerText = txt;
+      p.className = esError 
+        ? "text-center text-sm mt-4 text-red-400 font-semibold" 
+        : "text-center text-sm mt-4 text-emerald-400 font-semibold";
+    }
 
     async function iniciarSesion() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
+      const btn = document.getElementById('btn-login');
 
       if (!email || !password) {
-        alert("Por favor ingresa correo y contraseña.");
+        mostrarMensaje("Ingresa correo y contraseña", true);
         return;
       }
 
-      if (!supabase) {
-        alert("Supabase todavía no está listo.");
-        return;
-      }
+      btn.disabled = true;
+      btn.innerText = "Conectando...";
+      mostrarMensaje("Verificando credenciales...");
 
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) alert("Error al ingresar: " + error.message);
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          mostrarMensaje("Error: " + error.message, true);
+        } else {
+          mostrarMensaje("¡Acceso correcto! Cargando...");
+          mostrarPanel(data.user);
+        }
+      } catch (err) {
+        mostrarMensaje("Excepción: " + err.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Iniciar Sesión";
+      }
     }
 
     async function registrarse() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
+      const btn = document.getElementById('btn-registro');
 
       if (!email || !password) {
-        alert("Por favor ingresa correo y contraseña.");
+        mostrarMensaje("Ingresa correo y contraseña", true);
         return;
       }
 
-      if (!supabase) {
-        alert("Supabase todavía no está listo.");
-        return;
-      }
+      btn.disabled = true;
+      btn.innerText = "Registrando...";
+      mostrarMensaje("Creando cuenta...");
 
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) {
-        alert("Error al registrar: " + error.message);
-      } else {
-        alert("Cuenta creada con éxito. Ya podés iniciar sesión.");
+      try {
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error) {
+          mostrarMensaje("Error: " + error.message, true);
+        } else {
+          mostrarMensaje("Cuenta creada. Si Supabase requiere confirmación, revisa tu correo.");
+        }
+      } catch (err) {
+        mostrarMensaje("Excepción: " + err.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Crear cuenta nueva";
       }
     }
 
     async function cerrarSesion() {
-      if (supabase) await supabase.auth.signOut();
+      await supabase.auth.signOut();
+      mostrarLogin();
     }
 
     function mostrarLogin() {
       document.getElementById('seccion-auth').classList.remove('hidden');
       document.getElementById('seccion-panel').classList.add('hidden');
       document.getElementById('usuario-info').classList.add('hidden');
+      document.getElementById('usuario-info').classList.remove('flex');
     }
 
     async function mostrarPanel(user) {
@@ -199,8 +216,9 @@
         ejercicios: ejercicios
       }]);
 
-      if (error) alert("Error al guardar: " + error.message);
-      else {
+      if (error) {
+        alert("Error al guardar: " + error.message);
+      } else {
         alert("¡Rutina cargada con éxito!");
         location.reload();
       }
