@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PF Ramiro - Entrenamientos Personalizados</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <!-- CDN oficial de Supabase para navegador -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
@@ -32,16 +33,14 @@
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Contraseña</label>
         <input type="password" id="password" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="••••••••">
       </div>
-      <button onclick="iniciarSesion()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-lg transition">Iniciar Sesión</button>
-      <button onclick="registrarse()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-2.5 rounded-lg transition text-sm">Crear cuenta nueva</button>
+      <button type="button" onclick="iniciarSesion()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-lg transition active:scale-95">Iniciar Sesión</button>
+      <button type="button" onclick="registrarse()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-2.5 rounded-lg transition text-sm active:scale-95">Crear cuenta nueva</button>
     </div>
     <p id="auth-mensaje" class="text-center text-sm mt-4 text-emerald-400"></p>
   </main>
 
   <!-- PANTALLA 2: PANEL DEL ALUMNO / ADMIN -->
   <main id="seccion-panel" class="hidden max-w-4xl mx-auto p-6 space-y-8">
-    
-    <!-- Bienvenida -->
     <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
       <h2 class="text-2xl font-bold text-white mb-1">¡Hola de nuevo! 👋</h2>
       <p class="text-slate-400 text-sm">Acá tenés tus rutinas asignadas y el historial de entrenamientos.</p>
@@ -74,20 +73,27 @@
     const SUPABASE_KEY = 'sb_publishable_JNr-yY7bAtM8Sg4ioNXFcA_wMZOYuYq';
 
     let supabase;
-    try {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      // Revisar si ya hay sesión iniciada al abrir la web
-      supabase.auth.onAuthStateChange((event, session) => {
-        if (session) {
-          mostrarPanel(session.user);
-        } else {
-          mostrarLogin();
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        if (!window.supabase) {
+          alert("Error: No se pudo cargar el script de Supabase. Revisa tu conexión a internet.");
+          return;
         }
-      });
-    } catch (err) {
-      alert("Error al inicializar la base de datos: " + err.message);
-    }
+
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        supabase.auth.onAuthStateChange((event, session) => {
+          if (session) {
+            mostrarPanel(session.user);
+          } else {
+            mostrarLogin();
+          }
+        });
+      } catch (err) {
+        alert("Error iniciando Supabase: " + err.message);
+      }
+    });
 
     async function iniciarSesion() {
       const email = document.getElementById('email').value.trim();
@@ -95,6 +101,11 @@
 
       if (!email || !password) {
         alert("Por favor ingresa correo y contraseña.");
+        return;
+      }
+
+      if (!supabase) {
+        alert("Supabase todavía no está listo.");
         return;
       }
 
@@ -111,6 +122,11 @@
         return;
       }
 
+      if (!supabase) {
+        alert("Supabase todavía no está listo.");
+        return;
+      }
+
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) {
         alert("Error al registrar: " + error.message);
@@ -120,7 +136,7 @@
     }
 
     async function cerrarSesion() {
-      await supabase.auth.signOut();
+      if (supabase) await supabase.auth.signOut();
     }
 
     function mostrarLogin() {
@@ -136,7 +152,6 @@
       document.getElementById('usuario-info').classList.add('flex');
       document.getElementById('user-email').innerText = user.email;
 
-      // Si tu email es el de profesor, mostramos el panel admin
       if (user.email === 'axiss.training@gmail.com') {
         document.getElementById('seccion-admin').classList.remove('hidden');
       }
