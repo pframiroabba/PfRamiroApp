@@ -6,7 +6,6 @@
   <title>PF Ramiro Abbattista - Planificaciones Online</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-  <!-- Drag and Drop para reordenar ejercicios -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <style>
     .serie-done {
@@ -43,7 +42,8 @@
   <!-- ENCABEZADO SUPERIOR -->
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 md:px-8 py-3 flex justify-between items-center sticky top-0 z-40">
     <div class="flex items-center gap-3">
-      <img src="logo.png" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-10 w-10 md:h-12 md:w-12 object-contain rounded-lg border border-slate-700">
+      <!-- LOGO SUPERIOR CONFIGURADO CON EL NOMBRE EXACTO -->
+      <img src="Screenshot_20260929-232106.png" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-10 w-10 md:h-12 md:w-12 object-contain rounded-lg border border-slate-700">
       <div>
         <h1 class="text-base md:text-lg font-black tracking-wide text-white leading-tight">PF RAMIRO ABBATTISTA</h1>
         <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Preparación Física & Rendimiento</span>
@@ -63,16 +63,15 @@
 
   <!-- PANTALLA INICIO / ACCESO -->
   <main id="seccion-auth" class="max-w-md mx-auto mt-10 p-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl mx-4 md:mx-auto text-center space-y-6">
-    <!-- LOGO DESTACADO EN EL INICIO -->
     <div class="flex flex-col items-center">
       <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 shadow-inner mb-3">
-        <img src="logo.png" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-28 w-28 md:h-32 md:w-32 object-contain">
+        <!-- LOGO CENTRAL CONFIGURADO CON EL NOMBRE EXACTO -->
+        <img src="Screenshot_20260929-232106.png" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-28 w-28 md:h-32 md:w-32 object-contain">
       </div>
       <h2 class="text-2xl font-black text-white tracking-wide">PF Ramiro Abbattista</h2>
       <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma de Alumnos</p>
     </div>
 
-    <!-- FORMULARIO DE ACCESO -->
     <div class="space-y-4 text-left">
       <div>
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Correo Electrónico</label>
@@ -102,14 +101,17 @@
   <!-- PANTALLA PRINCIPAL: PLANIFICACIONES Y GESTIÓN -->
   <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- PANEL DEL ENTRENADOR (PROTEGIDO CON CONTRASEÑA MAESTRA) -->
+    <!-- PANEL DEL ENTRENADOR -->
     <div id="seccion-admin" class="hidden bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-6">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div>
           <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🛠️ Creador de Rutinas Personalizadas</h3>
           <p class="text-xs text-slate-400">Arma las sesiones por bloques, arrastra para ordenar y asigna al instante.</p>
         </div>
-        <span class="text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">Modo Coach Activo</span>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">Modo Coach</span>
+          <button onclick="cerrarModoAdmin()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg">Cerrar Coach</button>
+        </div>
       </div>
 
       <!-- CAMPOS PRINCIPALES -->
@@ -181,7 +183,6 @@
           </div>
         </div>
 
-        <!-- SERIES, REPS, RIR, DESCANSO -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
           <div>
             <label class="text-[11px] text-slate-400 font-semibold">Series</label>
@@ -218,9 +219,7 @@
 
       <!-- TABLA REORDENABLE -->
       <div class="space-y-2">
-        <div class="flex justify-between items-center">
-          <span class="text-xs uppercase font-extrabold text-slate-400 tracking-wider">2. Vista Previa de la Sesión (Arrastrá ☰ para ordenar)</span>
-        </div>
+        <span class="text-xs uppercase font-extrabold text-slate-400 tracking-wider">2. Vista Previa de la Sesión (Arrastrá ☰ para ordenar)</span>
         <div class="overflow-x-auto border border-slate-800 rounded-2xl overflow-hidden bg-slate-950">
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-900 text-slate-400 uppercase font-black">
@@ -264,12 +263,9 @@
     const SUPABASE_URL = 'https://zuwqfzfncybtwvzwlqmw.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1d3FmemZuY3lidHd2endscW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2OTgzMTYsImV4cCI6MjEwNjI3NDMxNn0.B2NPB2q5Blni4KNcBoyvfp8yW70hC0KqOgm3O2q1gGI';
 
-    // CLAVE MAESTRA ÚNICA DE ENTRENADOR
     const CLAVE_ADMIN_MASTER = 'ramiro2026';
-
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // BIBLIOTECA EXTENSA CON MOVILIDAD Y FUERZA
     const BIBLIOTECA_DEFAULT = {
       mov_tobillo: [
         "Dorsiflexión contra pared con rodilla adelantada",
@@ -376,24 +372,28 @@
     let sesionActual = [];
     let usuarioActual = null;
     let sortableInstance = null;
-    let esAdminVerificado = sessionStorage.getItem('admin_master_ok') === 'true';
+    let esAdminVerificado = false;
 
-    // SOLICITUD DE CLAVE MAESTRA
+    // CONTROL EXCLUSIVO DE MODO COACH
     function solicitarClaveAdmin() {
-      const clave = prompt("Ingresá la Clave de Administrador:");
+      const clave = prompt("Ingresá la Clave de Administrador / Coach:");
       if (!clave) return;
 
       if (clave === CLAVE_ADMIN_MASTER) {
         esAdminVerificado = true;
-        sessionStorage.setItem('admin_master_ok', 'true');
-        alert("¡Acceso concedido! Panel de Entrenador activado.");
         document.getElementById('seccion-admin').classList.remove('hidden');
         document.getElementById('seccion-auth').classList.add('hidden');
         document.getElementById('seccion-panel').classList.remove('hidden');
         inicializarSelectores();
+        alert("¡Acceso correcto! Panel de Entrenador activado.");
       } else {
-        alert("Clave incorrecta. Intentalo nuevamente.");
+        alert("Clave incorrecta.");
       }
+    }
+
+    function cerrarModoAdmin() {
+      esAdminVerificado = false;
+      document.getElementById('seccion-admin').classList.add('hidden');
     }
 
     // TIMER
@@ -598,7 +598,6 @@
       }
     }
 
-    // REGISTRO DE CARGAS DEL ALUMNO
     function guardarCargaAlumno(rutinaId, ejIndex, serieIndex, valor) {
       const key = `carga_${rutinaId}_${ejIndex}_${serieIndex}`;
       localStorage.setItem(key, valor);
@@ -740,14 +739,19 @@
       const password = document.getElementById('password').value;
       if (!email || !password) return mostrarMensaje("Ingresá correo y contraseña", true);
 
-      mostrarMensaje("Creando cuenta...");
+      esAdminVerificado = false;
+      document.getElementById('seccion-admin').classList.add('hidden');
+
+      mostrarMensaje("Creando cuenta de alumno...");
       const { data, error } = await sb.auth.signUp({ email, password });
-      if (error) mostrarMensaje("Error: " + error.message, true);
-      else mostrarMensaje("Cuenta creada con éxito. Ya podés iniciar sesión.");
+      if (error) {
+        mostrarMensaje("Error: " + error.message, true);
+      } else {
+        mostrarMensaje("¡Cuenta de alumno creada con éxito! Ya podés ingresar.");
+      }
     }
 
     async function cerrarSesion() {
-      sessionStorage.removeItem('admin_master_ok');
       esAdminVerificado = false;
       await sb.auth.signOut();
       mostrarLogin();
@@ -760,27 +764,21 @@
       document.getElementById('seccion-admin').classList.add('hidden');
     }
 
-    async function mostrarPanel(user) {
+    function mostrarPanel(user) {
       document.getElementById('seccion-auth').classList.add('hidden');
       document.getElementById('seccion-panel').classList.remove('hidden');
       document.getElementById('usuario-info').classList.remove('hidden');
       document.getElementById('usuario-info').classList.add('flex');
       document.getElementById('user-email').innerText = user.email;
 
-      if (esAdminVerificado || user.email === 'axiss.training@gmail.com' || user.email === 'axiss.trainig@gmail.com' || user.email === 'pf.ramiroabba@gmail.com') {
+      if (esAdminVerificado) {
         document.getElementById('seccion-admin').classList.remove('hidden');
+        inicializarSelectores();
+      } else {
+        document.getElementById('seccion-admin').classList.add('hidden');
       }
 
-      inicializarSelectores();
       cargarRutinas(user.email, user.id);
-    }
-
-    // Auto-restaurar sesión admin si ya colocó la clave
-    if (esAdminVerificado) {
-      document.getElementById('seccion-admin').classList.remove('hidden');
-      document.getElementById('seccion-auth').classList.add('hidden');
-      document.getElementById('seccion-panel').classList.remove('hidden');
-      inicializarSelectores();
     }
   </script>
 </body>
