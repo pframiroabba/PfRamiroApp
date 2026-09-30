@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PF Ramiro Abbattista - Rendimiento & Fuerza</title>
+  <title>PF Ramiro Abbattista - Koena & Online</title>
   
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,6 +33,16 @@
       color: #020617 !important;
       font-weight: 900 !important;
       box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.35);
+    }
+    .medalla-bloqueada {
+      opacity: 0.35;
+      filter: grayscale(100%);
+    }
+    .medalla-desbloqueada {
+      opacity: 1;
+      filter: none;
+      border-color: rgba(16, 185, 129, 0.8) !important;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
     }
     @media print {
       header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container {
@@ -69,10 +79,18 @@
   <!-- ENCABEZADO SUPERIOR -->
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 md:px-8 py-3 flex justify-between items-center sticky top-0 z-40">
     <div class="flex items-center gap-3">
-      <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-10 w-10 md:h-12 md:w-12 object-contain rounded-lg border border-slate-700">
-      <div>
+      <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-10 w-10 md:h-11 md:w-11 object-contain rounded-lg border border-slate-700">
+      
+      <div class="flex items-center pl-2 border-l border-slate-800">
+        <img src="logo-koena.webp" onerror="this.style.display='none'; document.getElementById('tag-koena-header').style.display='flex';" alt="Logo Koena" class="h-9 w-auto object-contain rounded">
+        <div id="tag-koena-header" class="hidden items-center bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
+          🌊 Koena
+        </div>
+      </div>
+
+      <div class="hidden sm:block">
         <h1 class="text-base md:text-lg font-black tracking-wide text-white leading-tight">PF RAMIRO ABBATTISTA</h1>
-        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Preparación Física & Rendimiento</span>
+        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Rendimiento • Fuerza • Koena</span>
       </div>
     </div>
     
@@ -97,11 +115,15 @@
   <!-- PANTALLA INICIO / ACCESO -->
   <main id="seccion-auth" class="max-w-md mx-auto mt-10 p-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl mx-4 md:mx-auto text-center space-y-6">
     <div class="flex flex-col items-center">
-      <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 shadow-inner mb-3">
-        <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-28 w-28 md:h-32 md:w-32 object-contain">
+      <div class="flex items-center justify-center gap-3 p-3 bg-slate-950 rounded-2xl border border-slate-800 shadow-inner mb-3">
+        <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-20 w-20 object-contain">
+        <img src="logo-koena.webp" onerror="this.style.display='none'; document.getElementById('tag-koena-auth').style.display='block';" alt="Logo Koena" class="h-16 w-auto object-contain">
+        <div id="tag-koena-auth" class="hidden bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-black px-2.5 py-1 rounded-lg uppercase tracking-wider">
+          🌊 Koena
+        </div>
       </div>
       <h2 class="text-2xl font-black text-white tracking-wide">PF Ramiro Abbattista</h2>
-      <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma de Alumnos</p>
+      <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Personalizados Online & Presenciales Koena</p>
     </div>
 
     <div class="space-y-4 text-left">
@@ -133,60 +155,86 @@
   <!-- PANTALLA PRINCIPAL -->
   <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- DASHBOARD DEL ALUMNO -->
-    <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 p-5 md:p-6 rounded-3xl border border-emerald-500/30 shadow-2xl space-y-4">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+    <!-- DASHBOARD DEL ALUMNO CON MEDALLAS BRONCE, PLATA, ORO Y DIAMANTE -->
+    <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 p-5 md:p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-5">
+      
+      <!-- IDENTIFICADOR DE MODALIDAD DEL ALUMNO (KOENA VS ONLINE) -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
         <div>
-          <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Panel de Rendimiento</span>
-          <h3 class="text-lg font-black text-white" id="dash-alumno-nombre">Bienvenido a tu Plan</h3>
+          <div class="flex items-center gap-2 mb-1">
+            <span id="badge-modalidad-alumno" class="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border">
+              Modalidad
+            </span>
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block">Panel del Atleta</span>
+          </div>
+          <h3 class="text-xl font-black text-white" id="dash-alumno-nombre">Bienvenido a tu Plan</h3>
         </div>
-        <div class="flex items-center gap-3">
-          <div class="bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
-            <span class="text-lg">🔥</span>
+
+        <div class="flex items-center gap-3 self-start sm:self-auto">
+          <!-- CONMUTADOR DE VISTA DE ENTORNO SI EL ALUMNO PARTICIPA EN AMBOS -->
+          <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1">
+            <button type="button" onclick="cambiarEntornoAlumno('KOENA')" id="btn-env-koena" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition">🌊 Koena</button>
+            <button type="button" onclick="cambiarEntornoAlumno('ONLINE')" id="btn-env-online" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition">🌐 Online</button>
+          </div>
+
+          <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
+            <span class="text-base">🔥</span>
             <div>
               <span class="text-[9px] text-slate-400 uppercase font-bold block">Racha</span>
-              <span id="stat-racha" class="text-xs font-black text-emerald-400">1 Sesión</span>
+              <span id="stat-racha" class="text-xs font-black text-emerald-400">1</span>
             </div>
           </div>
-          <div class="bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
-            <span class="text-lg">🏆</span>
+          <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
+            <span class="text-base">🏆</span>
             <div>
-              <span class="text-[9px] text-slate-400 uppercase font-bold block">Completadas</span>
+              <span class="text-[9px] text-slate-400 uppercase font-bold block">Sesiones</span>
               <span id="stat-totales" class="text-xs font-black text-white">0</span>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- MEDALLAS PROGRESIVAS: BRONCE, PLATA, ORO, DIAMANTE -->
       <div>
-        <span class="text-[11px] text-slate-400 uppercase font-bold tracking-wider block mb-2">Tus Insignias y Logros Koena:</span>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="contenedor-insignias">
-          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2">
-            <span class="text-2xl">🌱</span>
+        <div class="flex justify-between items-center mb-2.5">
+          <span class="text-[11px] text-slate-400 uppercase font-bold tracking-wider block">Nivel y Medallas de Rendimiento:</span>
+          <span id="lbl-rango-actual" class="text-xs font-black text-emerald-400">Rango Actual: Iniciado</span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <!-- BRONCE -->
+          <div id="medalla-bronce" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-amber-800/40 flex items-center gap-3 transition">
+            <span class="text-3xl">🥉</span>
             <div>
-              <h5 class="text-xs font-bold text-white leading-tight">Iniciación</h5>
-              <span class="text-[10px] text-emerald-400">Primer entreno</span>
+              <h5 class="text-xs font-black text-amber-500 leading-tight">Bronce</h5>
+              <span class="text-[10px] text-slate-400 font-medium">1ª Sesión lista</span>
             </div>
           </div>
-          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2">
-            <span class="text-2xl">⚡</span>
+
+          <!-- PLATA -->
+          <div id="medalla-plata" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-slate-400/40 flex items-center gap-3 transition">
+            <span class="text-3xl">🥈</span>
             <div>
-              <h5 class="text-xs font-bold text-slate-300 leading-tight">Disciplina</h5>
-              <span class="text-[10px] text-slate-500">5 completados</span>
+              <h5 class="text-xs font-black text-slate-300 leading-tight">Plata</h5>
+              <span class="text-[10px] text-slate-400 font-medium">5 Sesiones</span>
             </div>
           </div>
-          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2">
-            <span class="text-2xl">🥇</span>
+
+          <!-- ORO -->
+          <div id="medalla-oro" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-yellow-500/40 flex items-center gap-3 transition">
+            <span class="text-3xl">🥇</span>
             <div>
-              <h5 class="text-xs font-bold text-slate-300 leading-tight">Fuerza Élite</h5>
-              <span class="text-[10px] text-slate-500">10 completados</span>
+              <h5 class="text-xs font-black text-yellow-400 leading-tight">Oro</h5>
+              <span class="text-[10px] text-slate-400 font-medium">10 Sesiones</span>
             </div>
           </div>
-          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2">
-            <span class="text-2xl">🌊</span>
+
+          <!-- DIAMANTE -->
+          <div id="medalla-diamante" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-cyan-400/40 flex items-center gap-3 transition">
+            <span class="text-3xl">💎</span>
             <div>
-              <h5 class="text-xs font-bold text-slate-300 leading-tight">Surf Koena</h5>
-              <span class="text-[10px] text-slate-500">Potencia & Movilidad</span>
+              <h5 class="text-xs font-black text-cyan-300 leading-tight">Diamante</h5>
+              <span class="text-[10px] text-slate-400 font-medium">20 Sesiones Élite</span>
             </div>
           </div>
         </div>
@@ -199,25 +247,33 @@
       <!-- BOTONES DE NAVEGACIÓN COACH -->
       <div class="flex items-center justify-between bg-slate-900 p-3 rounded-2xl border border-slate-800">
         <div class="flex flex-wrap gap-2">
-          <button type="button" onclick="cambiarSolapaCoach('alumnos')" id="tab-c-alumnos" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition">👥 Alumnos & Cargas en Vivo</button>
+          <button type="button" onclick="cambiarSolapaCoach('alumnos')" id="tab-c-alumnos" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition">👥 Alumnos & Cargas</button>
           <button type="button" onclick="cambiarSolapaCoach('rms')" id="tab-c-rms" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📊 Planilla RMs Alumnos</button>
           <button type="button" onclick="cambiarSolapaCoach('plantillas')" id="tab-c-plantillas" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📑 Plantillas Inteligentes</button>
-          <button type="button" onclick="cambiarSolapaCoach('creador')" id="tab-c-creador" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">🛠️ Creador Mensual</button>
+          <button type="button" onclick="cambiarSolapaCoach('creador')" id="tab-c-creador" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">🛠️️ Creador Mensual</button>
         </div>
         <button type="button" onclick="cerrarModoAdmin()" class="text-xs bg-red-500/20 text-red-300 px-3 py-2 rounded-xl font-bold">Cerrar Coach</button>
       </div>
 
-      <!-- SECTOR 1: GESTOR DE ALUMNOS Y CONTROL DE CARGAS EN VIVO -->
+      <!-- SECTOR 1: GESTOR DE ALUMNOS CON SEGMENTACIÓN ONLINE VS KOENA -->
       <div id="vista-c-alumnos" class="bg-slate-900 p-5 md:p-7 rounded-3xl border border-blue-500/40 shadow-2xl space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
           <div>
-            <h3 class="text-lg font-black text-blue-400 flex items-center gap-2">👥 Supervisión y Manejo de Cargas en Vivo</h3>
-            <p class="text-xs text-slate-400">Verificá kilos levantados, bienestar diario (wellness) y ajustá cargas en tiempo real.</p>
+            <h3 class="text-lg font-black text-blue-400 flex items-center gap-2">👥 Supervisión y Segmentación de Alumnos</h3>
+            <p class="text-xs text-slate-400">Filtrá entre tus alumnos presenciales de Koena y tus personalizados Online.</p>
           </div>
-          <div class="flex items-center gap-2">
-            <select id="sel-filtro-alumnos" onchange="filtrarPlanesPorAlumno()" class="bg-slate-950 border border-slate-700 text-emerald-400 text-xs rounded-xl p-2.5 font-bold focus:outline-none focus:border-blue-400">
-              <option value="TODOS">👀 Ver Todos los Alumnos</option>
+          
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="sel-filtro-entorno" onchange="filtrarPlanesPorEntornoYAlumno()" class="bg-slate-950 border border-slate-700 text-cyan-400 text-xs rounded-xl p-2.5 font-bold focus:outline-none focus:border-cyan-400">
+              <option value="TODOS">🏢 Todos los Entornos</option>
+              <option value="KOENA">🌊 Solo Alumnos Koena</option>
+              <option value="ONLINE">🌐 Solo Personalizados Online</option>
             </select>
+
+            <select id="sel-filtro-alumnos" onchange="filtrarPlanesPorEntornoYAlumno()" class="bg-slate-950 border border-slate-700 text-emerald-400 text-xs rounded-xl p-2.5 font-bold focus:outline-none focus:border-blue-400">
+              <option value="TODOS">👤 Todos los Alumnos</option>
+            </select>
+
             <button type="button" onclick="cargarPlanesAdmin()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-xl font-bold">Refrescar</button>
           </div>
         </div>
@@ -232,7 +288,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
           <div>
             <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">📊 Monitoreo y Edición de RMs de Alumnos</h3>
-            <p class="text-xs text-slate-400">Seleccioná un alumno para consultar o editar sus RMs y porcentajes calculados.</p>
+            <p class="text-xs text-slate-400">Consultá o editá las marcas y porcentajes Epley de cada atleta.</p>
           </div>
           <select id="sel-filtro-rm-alumno" onchange="cargarRMsAdminParaAlumno(this.value)" class="bg-slate-950 border border-slate-700 text-emerald-400 text-xs rounded-xl p-2.5 font-bold focus:outline-none focus:border-emerald-500">
             <option value="">▼ Elegir Alumno...</option>
@@ -259,24 +315,37 @@
 
       <!-- SECTOR 3: CREADOR / EDITOR DE PLANIFICACIÓN MENSUAL -->
       <div id="vista-c-creador" class="hidden bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-6">
-        <div class="border-b border-slate-800 pb-3">
-          <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🛠️ Diseñador de Planificación Mensual</h3>
-          <p class="text-xs text-slate-400">Podés armar todos los bloques del día juntos (Recomendado) o enviarlos de forma independiente.</p>
+        <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
+          <div>
+            <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🛠️ Diseñador de Planificación Mensual</h3>
+            <p class="text-xs text-slate-400">Elegí la modalidad (Online o Koena) y armá el día con todos sus bloques.</p>
+          </div>
         </div>
 
         <div class="space-y-4 bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
-          <div>
-            <label class="text-xs font-bold text-emerald-400 uppercase tracking-wider block mb-1.5">
-              👤 Seleccionar Alumno Registrado (o escribir uno nuevo abajo):
-            </label>
-            <select id="sel-alumno-rapido" onchange="seleccionarAlumnoRapido(this.value)" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-3 text-xs md:text-sm font-semibold focus:outline-none focus:border-emerald-500">
-              <option value="">▼ Elegir de la lista de alumnos...</option>
-            </select>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs font-bold text-cyan-400 uppercase tracking-wider block mb-1">
+                🏢 Modalidad / Entorno de Entrenamiento:
+              </label>
+              <select id="admin-entorno" class="w-full bg-slate-900 border border-cyan-500/40 text-cyan-300 rounded-xl p-2.5 text-xs md:text-sm font-bold focus:outline-none focus:border-cyan-400">
+                <option value="KOENA">🌊 Presencial en Koena</option>
+                <option value="ONLINE">🌐 Personalizado Online</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs font-bold text-emerald-400 uppercase tracking-wider block mb-1">
+                👤 Alumno Registrado:
+              </label>
+              <select id="sel-alumno-rapido" onchange="seleccionarAlumnoRapido(this.value)" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 text-xs md:text-sm font-semibold focus:outline-none focus:border-emerald-500">
+                <option value="">▼ Elegir de la lista de alumnos...</option>
+              </select>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-slate-800/60">
             <div>
-              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Correo o Nombre Confirmado</label>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Correo o Nombre</label>
               <input type="text" id="admin-alumno" placeholder="ej: imanol@gmail.com" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
             </div>
             <div>
@@ -288,7 +357,7 @@
               <input type="text" id="admin-semana" placeholder="Semana 1 de 4" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
             </div>
             <div>
-              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Día de Rutina / Solapa</label>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Día / Solapa</label>
               <input type="text" id="admin-dia" placeholder="Lunes (o Día 1)" class="w-full bg-slate-900 border border-emerald-500/50 rounded-xl p-2.5 text-xs text-emerald-300 font-bold focus:outline-none focus:border-emerald-400">
             </div>
           </div>
@@ -329,10 +398,10 @@
                   <option value="mov_toracica">Movilidad - Columna Torácica</option>
                   <option value="mov_hombros">Movilidad - Hombro y Escápula</option>
                   <option value="propiocepcion_equilibrio">Propiocepción & Equilibrio Dinámico</option>
-                  <option value="recepciones_amortiguacion">Recepciones & Amortiguaciones (Drop/Surf)</option>
+                  <option value="recepciones_amortiguacion">Recepciones & Amortiguaciones</option>
                   <option value="coordinacion_agilidad">Coordinación General & Pies Rápidos</option>
                 </optgroup>
-                <optgroup label="Fuerza, Rendimiento & Surf">
+                <optgroup label="Fuerza, Rendimiento & Koena">
                   <option value="olimpicos_variantes">Levantamiento Olímpico (Variantes & Complejos)</option>
                   <option value="balisticos">Potencia & Pliometría</option>
                   <option value="tracciones_vertical_horizontal">Tracciones (Verticales & Horizontales)</option>
@@ -392,7 +461,7 @@
         <!-- TABLA REORDENABLE -->
         <div class="space-y-2">
           <div class="flex justify-between items-center">
-            <span class="text-xs uppercase font-extrabold text-slate-400 tracking-wider">Ejercicios de la Sesión (Podés mezclar varios bloques acá)</span>
+            <span class="text-xs uppercase font-extrabold text-slate-400 tracking-wider">Ejercicios de la Sesión</span>
             <span id="contador-ejercicios-sesion" class="text-xs font-bold text-emerald-400">0 ejercicios listos</span>
           </div>
           <div class="overflow-x-auto border border-slate-800 rounded-2xl overflow-hidden bg-slate-950">
@@ -421,10 +490,10 @@
         <!-- MODOS DE GUARDADO -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <button type="button" onclick="guardarPlanificacionCompleta(false, 'unir')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3.5 rounded-2xl transition shadow-xl shadow-emerald-500/20 active:scale-98 text-xs sm:text-sm uppercase tracking-wider">
-            🚀 Asignar Día Completo (Todos los bloques juntos)
+            🚀 Asignar Día Completo (Todos los bloques)
           </button>
           <button type="button" onclick="guardarPlanificacionCompleta(false, 'separado')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3.5 rounded-2xl transition active:scale-98 text-xs sm:text-sm uppercase tracking-wider">
-            📦 Asignar como Bloque Suelto / Separado
+            📦 Asignar como Bloque Suelto
           </button>
           <button type="button" onclick="guardarPlanificacionCompleta(true, 'plantilla')" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 font-bold py-3.5 rounded-2xl transition active:scale-98 text-xs sm:text-sm uppercase tracking-wider">
             💾 Guardar como Plantilla
@@ -454,17 +523,56 @@
         <p class="text-slate-500 text-sm">Cargando tus entrenamientos...</p>
       </div>
 
-      <!-- SECCIÓN 2: PLANILLA DE RMs Y PORCENTAJES DEL ALUMNO (EPLEY) -->
+      <!-- SECCIÓN 2: PLANILLA DE RMs CON SELECTOR DESPLEGABLE DE EJERCICIOS -->
       <div id="seccion-rms-alumno" class="hidden space-y-6">
-        <div class="bg-slate-900 p-5 md:p-6 rounded-3xl border border-emerald-500/40 shadow-xl space-y-4">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+        <div class="bg-slate-900 p-5 md:p-6 rounded-3xl border border-emerald-500/40 shadow-xl space-y-5">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
             <div>
               <h3 class="text-lg font-black text-emerald-400">📊 Planilla de Fuerza Máxima (1RM) & Porcentajes</h3>
-              <p class="text-xs text-slate-400">Cargá el peso que levantaste y cuántas repeticiones lograste. La planilla calcula tu 1RM estimado y la tabla completa de porcentajes.</p>
+              <p class="text-xs text-slate-400">Seleccioná un ejercicio de la lista desplegable, ingresá los kilos y las repeticiones para calcular tu 1RM estimado (Epley) y la tabla de porcentajes.</p>
             </div>
-            <button type="button" onclick="agregarFilaRMManual()" class="text-xs bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-3.5 py-2 rounded-xl transition self-start md:self-auto">
-              ＋ Agregar Ejercicio
-            </button>
+            
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 self-start md:self-auto">
+              <select id="sel-ejercicio-rm-desplegable" class="bg-slate-950 border border-emerald-500/40 text-emerald-300 text-xs rounded-xl p-2.5 font-bold focus:outline-none focus:border-emerald-500">
+                <option value="">▼ Elegir Ejercicio de la Lista...</option>
+                <optgroup label="Sentadillas & Tren Inferior">
+                  <option value="Sentadilla Trasera con Barra Olímpica">Sentadilla Trasera con Barra</option>
+                  <option value="Sentadilla Frontal (Front Squat)">Sentadilla Frontal (Front Squat)</option>
+                  <option value="Sentadilla Búlgara con Mancuernas">Sentadilla Búlgara</option>
+                  <option value="Prensa a 45 Grados">Prensa a 45 Grados</option>
+                </optgroup>
+                <optgroup label="Pesos Muertos & Cadera">
+                  <option value="Peso Muerto Convencional">Peso Muerto Convencional</option>
+                  <option value="Peso Muerto Rumano con Barra">Peso Muerto Rumano</option>
+                  <option value="Peso Muerto Sumo">Peso Muerto Sumo</option>
+                  <option value="Hip Thrust con Barra Olímpica">Hip Thrust con Barra</option>
+                  <option value="Trap Bar Deadlift">Peso Muerto con Barra Hexagonal</option>
+                </optgroup>
+                <optgroup label="Empujes & Tren Superior">
+                  <option value="Press de Banca Plano con Barra">Press de Banca Plano</option>
+                  <option value="Press Militar Estricto de pie">Press Militar Estricto</option>
+                  <option value="Press Inclinado con Mancuernas">Press Inclinado</option>
+                  <option value="Fondos en Paralelas (Dips)">Fondos en Paralelas (Dips)</option>
+                  <option value="Push Press">Push Press</option>
+                </optgroup>
+                <optgroup label="Tracciones">
+                  <option value="Dominadas Pronas (Pull-ups)">Dominadas Pronas (Pull-ups)</option>
+                  <option value="Remo Pendlay con Barra">Remo Pendlay desde el piso</option>
+                  <option value="Remo Seal con Mancuernas">Remo Seal en banco</option>
+                  <option value="Jalón al Pecho en Polea Alta">Jalón al Pecho en Polea</option>
+                </optgroup>
+                <optgroup label="Levantamiento Olímpico">
+                  <option value="Power Clean (Cargada de potencia)">Power Clean (Cargada de potencia)</option>
+                  <option value="Hang Clean (Cargada desde colgante)">Hang Clean</option>
+                  <option value="Snatch (Arrancada olímpica)">Snatch (Arrancada olímpica)</option>
+                  <option value="Power Snatch">Power Snatch</option>
+                  <option value="Split Jerk (Envión en tijera)">Split Jerk</option>
+                </optgroup>
+              </select>
+              <button type="button" onclick="agregarFilaRMDesdeDesplegable()" class="text-xs bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 py-2.5 rounded-xl transition shadow-md whitespace-nowrap">
+                ＋ Agregar a mi Tabla
+              </button>
+            </div>
           </div>
 
           <div id="lista-tabla-rms" class="space-y-4">
@@ -513,14 +621,14 @@
         "Apoyo Unilateral sobre Bosu o colchoneta con ojos cerrados",
         "Single Leg Romanian Deadlift con énfasis en estabilidad de arco plantar",
         "Lanzamientos de pelota medicinal contra pared en apoyo monopodal",
-        "Desplazamiento anteroposterior sobre tabla de surf simulada / rodillo"
+        "Desplazamiento anteroposterior sobre tabla simulada / rodillo"
       ],
       recepciones_amortiguacion: [
         "Drop Landing desde cajón (30-40cm) con frenado bilateral reactivo",
         "Caída unilateral desde escalón con amortiguación suave y rodilla alineada",
-        "Salto vertical con recepción en posición baja de surf (Take-off squat)",
+        "Salto vertical con recepción en posición baja Koena",
         "Aterrizaje en 1 pierna tras salto lateral reactivo (Skater Jump to Stick)",
-        "Recepción con rotación de cadera simulando giro en la ola"
+        "Recepción con rotación de cadera simulando giro"
       ],
       coordinacion_agilidad: [
         "Escalera de Coordinación: 2 pies adentro - 2 pies afuera (In & Out)",
@@ -637,9 +745,10 @@
     let todasLasPlantillasAdmin = [];
     let wakeLockSentinel = null;
     let rutinasActivasAlumno = [];
-    let listaEjerciciosRM = [];
+    let todasLasRutinasAlumno = [];
+    let entornoActivoAlumno = 'TODOS';
 
-    // FÓRMULA DE EPLEY PURA Y EXACTA: 1RM = PESO * (1 + REPS / 30)
+    // FÓRMULA DE EPLEY PURA
     function calcularEpley(peso, reps) {
       const p = parseFloat(peso);
       const r = parseInt(reps);
@@ -808,14 +917,13 @@
       const listaAlumnos = Array.from(alumnosSet).sort();
 
       const selFiltro = document.getElementById('sel-filtro-alumnos');
-      selFiltro.innerHTML = '<option value="TODOS">👀 Ver Todos los Alumnos</option>';
-      listaAlumnos.forEach(a => selFiltro.innerHTML += `<option value="${a}">👤 ${a}</option>`);
+      selFiltro.innerHTML = '<option value="TODOS">👤 Todos los Alumnos</option>';
+      listaAlumnos.forEach(a => selFiltro.innerHTML += `<option value="${a}">${a}</option>`);
 
       const selRapido = document.getElementById('sel-alumno-rapido');
       selRapido.innerHTML = '<option value="">▼ Elegir de la lista de alumnos...</option>';
       listaAlumnos.forEach(a => selRapido.innerHTML += `<option value="${a}">${a}</option>`);
 
-      // Selector de alumnos para el sector de RMs del Coach
       const selRmCoach = document.getElementById('sel-filtro-rm-alumno');
       selRmCoach.innerHTML = '<option value="">▼ Elegir Alumno...</option>';
       listaAlumnos.forEach(a => selRmCoach.innerHTML += `<option value="${a}">👤 ${a}</option>`);
@@ -828,19 +936,32 @@
       if (valor) document.getElementById('admin-alumno').value = valor;
     }
 
-    function filtrarPlanesPorAlumno() {
-      const seleccionado = document.getElementById('sel-filtro-alumnos').value;
-      if (seleccionado === 'TODOS') {
-        renderizarPlanesAdmin(todasLasPlanificacionesAdmin);
-      } else {
-        renderizarPlanesAdmin(todasLasPlanificacionesAdmin.filter(p => p.alumno_id === seleccionado));
+    function filtrarPlanesPorEntornoYAlumno() {
+      const entorno = document.getElementById('sel-filtro-entorno').value;
+      const alumno = document.getElementById('sel-filtro-alumnos').value;
+
+      let filtrados = todasLasPlanificacionesAdmin;
+
+      if (entorno !== 'TODOS') {
+        filtrados = filtrados.filter(p => {
+          const sem = (p.semana || '').toUpperCase();
+          if (entorno === 'KOENA') return sem.includes('KOENA') || sem.includes('PRESENCIAL');
+          if (entorno === 'ONLINE') return sem.includes('ONLINE') || !sem.includes('KOENA');
+          return true;
+        });
       }
+
+      if (alumno !== 'TODOS') {
+        filtrados = filtrados.filter(p => p.alumno_id === alumno);
+      }
+
+      renderizarPlanesAdmin(filtrados);
     }
 
     function renderizarPlanesAdmin(lista) {
       const cont = document.getElementById('contenedor-planes-admin');
       if (!lista || lista.length === 0) {
-        cont.innerHTML = '<p class="text-slate-500 text-xs col-span-2">No se encontraron planificaciones activas.</p>';
+        cont.innerHTML = '<p class="text-slate-500 text-xs col-span-2">No se encontraron planificaciones con esos filtros.</p>';
         return;
       }
 
@@ -849,11 +970,15 @@
         const fechaReal = localStorage.getItem(`fecha_ejecucion_${p.id}`) || '';
         const rpe = localStorage.getItem(`rpe_${p.id}`) || '-';
         const wellness = localStorage.getItem(`wellness_${p.id}`) || '';
+        const esKoena = (p.semana || '').toUpperCase().includes('KOENA');
 
         return `
-        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2 text-xs">
+        <div class="bg-slate-950 p-4 rounded-2xl border ${esKoena ? 'border-cyan-500/40' : 'border-slate-800'} space-y-2 text-xs">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] text-emerald-400 font-bold uppercase block">${p.alumno_id}</span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] text-emerald-400 font-bold uppercase block">${p.alumno_id}</span>
+              ${esKoena ? '<span class="bg-cyan-500/20 text-cyan-300 text-[9px] font-black px-1.5 py-0.5 rounded border border-cyan-500/30">🌊 KOENA</span>' : '<span class="bg-blue-500/20 text-blue-300 text-[9px] font-black px-1.5 py-0.5 rounded border border-blue-500/30">🌐 ONLINE</span>'}
+            </div>
             <span class="text-[10px] bg-slate-900 border border-slate-700 px-2 py-0.5 rounded text-slate-300">
               🗓️ ${diaReal} ${fechaReal ? `(${fechaReal})` : ''}
             </span>
@@ -1120,6 +1245,7 @@
       const mes = document.getElementById('admin-mes').value.trim();
       const semana = document.getElementById('admin-semana').value.trim();
       let dia = document.getElementById('admin-dia').value.trim() || 'Lunes';
+      const entorno = document.getElementById('admin-entorno').value;
 
       if (comoPlantilla) alumno = "PLANTILLA_MAESTRA";
 
@@ -1128,7 +1254,8 @@
         return;
       }
 
-      const encabezadoCiclo = mes ? `${mes} • ${semana || 'Semana 1'}` : (semana || 'Plan');
+      const prefijoEntorno = entorno === 'KOENA' ? '[Koena] ' : '[Online] ';
+      const encabezadoCiclo = `${prefijoEntorno}${mes ? `${mes} • ${semana || 'Semana 1'}` : (semana || 'Plan')}`;
       const resumenTexto = sesionActual.map(e => `[${e.bloque}] ${e.ejercicio} | ${e.series} x ${e.reps} (${e.rir}) - Carga: ${e.cargaCoach || 'Libre'} - Descanso: ${e.descanso}`).join('\n');
 
       if (modo === 'unir' && !comoPlantilla) {
@@ -1280,9 +1407,44 @@
       window.open(`https://wa.me/${WHATSAPP_COACH}?text=${textoMensaje}`, '_blank');
     }
 
+    // ACTUALIZACIÓN DE MEDALLAS BRONCE, PLATA, ORO Y DIAMANTE
     function actualizarGamificacionUI(totales, racha) {
       document.getElementById('stat-totales').innerText = totales;
       document.getElementById('stat-racha').innerText = `${racha} ${racha === 1 ? 'Sesión' : 'Sesiones'}`;
+
+      const mBronce = document.getElementById('medalla-bronce');
+      const mPlata = document.getElementById('medalla-plata');
+      const mOro = document.getElementById('medalla-oro');
+      const mDiamante = document.getElementById('medalla-diamante');
+      const lblRango = document.getElementById('lbl-rango-actual');
+
+      // Reset
+      [mBronce, mPlata, mOro, mDiamante].forEach(m => {
+        m.classList.remove('medalla-desbloqueada');
+        m.classList.add('medalla-bloqueada');
+      });
+
+      if (totales >= 20) {
+        mBronce.classList.add('medalla-desbloqueada');
+        mPlata.classList.add('medalla-desbloqueada');
+        mOro.classList.add('medalla-desbloqueada');
+        mDiamante.classList.add('medalla-desbloqueada');
+        lblRango.innerText = "Rango Actual: Diamante Élite 💎";
+      } else if (totales >= 10) {
+        mBronce.classList.add('medalla-desbloqueada');
+        mPlata.classList.add('medalla-desbloqueada');
+        mOro.classList.add('medalla-desbloqueada');
+        lblRango.innerText = "Rango Actual: Oro Pro 🥇";
+      } else if (totales >= 5) {
+        mBronce.classList.add('medalla-desbloqueada');
+        mPlata.classList.add('medalla-desbloqueada');
+        lblRango.innerText = "Rango Actual: Plata Constante 🥈";
+      } else if (totales >= 1) {
+        mBronce.classList.add('medalla-desbloqueada');
+        lblRango.innerText = "Rango Actual: Bronce Iniciado 🥉";
+      } else {
+        lblRango.innerText = "Rango Actual: Por comenzar";
+      }
     }
 
     function activarSolapaDia(rutinaId) {
@@ -1305,9 +1467,8 @@
       }
     }
 
-    // ====== PLANILLA DE RMs & PORCENTAJES (EPLEY) ======
+    // ====== PLANILLA DE RMs (EPLEY) ======
 
-    // Recalcular y actualizar tarjeta de RM
     function recalcularYGuardarRM(alumnoId, ejNombre, pesoInput, repsInput, notasInput) {
       const p = parseFloat(pesoInput.value) || 0;
       const r = parseInt(repsInput.value) || 1;
@@ -1316,14 +1477,12 @@
       const labelRM = document.getElementById(`rm-valor-${alumnoId}-${ejNombre}`);
       if (labelRM) labelRM.innerText = `${rm} kg`;
 
-      // Actualizar tabla de porcentajes
       const porcentajes = [95, 90, 85, 80, 75, 70, 65, 60];
       porcentajes.forEach(pct => {
         const cell = document.getElementById(`pct-${alumnoId}-${ejNombre}-${pct}`);
         if (cell) cell.innerText = `${Math.round(rm * (pct / 100) * 10) / 10} kg`;
       });
 
-      // Guardado local
       const dataObj = {
         peso: p,
         reps: r,
@@ -1332,7 +1491,6 @@
       };
       localStorage.setItem(`rm_data_${alumnoId}_${ejNombre}`, JSON.stringify(dataObj));
 
-      // Guardado en Supabase
       sb.from('registros_rm').upsert({
         alumno_id: alumnoId,
         ejercicio: ejNombre,
@@ -1343,7 +1501,6 @@
       }, { onConflict: 'alumno_id,ejercicio' }).then();
     }
 
-    // Extraer ejercicios de fuerza de la planificación activa para armar la lista de RMs
     function extraerEjerciciosFuerzaPlanificacion(planificaciones) {
       const setEjercicios = new Set();
       planificaciones.forEach(p => {
@@ -1354,7 +1511,6 @@
           }
         });
       });
-      // Si no hay ninguno específico, agregamos los pilares básicos
       if (setEjercicios.size === 0) {
         setEjercicios.add("Sentadilla Trasera con Barra Olímpica");
         setEjercicios.add("Press de Banca Plano con Barra");
@@ -1393,11 +1549,10 @@
             </div>
             <div>
               <label class="text-[11px] text-slate-400 font-semibold block mb-1">Anotaciones / Sensaciones:</label>
-              <input type="text" id="rm-n-${alumnoId}-${ejNombre}" value="${guardado.notas}" placeholder="ej: Buen control de barra" ${!editable ? 'disabled' : ''} onchange="recalcularYGuardarRM('${alumnoId}', '${ejNombre}', document.getElementById('rm-p-${alumnoId}-${ejNombre}'), document.getElementById('rm-r-${alumnoId}-${ejNombre}'), this)" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <input type="text" id="rm-n-${alumnoId}-${ejNombre}" value="${guardado.notas}" placeholder="ej: Buen control" ${!editable ? 'disabled' : ''} onchange="recalcularYGuardarRM('${alumnoId}', '${ejNombre}', document.getElementById('rm-p-${alumnoId}-${ejNombre}'), document.getElementById('rm-r-${alumnoId}-${ejNombre}'), this)" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
             </div>
           </div>
 
-          <!-- TABLA DE PORCENTAJES DE CARGA -->
           <div class="space-y-1.5">
             <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tabla de Porcentajes de Carga:</span>
             <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 text-center">
@@ -1419,7 +1574,6 @@
     async function cargarPlanillaRMsAlumno(email) {
       const cont = document.getElementById('lista-tabla-rms');
       
-      // Consultar RMs guardados en Supabase para sincronizar
       const { data: rmsNube } = await sb.from('registros_rm').select('*').eq('alumno_id', email);
       if (rmsNube && rmsNube.length > 0) {
         rmsNube.forEach(r => {
@@ -1436,15 +1590,18 @@
       cont.innerHTML = ejercicios.map(ej => renderizarTarjetaRM(email, ej, true)).join('');
     }
 
-    function agregarFilaRMManual() {
-      const nombre = prompt("Nombre del ejercicio para calcular su 1RM:");
-      if (!nombre || !nombre.trim()) return;
-      const cont = document.getElementById('lista-tabla-rms');
+    function agregarFilaRMDesdeDesplegable() {
+      const sel = document.getElementById('sel-ejercicio-rm-desplegable');
+      const ejNombre = sel.value;
+      if (!ejNombre) return alert("Seleccioná un ejercicio de la lista desplegable.");
+
       const email = usuarioActual ? usuarioActual.email : 'alumno';
-      cont.insertAdjacentHTML('afterbegin', renderizarTarjetaRM(email, nombre.trim(), true));
+      const cont = document.getElementById('lista-tabla-rms');
+      
+      cont.insertAdjacentHTML('afterbegin', renderizarTarjetaRM(email, ejNombre, true));
+      sel.value = "";
     }
 
-    // MONITOREO Y EDICIÓN DE RMs DESDE EL MODO COACH
     async function cargarRMsAdminParaAlumno(alumnoEmail) {
       const cont = document.getElementById('contenedor-rms-admin');
       if (!alumnoEmail) {
@@ -1483,33 +1640,48 @@
       cont.insertAdjacentHTML('beforeend', renderizarTarjetaRM(alumnoEmail, nombre.trim(), true));
     }
 
-    async function cargarRutinas(userEmail, userId) {
+    // CAMBIO DE ENTORNO EN VISTA ALUMNO (KOENA VS ONLINE)
+    function cambiarEntornoAlumno(entorno) {
+      entornoActivoAlumno = entorno;
+      const btnK = document.getElementById('btn-env-koena');
+      const btnO = document.getElementById('btn-env-online');
+
+      if (entorno === 'KOENA') {
+        btnK.className = "px-2.5 py-1 rounded-lg text-[11px] font-black bg-cyan-500 text-slate-950 transition";
+        btnO.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-400 hover:text-white transition";
+      } else {
+        btnO.className = "px-2.5 py-1 rounded-lg text-[11px] font-black bg-blue-500 text-white transition";
+        btnK.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-400 hover:text-white transition";
+      }
+
+      aplicarFiltroEntornoRutinas();
+    }
+
+    function aplicarFiltroEntornoRutinas() {
+      let filtradas = todasLasRutinasAlumno;
+      if (entornoActivoAlumno !== 'TODOS') {
+        filtradas = todasLasRutinasAlumno.filter(r => {
+          const sem = (r.semana || '').toUpperCase();
+          if (entornoActivoAlumno === 'KOENA') return sem.includes('KOENA') || sem.includes('PRESENCIAL');
+          if (entornoActivoAlumno === 'ONLINE') return sem.includes('ONLINE') || !sem.includes('KOENA');
+          return true;
+        });
+      }
+
       const contActual = document.getElementById('lista-rutinas');
       const contHistorial = document.getElementById('lista-historial');
       const contTabsDias = document.getElementById('contenedor-tabs-dias');
       const barraSolapas = document.getElementById('barra-solapas-dias');
 
-      const tot = parseInt(localStorage.getItem(`stats_total_${userEmail}`) || "1");
-      const rac = parseInt(localStorage.getItem(`stats_racha_${userEmail}`) || "1");
-      actualizarGamificacionUI(tot, rac);
-      document.getElementById('dash-alumno-nombre').innerText = `Plan de ${userEmail.split('@')[0]}`;
-
-      const { data, error } = await sb
-        .from('planificaciones')
-        .select('*')
-        .or(`alumno_id.eq.${userEmail},alumno_id.eq.${userId}`)
-        .order('created_at', { ascending: false });
-
-      if (error || !data || data.length === 0) {
-        contActual.innerHTML = '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-400">Todavía no tenés planificaciones cargadas para tu cuenta. Tu entrenador te la asignará a la brevedad.</div>';
-        contHistorial.innerHTML = '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-500">Sin rutinas en el historial.</div>';
+      if (filtradas.length === 0) {
+        contActual.innerHTML = '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-400">No hay planificaciones en esta sede o modalidad.</div>';
         contTabsDias.classList.add('hidden');
         return;
       }
 
-      const ultimaSemana = data[0].semana;
-      rutinasActivasAlumno = data.filter(d => d.semana === ultimaSemana);
-      const rutinasViejas = data.filter(d => d.semana !== ultimaSemana);
+      const ultimaSemana = filtradas[0].semana;
+      rutinasActivasAlumno = filtradas.filter(d => d.semana === ultimaSemana);
+      const rutinasViejas = filtradas.filter(d => d.semana !== ultimaSemana);
 
       if (rutinasActivasAlumno.length > 1) {
         contTabsDias.classList.remove('hidden');
@@ -1523,10 +1695,46 @@
       }
 
       contActual.innerHTML = renderizarListaTarjetas(rutinasActivasAlumno, false);
-      contHistorial.innerHTML = rutinasViejas.length > 0 ? renderizarListaTarjetas(rutinasViejas, true) : '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-500">Todavía no tenés rutinas archivadas.</div>';
+      contHistorial.innerHTML = rutinasViejas.length > 0 ? renderizarListaTarjetas(rutinasViejas, true) : '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-500">Sin rutinas archivadas en este entorno.</div>';
 
       if (rutinasActivasAlumno.length > 0) {
         activarSolapaDia(rutinasActivasAlumno[0].id);
+      }
+    }
+
+    async function cargarRutinas(userEmail, userId) {
+      const tot = parseInt(localStorage.getItem(`stats_total_${userEmail}`) || "0");
+      const rac = parseInt(localStorage.getItem(`stats_racha_${userEmail}`) || "0");
+      actualizarGamificacionUI(tot, rac);
+      document.getElementById('dash-alumno-nombre').innerText = `Plan de ${userEmail.split('@')[0]}`;
+
+      const { data, error } = await sb
+        .from('planificaciones')
+        .select('*')
+        .or(`alumno_id.eq.${userEmail},alumno_id.eq.${userId}`)
+        .order('created_at', { ascending: false });
+
+      if (error || !data || data.length === 0) {
+        document.getElementById('lista-rutinas').innerHTML = '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-400">Todavía no tenés planificaciones cargadas para tu cuenta. Tu entrenador te la asignará a la brevedad.</div>';
+        document.getElementById('lista-historial').innerHTML = '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-500">Sin rutinas en el historial.</div>';
+        document.getElementById('contenedor-tabs-dias').classList.add('hidden');
+        return;
+      }
+
+      todasLasRutinasAlumno = data;
+
+      // Detectar entorno por defecto según la última planificación
+      const esKoena = (data[0].semana || '').toUpperCase().includes('KOENA');
+      const badge = document.getElementById('badge-modalidad-alumno');
+
+      if (esKoena) {
+        badge.innerText = "🌊 Sede Presencial Koena";
+        badge.className = "text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border bg-cyan-500/15 text-cyan-300 border-cyan-500/30";
+        cambiarEntornoAlumno('KOENA');
+      } else {
+        badge.innerText = "🌐 Personalizado Online";
+        badge.className = "text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border bg-blue-500/15 text-blue-300 border-blue-500/30";
+        cambiarEntornoAlumno('ONLINE');
       }
     }
 
@@ -1545,13 +1753,19 @@
         const videoGuardado = localStorage.getItem(`video_alumno_${r.id}`) || "";
         const diaRealGuardado = localStorage.getItem(`dia_ejecucion_${r.id}`) || "Lunes";
         const fechaRealGuardada = localStorage.getItem(`fecha_ejecucion_${r.id}`) || new Date().toISOString().split('T')[0];
+        const esKoena = (r.semana || '').toUpperCase().includes('KOENA');
 
         return `
-          <div id="tarjeta-rutina-${r.id}" class="${!esHistorial && rIdx > 0 ? 'hidden' : ''} bg-slate-900 border ${esHistorial ? 'border-slate-800/80 opacity-90' : 'border-slate-800'} p-5 md:p-6 rounded-3xl shadow-xl space-y-6 print-clean">
+          <div id="tarjeta-rutina-${r.id}" class="${!esHistorial && rIdx > 0 ? 'hidden' : ''} bg-slate-900 border ${esKoena ? 'border-cyan-500/30' : (esHistorial ? 'border-slate-800/80 opacity-90' : 'border-slate-800')} p-5 md:p-6 rounded-3xl shadow-xl space-y-6 print-clean">
             
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
               <div>
-                <span class="text-xs uppercase font-extrabold tracking-wider bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">${r.semana || 'Planificación'}</span>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-xs uppercase font-extrabold tracking-wider ${esKoena ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'} px-3 py-1 rounded-full border">
+                    ${r.semana || 'Planificación'}
+                  </span>
+                  ${esKoena ? '<span class="text-[10px] font-black text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">🌊 Koena</span>' : '<span class="text-[10px] font-black text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">🌐 Online</span>'}
+                </div>
                 <h4 class="text-2xl font-black text-white mt-1.5">${r.dia || 'Entrenamiento'}</h4>
               </div>
 
@@ -1574,6 +1788,7 @@
               </div>
             </div>
 
+            <!-- CHECK-IN BIENESTAR -->
             <div class="bg-slate-950/90 border border-blue-500/30 p-4 rounded-2xl space-y-2 no-print">
               <span class="text-[11px] font-bold text-blue-400 uppercase tracking-wider block">🩺 Check-in Diario de Bienestar (Previo al entreno)</span>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
@@ -1582,7 +1797,7 @@
                   <select id="check-sueno-${r.id}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white font-bold">
                     <option value="5">😴 5/5 - Excelente descanso</option>
                     <option value="4" selected>😊 4/5 - Buen sueño</option>
-                    <option value="3">😐 3/5 - Regular / Algo cortado</option>
+                    <option value="3">😐 3/5 - Regular / Cortado</option>
                     <option value="2">🥱 2/5 - Mal descanso</option>
                     <option value="1">😫 1/5 - Insomnio / Pésimo</option>
                   </select>
@@ -1604,12 +1819,13 @@
                     <option value="2">🟡 2/5 - Leve tensión</option>
                     <option value="3">🟠 3/5 - Agujetas normales</option>
                     <option value="4">🔴 4/5 - Dolor muscular alto</option>
-                    <option value="5">🚨 5/5 - Dolor agudo / Molestia</option>
+                    <option value="5">🚨 5/5 - Dolor agudo</option>
                   </select>
                 </div>
               </div>
             </div>
 
+            <!-- SECCIONES DE BLOQUES -->
             <div class="space-y-6">
               ${Object.keys(bloques).map((nombreBloque, bIdx) => {
                 const bloqueId = `bloque_c_${r.id}_${bIdx}`;
