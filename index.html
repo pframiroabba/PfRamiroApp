@@ -6,21 +6,56 @@
   <title>PF Ramiro - Planificaciones Koena</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <!-- Soporte para arrastrar y soltar (Drag and Drop) -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <style>
+    .serie-done {
+      background-color: rgba(16, 185, 129, 0.15) !important;
+      border-color: rgba(16, 185, 129, 0.5) !important;
+    }
+    .sortable-ghost {
+      opacity: 0.3;
+      background-color: #064e3b !important;
+    }
+    .cursor-grab {
+      cursor: grab;
+      touch-action: none;
+    }
+    .cursor-grab:active {
+      cursor: grabbing;
+    }
+  </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-20">
 
-  <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
-    <h1 class="text-xl font-bold tracking-wide text-emerald-400">⚡ PF Ramiro</h1>
+  <!-- CRONÓMETRO FLOTANTE -->
+  <div id="timer-box" class="hidden fixed bottom-4 right-4 bg-slate-800 border-2 border-emerald-500 shadow-2xl rounded-2xl p-4 z-50 flex items-center gap-4">
+    <div>
+      <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Pausa de descanso</span>
+      <span id="timer-display" class="text-3xl font-black text-emerald-400 font-mono">01:30</span>
+    </div>
+    <div class="flex gap-1.5">
+      <button onclick="pausarReanudarTimer()" id="btn-timer-toggle" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold">Pausa</button>
+      <button onclick="cerrarTimer()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-2.5 py-1.5 rounded-lg text-xs font-bold">✕</button>
+    </div>
+  </div>
+
+  <!-- BARRA DE NAVEGACIÓN -->
+  <header class="bg-slate-800 border-b border-slate-700 px-4 md:px-6 py-4 flex justify-between items-center sticky top-0 z-40">
+    <div class="flex items-center gap-2">
+      <span class="text-xl">⚡</span>
+      <h1 class="text-lg md:text-xl font-bold tracking-wide text-emerald-400">PF Ramiro</h1>
+    </div>
     <div id="usuario-info" class="hidden items-center gap-3">
-      <span id="user-email" class="text-sm text-slate-300"></span>
-      <button onclick="cerrarSesion()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-3 py-1.5 rounded-lg text-sm font-medium transition">Salir</button>
+      <span id="user-email" class="text-xs md:text-sm text-slate-300 font-medium truncate max-w-[150px] md:max-w-none"></span>
+      <button onclick="cerrarSesion()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Salir</button>
     </div>
   </header>
 
-  <!-- PANTALLA LOGIN -->
-  <main id="seccion-auth" class="max-w-md mx-auto mt-16 p-6 bg-slate-800 rounded-2xl border border-slate-700 shadow-xl">
-    <h2 class="text-2xl font-bold text-center mb-2">Ingresar a tus Entrenamientos</h2>
-    <p class="text-sm text-slate-400 text-center mb-6">Ingresá tu correo y contraseña</p>
+  <!-- PANTALLA INICIO DE SESIÓN -->
+  <main id="seccion-auth" class="max-w-md mx-auto mt-14 p-6 bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl mx-4 md:mx-auto">
+    <h2 class="text-2xl font-bold text-center mb-1">Entrenamientos Online</h2>
+    <p class="text-sm text-slate-400 text-center mb-6">Ingresá a tu planificación personalizada</p>
     
     <div class="space-y-4">
       <div>
@@ -31,132 +66,169 @@
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Contraseña</label>
         <input type="password" id="password" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="••••••••">
       </div>
-      <button type="button" id="btn-login" onclick="iniciarSesion()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-lg transition active:scale-95">Iniciar Sesión</button>
+      <button type="button" id="btn-login" onclick="iniciarSesion()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-lg transition active:scale-95 shadow-lg shadow-emerald-500/10">Iniciar Sesión</button>
       <button type="button" id="btn-registro" onclick="registrarse()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-2.5 rounded-lg transition text-sm active:scale-95">Crear cuenta nueva</button>
     </div>
     <p id="auth-mensaje" class="text-center text-sm mt-4 text-emerald-400 font-semibold"></p>
   </main>
 
-  <!-- PANEL ALUMNO / ENTRENADOR -->
+  <!-- PANTALLA PRINCIPAL -->
   <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
-    <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-      <h2 class="text-2xl font-bold text-white mb-1">¡Bienvenido! 👋</h2>
-      <p class="text-slate-400 text-sm">Panel de entrenamientos y rutinas personalizadas.</p>
-    </div>
 
-    <!-- PANEL ENTRENADOR -->
-    <div id="seccion-admin" class="hidden bg-slate-800 p-6 rounded-2xl border border-emerald-500/40 space-y-6">
+    <!-- PANEL DEL ENTRENADOR -->
+    <div id="seccion-admin" class="hidden bg-slate-800 p-5 md:p-6 rounded-2xl border border-emerald-500/40 shadow-xl space-y-6">
       <div class="flex justify-between items-center border-b border-slate-700 pb-3">
-        <h3 class="text-lg font-bold text-emerald-400">📋 Armar Planificación (Estilo Excel / App)</h3>
-        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded">Modo Coach</span>
+        <div>
+          <h3 class="text-lg font-bold text-emerald-400 flex items-center gap-2">🛠️ Diseñador de Planificación</h3>
+          <p class="text-xs text-slate-400">Armá la sesión por bloques, agregá ejercicios y arrastralos para ordenar.</p>
+        </div>
+        <span class="text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">Coach</span>
       </div>
 
-      <!-- DATOS GENERALES -->
+      <!-- DATOS DE ASIGNACIÓN -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
           <label class="text-xs text-slate-400 font-semibold">Correo o Nombre del Alumno</label>
-          <input type="text" id="admin-alumno" placeholder="ej: imanol@gmail.com" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm mt-1">
+          <input type="text" id="admin-alumno" placeholder="ej: imanol@gmail.com" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1 text-white">
         </div>
         <div>
-          <label class="text-xs text-slate-400 font-semibold">Semana / Ciclo</label>
-          <input type="text" id="admin-semana" placeholder="Semana 1 - Fuerza" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm mt-1">
+          <label class="text-xs text-slate-400 font-semibold">Semana / Microciclo</label>
+          <input type="text" id="admin-semana" placeholder="Semana 1 - Fuerza y Potencia" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1 text-white">
         </div>
         <div>
-          <label class="text-xs text-slate-400 font-semibold">Día / Foco</label>
-          <input type="text" id="admin-dia" placeholder="Día 1 - Tren Inferior" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm mt-1">
+          <label class="text-xs text-slate-400 font-semibold">Día / Enfoque</label>
+          <input type="text" id="admin-dia" placeholder="Día 1 - Tren Inferior + Oly" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1 text-white">
         </div>
       </div>
 
-      <!-- AGREGADOR DE EJERCICIOS -->
+      <!-- SELECTOR Y CONFIGURADOR DE BLOQUES -->
       <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 space-y-4">
         <div class="flex justify-between items-center">
-          <h4 class="text-sm font-bold text-slate-300">Seleccionar Ejercicio</h4>
+          <span class="text-xs uppercase font-bold text-emerald-400 tracking-wider">1. Configurar Bloque y Ejercicio</span>
           <div class="flex gap-2">
-            <button onclick="crearNuevoEjercicio()" class="text-xs bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded text-emerald-300">+ Crear Ejercicio</button>
-            <button onclick="eliminarEjercicioSeleccionado()" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-300 px-2.5 py-1 rounded">Eliminar de Biblioteca</button>
+            <button onclick="crearNuevoEjercicio()" class="text-xs bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded text-emerald-300 font-medium">+ Crear Ejercicio</button>
+            <button onclick="eliminarEjercicioSeleccionado()" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-300 px-2.5 py-1 rounded font-medium">Eliminar Ejercicio</button>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-2">
-          <!-- CATEGORÍA -->
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-2.5">
           <div class="md:col-span-2">
-            <select id="sel-categoria" onchange="cargarEjerciciosPorCategoria()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-200">
-              <option value="olimpicos">Levantamiento Olímpico y Derivados</option>
-              <option value="balisticos">Potencia y Balísticos</option>
-              <option value="inferior_rodilla">Tren Inferior - Dom. Rodilla</option>
-              <option value="inferior_cadera">Tren Inferior - Dom. Cadera</option>
-              <option value="superior_empuje">Tren Superior - Empujes</option>
-              <option value="superior_traccion">Tren Superior - Tracciones</option>
-              <option value="core">Zona Media & Funcional Koena</option>
-              <option value="personalizados">Mis Ejercicios Creados</option>
+            <label class="text-[11px] text-slate-400 font-medium">Bloque de Entrenamiento</label>
+            <select id="inp-bloque" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-emerald-300 font-semibold mt-1">
+              <option value="Movilidad Articular">Movilidad Articular</option>
+              <option value="Entrada en Calor / Warm-up">Entrada en Calor / Warm-up</option>
+              <option value="Bloque A - Olímpico / Potencia">Bloque A - Olímpico / Potencia</option>
+              <option value="Bloque B - Fuerza Principal">Bloque B - Fuerza Principal</option>
+              <option value="Bloque C - Accesorios">Bloque C - Accesorios</option>
+              <option value="Bloque D - Core / Zona Media">Bloque D - Core / Zona Media</option>
+              <option value="Acondicionamiento / Finisher">Acondicionamiento / Finisher</option>
             </select>
           </div>
 
-          <!-- LISTA EJERCICIO -->
-          <div class="md:col-span-4">
-            <select id="sel-ejercicio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-200"></select>
+          <div class="md:col-span-2">
+            <label class="text-[11px] text-slate-400 font-medium">Categoría / Patrón</label>
+            <select id="sel-categoria" onchange="cargarEjerciciosPorCategoria()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 mt-1">
+              <optgroup label="Movilidad Articular">
+                <option value="mov_tobillo">Movilidad - Tobillo</option>
+                <option value="mov_cadera">Movilidad - Cadera y Pelvis</option>
+                <option value="mov_toracica">Movilidad - Columna Torácica</option>
+                <option value="mov_hombros">Movilidad - Hombro y Escápula</option>
+                <option value="mov_muneca">Movilidad - Muñeca</option>
+              </optgroup>
+              <optgroup label="Fuerza y Rendimiento">
+                <option value="olimpicos">Levantamiento Olímpico y Derivados</option>
+                <option value="balisticos">Potencia y Balísticos</option>
+                <option value="inferior_rodilla">Tren Inferior - Dom. Rodilla</option>
+                <option value="inferior_cadera">Tren Inferior - Dom. Cadera</option>
+                <option value="superior_empuje">Tren Superior - Empujes</option>
+                <option value="superior_traccion">Tren Superior - Tracciones</option>
+                <option value="core">Zona Media & Funcional Koena</option>
+                <option value="personalizados">Mis Ejercicios Creados</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="text-[11px] text-slate-400 font-medium">Ejercicio Específico</label>
+            <select id="sel-ejercicio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 mt-1"></select>
           </div>
         </div>
 
-        <!-- SERIES, REPS, RIR, PAUSA -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
-          <div>
-            <label class="text-[11px] text-slate-400">Bloque (Ej: A1, B1)</label>
-            <input type="text" id="inp-bloque" value="A1" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm">
-          </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
           <div>
             <label class="text-[11px] text-slate-400">Series</label>
-            <input type="number" id="inp-series" value="3" min="1" max="20" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm">
+            <input type="number" id="inp-series" value="3" min="1" max="20" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white">
           </div>
           <div>
             <label class="text-[11px] text-slate-400">Repeticiones (1 a 100)</label>
-            <select id="inp-reps" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm"></select>
+            <select id="inp-reps" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white"></select>
           </div>
           <div>
-            <label class="text-[11px] text-slate-400">RIR (1 a 10)</label>
-            <select id="inp-rir" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm"></select>
+            <label class="text-[11px] text-slate-400">RIR (1 a 10) / Esfuerzo</label>
+            <select id="inp-rir" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white"></select>
           </div>
-          <div class="col-span-2 md:col-span-1">
-            <label class="text-[11px] text-slate-400">Descanso (seg)</label>
-            <input type="text" id="inp-descanso" placeholder="90s" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm">
+          <div>
+            <label class="text-[11px] text-slate-400">Descanso (segundos)</label>
+            <select id="inp-descanso" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white">
+              <option value="30s">30 seg</option>
+              <option value="45s">45 seg</option>
+              <option value="60s">60 seg (1 min)</option>
+              <option value="90s" selected>90 seg (1.5 min)</option>
+              <option value="120s">120 seg (2 min)</option>
+              <option value="180s">180 seg (3 min)</option>
+              <option value="240s">240 seg (4 min)</option>
+              <option value="Libre">Libre / Sin pausa</option>
+            </select>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-          <input type="text" id="inp-video" placeholder="Link de Video YouTube (opcional)" class="md:col-span-3 bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm">
-          <button onclick="agregarFilaRutina()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-2 rounded-lg text-sm transition">＋ Agregar a Sesión</button>
+          <input type="text" id="inp-video" placeholder="Link de Video YouTube (opcional)" class="md:col-span-3 bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white">
+          <button onclick="agregarFilaRutina()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-2.5 rounded-lg text-sm transition active:scale-95">＋ Agregar Ejercicio</button>
         </div>
       </div>
 
-      <!-- TABLA PREVIA DE LA RUTINA -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs border border-slate-700 rounded-lg overflow-hidden">
-          <thead class="bg-slate-900 text-slate-400 uppercase">
-            <tr>
-              <th class="p-2.5">Bloque</th>
-              <th class="p-2.5">Ejercicio</th>
-              <th class="p-2.5">Series</th>
-              <th class="p-2.5">Reps</th>
-              <th class="p-2.5">RIR</th>
-              <th class="p-2.5">Pausa</th>
-              <th class="p-2.5">Video</th>
-              <th class="p-2.5 text-center">Acción</th>
-            </tr>
-          </thead>
-          <tbody id="tabla-ejercicios-body" class="divide-y divide-slate-800 bg-slate-800/40">
-            <tr id="fila-vacia"><td colspan="8" class="p-4 text-center text-slate-500">No hay ejercicios agregados a esta sesión.</td></tr>
-          </tbody>
-        </table>
+      <!-- TABLA PREVIA REORDENABLE CON DRAG & DROP -->
+      <div class="space-y-2">
+        <div class="flex justify-between items-center">
+          <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">2. Resumen de Sesión (Arrastrá ☰ para reordenar)</span>
+          <span class="text-[11px] text-emerald-400">☰ Arrastrar filas</span>
+        </div>
+        <div class="overflow-x-auto border border-slate-700 rounded-xl overflow-hidden">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900 text-slate-400 uppercase font-bold">
+              <tr>
+                <th class="p-2.5 w-8 text-center">↕</th>
+                <th class="p-2.5">Bloque</th>
+                <th class="p-2.5">Ejercicio</th>
+                <th class="p-2.5">Series</th>
+                <th class="p-2.5">Reps</th>
+                <th class="p-2.5">RIR</th>
+                <th class="p-2.5">Descanso</th>
+                <th class="p-2.5">Video</th>
+                <th class="p-2.5 text-center">Quitar</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-ejercicios-body" class="divide-y divide-slate-800 bg-slate-800/40">
+              <tr id="fila-vacia"><td colspan="9" class="p-4 text-center text-slate-500">Todavía no agregaste ejercicios a la sesión.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <button onclick="guardarPlanificacionCompleta()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl transition">Guardar Planificación para el Alumno</button>
+      <button onclick="guardarPlanificacionCompleta()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3.5 rounded-xl transition shadow-lg shadow-emerald-500/10 active:scale-98 text-sm uppercase tracking-wide">
+        🚀 Asignar y Publicar Planificación
+      </button>
     </div>
 
-    <!-- LISTADO PLANIFICACIONES DEL ALUMNO -->
+    <!-- VISTA ALUMNO -->
     <div>
-      <h3 class="text-xl font-bold mb-4 flex items-center gap-2">📋 Tu Plan de Entrenamiento</h3>
-      <div id="lista-rutinas" class="space-y-4">
-        <p class="text-slate-500">Cargando tus entrenamientos...</p>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold flex items-center gap-2">📋 Tu Rutina de Entrenamiento</h3>
+        <button onclick="refrescarRutinas()" class="text-xs bg-slate-800 border border-slate-700 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-slate-300 font-medium">Actualizar</button>
+      </div>
+      <div id="lista-rutinas" class="space-y-6">
+        <p class="text-slate-500 text-sm">Cargando tus entrenamientos...</p>
       </div>
     </div>
   </main>
@@ -167,22 +239,163 @@
 
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // BIBLIOTECA DE EJERCICIOS KOENA
     const BIBLIOTECA_DEFAULT = {
-      olimpicos: ["Power Clean", "Hang Clean", "Snatch (Arrancada)", "Power Snatch", "Split Jerk", "Push Jerk", "Clean Pull", "Snatch Pull"],
-      balisticos: ["Saltos en Cajón (Box Jump)", "Trap Bar Jump", "Lanzamiento Balón Medicinal al Pecho", "Slam Ball", "Kettlebell Swing Ruso", "Saltos Pliométricos Unilaterales"],
-      inferior_rodilla: ["Sentadilla Trasera Barra", "Sentadilla Frontal", "Sentadilla Búlgara c/ Mancuernas", "Prensa 45°", "Estocadas Caminando", "Goblet Squat c/ Kettlebell", "Sillón de Cuádriceps"],
-      inferior_cadera: ["Peso Muerto Convencional", "Peso Muerto Rumano Barra/Mancuernas", "Hip Thrust c/ Barra", "Peso Muerto Sumo", "Curl Femoral Tumbado/Sentado", "Buenos Días c/ Barra"],
-      superior_empuje: ["Press de Banca Plano Barra", "Press Inclinado c/ Mancuernas", "Press Militar Barra", "Push Press", "Fondos en Paralelas", "Press de Hombro c/ Mancuernas", "Aperturas en Polea"],
-      superior_traccion: ["Dominadas Pronas / Supinas", "Remo con Barra Pendlay", "Remo Unilateral c/ Mancuerna", "Jalón al Pecho en Polea", "Remo en Polea Baja (Gironda)", "Face Pull en Polea", "Remo en TRX"],
-      core: ["Rueda Abdominal", "Press Pallof en Polea/Banda", "Paseo del Granjero (Farmer Walk)", "Plancha Prona con Carga", "Hollow Hold", "Deadbug", "Copenhagen Plank (Aductores)"],
+      mov_tobillo: [
+        "Dorsiflexión contra pared con rodilla adelantada",
+        "Movilidad de tobillo con banda elástica en tracción anterior",
+        "Círculos articulares lentos en apoyo monopodal",
+        "Descensos excéntricos de gemelos en escalón / cajón"
+      ],
+      mov_cadera: [
+        "90/90 Rotación interna y externa de cadera",
+        "Psoas Stretch dinámico con alcance torácico",
+        "World's Greatest Stretch (El mejor estiramiento del mundo)",
+        "Frog Pose (Postura de la rana para aductores)",
+        "Deslizamiento lateral Cossack Squat dinámico",
+        "Círculos controlados de cadera en cuadrupedia (CARs)"
+      ],
+      mov_toracica: [
+        "Rotaciones torácicas en cuadrupedia con mano en nuca",
+        "Gato - Camello (Cat-Cow) controlado respiratorio",
+        "Thread the Needle (Pasar la aguja) torácico",
+        "Extensión torácica sobre Foam Roller con brazos en cruz",
+        "Rotación torácica con brazo en pared (Open Book)"
+      ],
+      mov_hombros: [
+        "Dislocaciones de hombro con pica / banda elástica",
+        "CARs articulares de hombro completos",
+        "Y-T-W en banco inclinado o suelo para escápulas",
+        "Wall Slides (Deslizamientos de brazos contra pared)",
+        "Rotación externa con codo pegado y banda elástica",
+        "Sleeper Stretch dinámico y suave"
+      ],
+      mov_muneca: [
+        "Extensiones y flexiones en cuadrupedia palmas apoyadas",
+        "Círculos de muñecas con puño cerrado",
+        "Apoyo invertido de manos con descarga progresiva de peso",
+        "Tracción suave en flexores con codo extendido"
+      ],
+      olimpicos: [
+        "Power Clean (Cargada de potencia)",
+        "Hang Clean (Cargada desde colgante)",
+        "Snatch (Arrancada olímpica completa)",
+        "Power Snatch (Arrancada de potencia)",
+        "Split Jerk (Envión en tijera)",
+        "Push Jerk",
+        "Clean Pull (Tirón de cargada)",
+        "Snatch Pull (Tirón de arrancada)"
+      ],
+      balisticos: [
+        "Saltos al Cajón (Box Jump) con recepción suave",
+        "Trap Bar Jump (Saltos con barra hexagonal lastrada)",
+        "Lanzamiento de Balón Medicinal contra el piso (Slam Ball)",
+        "Lanzamiento de Balón Medicinal al pecho contra pared",
+        "Kettlebell Swing estilo Ruso",
+        "Saltos Pliométricos Unilaterales en vallas bajas"
+      ],
+      inferior_rodilla: [
+        "Sentadilla Trasera con Barra Olímpica",
+        "Sentadilla Frontal (Front Squat)",
+        "Sentadilla Búlgara con Mancuernas",
+        "Prensa a 45 Grados",
+        "Estocadas Caminando con Mancuernas",
+        "Goblet Squat con Kettlebell pesado",
+        "Sillón de Cuádriceps (Extensión de rodilla)"
+      ],
+      inferior_cadera: [
+        "Peso Muerto Convencional",
+        "Peso Muerto Rumano con Barra o Mancuernas",
+        "Hip Thrust con Barra Olímpica y almohadilla",
+        "Peso Muerto Sumo",
+        "Curl Femoral Tumbado o Sentado",
+        "Buenos Días con Barra en la espalda"
+      ],
+      superior_empuje: [
+        "Press de Banca Plano con Barra",
+        "Press Inclinado con Mancuernas",
+        "Press Militar Estricto de pie con Barra",
+        "Push Press con impulso de piernas",
+        "Fondos en Paralelas (Dips) con o sin lastre",
+        "Press de Hombros Sentado con Mancuernas",
+        "Aperturas o Cruces en Poleas"
+      ],
+      superior_traccion: [
+        "Dominadas Pronas (Pull-ups) estrictas",
+        "Dominadas Supinas (Chin-ups)",
+        "Remo Pendlay con Barra desde el piso",
+        "Remo Unilateral con Mancuerna apoyado en banco",
+        "Jalón al Pecho en Polea Alta",
+        "Remo Gironda (Polea baja al abdomen)",
+        "Face Pull con cuerda en polea para deltoides posterior",
+        "Remo en suspensión TRX"
+      ],
+      core: [
+        "Rueda Abdominal (Ab Wheel Rollout)",
+        "Press Pallof anti-rotación en polea o banda",
+        "Paseo del Granjero (Farmer's Walk pesado)",
+        "Plancha Prona con disco en la espalda",
+        "Copenhagen Plank (Plancha para aductores)",
+        "Hollow Body Hold",
+        "Deadbug con fitball o banda"
+      ],
       personalizados: []
     };
 
-    let biblioteca = JSON.parse(localStorage.getItem('biblioteca_ejercicios')) || BIBLIOTECA_DEFAULT;
+    let biblioteca = JSON.parse(localStorage.getItem('pf_biblioteca_v2')) || BIBLIOTECA_DEFAULT;
     let sesionActual = [];
+    let usuarioActual = null;
+    let sortableInstance = null;
 
-    // Llenar Reps (100 a 1) y RIR (10 a 1)
+    // TEMPORIZADOR
+    let timerInterval = null;
+    let tiempoRestante = 90;
+    let timerEnPausa = false;
+
+    function iniciarTimerDescanso(segundos) {
+      if (timerInterval) clearInterval(timerInterval);
+      tiempoRestante = segundos;
+      timerEnPausa = false;
+
+      document.getElementById('timer-box').classList.remove('hidden');
+      document.getElementById('btn-timer-toggle').innerText = "Pausa";
+      actualizarDisplayTimer();
+
+      timerInterval = setInterval(() => {
+        if (!timerEnPausa) {
+          tiempoRestante--;
+          actualizarDisplayTimer();
+          if (tiempoRestante <= 0) {
+            clearInterval(timerInterval);
+            navigator.vibrate?.([200, 100, 200]);
+            document.getElementById('timer-display').innerText = "¡TIEMPO!";
+          }
+        }
+      }, 1000);
+    }
+
+    function actualizarDisplayTimer() {
+      const min = Math.floor(tiempoRestante / 60);
+      const seg = tiempoRestante % 60;
+      document.getElementById('timer-display').innerText = 
+        `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
+    }
+
+    function pausarReanudarTimer() {
+      timerEnPausa = !timerEnPausa;
+      document.getElementById('btn-timer-toggle').innerText = timerEnPausa ? "Reanudar" : "Pausa";
+    }
+
+    function cerrarTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      document.getElementById('timer-box').classList.add('hidden');
+    }
+
+    function parseSegundos(texto) {
+      if (!texto) return 90;
+      const num = parseInt(texto.replace(/\D/g, ''));
+      return isNaN(num) ? 90 : num;
+    }
+
     function inicializarSelectores() {
       const selReps = document.getElementById('inp-reps');
       selReps.innerHTML = '';
@@ -196,13 +409,12 @@
       for (let r = 10; r >= 1; r--) {
         selRir.innerHTML += `<option value="RIR ${r}">RIR ${r}</option>`;
       }
+      selRir.innerHTML += `<option value="RPE 10 / Al Fallo">Al Fallo (RIR 0)</option>`;
+      selRir.innerHTML += `<option value="Movilidad">Movilidad / Fluido</option>`;
       selRir.value = "RIR 2";
 
       cargarEjerciciosPorCategoria();
-    }
-
-    function guardarBibliotecaLocal() {
-      localStorage.setItem('biblioteca_ejercicios', JSON.stringify(biblioteca));
+      inicializarDragAndDrop();
     }
 
     function cargarEjerciciosPorCategoria() {
@@ -222,12 +434,12 @@
     }
 
     function crearNuevoEjercicio() {
-      const nombre = prompt("Ingresa el nombre del nuevo ejercicio:");
+      const nombre = prompt("Nombre del nuevo ejercicio:");
       if (!nombre || !nombre.trim()) return;
       const cat = document.getElementById('sel-categoria').value;
       if (!biblioteca[cat]) biblioteca[cat] = [];
       biblioteca[cat].push(nombre.trim());
-      guardarBibliotecaLocal();
+      localStorage.setItem('pf_biblioteca_v2', JSON.stringify(biblioteca));
       cargarEjerciciosPorCategoria();
       document.getElementById('sel-ejercicio').value = nombre.trim();
     }
@@ -239,7 +451,7 @@
 
       if (confirm(`¿Eliminar "${ej}" de la biblioteca?`)) {
         biblioteca[cat] = biblioteca[cat].filter(item => item !== ej);
-        guardarBibliotecaLocal();
+        localStorage.setItem('pf_biblioteca_v2', JSON.stringify(biblioteca));
         cargarEjerciciosPorCategoria();
       }
     }
@@ -249,12 +461,12 @@
       if (!ejercicio) return alert("Selecciona un ejercicio válido.");
 
       const item = {
-        bloque: document.getElementById('inp-bloque').value || 'A1',
+        bloque: document.getElementById('inp-bloque').value,
         ejercicio: ejercicio,
-        series: document.getElementById('inp-series').value || '3',
+        series: parseInt(document.getElementById('inp-series').value) || 3,
         reps: document.getElementById('inp-reps').value,
         rir: document.getElementById('inp-rir').value,
-        descanso: document.getElementById('inp-descanso').value || '90s',
+        descanso: document.getElementById('inp-descanso').value,
         video: document.getElementById('inp-video').value.trim()
       };
 
@@ -268,23 +480,41 @@
       renderTablaSesion();
     }
 
+    // INICIALIZADOR DRAG & DROP
+    function inicializarDragAndDrop() {
+      const el = document.getElementById('tabla-ejercicios-body');
+      if (sortableInstance) sortableInstance.destroy();
+
+      sortableInstance = new Sortable(el, {
+        handle: '.handle-drag',
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: function (evt) {
+          const itemMovido = sesionActual.splice(evt.oldIndex, 1)[0];
+          sesionActual.splice(evt.newIndex, 0, itemMovido);
+          renderTablaSesion();
+        }
+      });
+    }
+
     function renderTablaSesion() {
       const tbody = document.getElementById('tabla-ejercicios-body');
       if (sesionActual.length === 0) {
-        tbody.innerHTML = '<tr id="fila-vacia"><td colspan="8" class="p-4 text-center text-slate-500">No hay ejercicios agregados a esta sesión.</td></tr>';
+        tbody.innerHTML = '<tr id="fila-vacia"><td colspan="9" class="p-4 text-center text-slate-500">Todavía no agregaste ejercicios a la sesión.</td></tr>';
         return;
       }
 
       tbody.innerHTML = sesionActual.map((f, i) => `
-        <tr class="hover:bg-slate-800">
-          <td class="p-2.5 font-bold text-emerald-400">${f.bloque}</td>
-          <td class="p-2.5 text-white">${f.ejercicio}</td>
-          <td class="p-2.5">${f.series}</td>
-          <td class="p-2.5">${f.reps}</td>
-          <td class="p-2.5">${f.rir}</td>
-          <td class="p-2.5">${f.descanso}</td>
-          <td class="p-2.5">${f.video ? `<a href="${f.video}" target="_blank" class="text-emerald-400 underline">Link</a>` : '-'}</td>
-          <td class="p-2.5 text-center"><button onclick="eliminarFila(${i})" class="text-red-400 hover:text-red-300">✕</button></td>
+        <tr class="hover:bg-slate-800 transition select-none">
+          <td class="p-2.5 text-center text-slate-400 font-bold handle-drag cursor-grab">☰</td>
+          <td class="p-2.5 font-bold text-emerald-400 text-xs">${f.bloque}</td>
+          <td class="p-2.5 text-white font-medium">${f.ejercicio}</td>
+          <td class="p-2.5 text-slate-300">${f.series}</td>
+          <td class="p-2.5 text-slate-300">${f.reps}</td>
+          <td class="p-2.5 text-emerald-300 font-semibold">${f.rir}</td>
+          <td class="p-2.5 text-slate-300">${f.descanso}</td>
+          <td class="p-2.5">${f.video ? `<a href="${f.video}" target="_blank" class="text-emerald-400 hover:underline">Ver</a>` : '-'}</td>
+          <td class="p-2.5 text-center"><button onclick="eliminarFila(${i})" class="text-red-400 hover:text-red-300 font-bold px-2 py-1">✕</button></td>
         </tr>
       `).join('');
     }
@@ -295,12 +525,11 @@
       const dia = document.getElementById('admin-dia').value.trim();
 
       if (!alumno || sesionActual.length === 0) {
-        alert("Completa el alumno/correo y agrega al menos un ejercicio.");
+        alert("Completá el correo/nombre del alumno y agregá al menos un ejercicio.");
         return;
       }
 
-      // Resumen textual para compatibilidad y JSON completo
-      const resumenTexto = sesionActual.map(e => `${e.bloque}: ${e.ejercicio} | ${e.series}x${e.reps} (${e.rir}) - Pausa: ${e.descanso}`).join('\n');
+      const resumenTexto = sesionActual.map(e => `[${e.bloque}] ${e.ejercicio} | ${e.series} x ${e.reps} (${e.rir}) - Descanso: ${e.descanso}`).join('\n');
 
       const { error } = await sb.from('planificaciones').insert([{
         alumno_id: alumno,
@@ -313,18 +542,128 @@
       if (error) {
         alert("Error al guardar: " + error.message);
       } else {
-        alert("¡Planificación guardada con éxito!");
+        alert("¡Planificación asignada con éxito al alumno!");
         sesionActual = [];
         renderTablaSesion();
-        location.reload();
+        refrescarRutinas();
       }
     }
 
-    // AUTH & NAVEGACIÓN
+    // REGISTRO DE CARGAS DEL ALUMNO
+    function guardarCargaAlumno(rutinaId, ejIndex, serieIndex, valor) {
+      const key = `carga_${rutinaId}_${ejIndex}_${serieIndex}`;
+      localStorage.setItem(key, valor);
+    }
+
+    function toggleSerieCompletada(btn, rutinaId, ejIndex, serieIndex) {
+      btn.classList.toggle('serie-done');
+      const key = `done_${rutinaId}_${ejIndex}_${serieIndex}`;
+      const estadoActual = localStorage.getItem(key) === 'true';
+      localStorage.setItem(key, (!estadoActual).toString());
+    }
+
+    async function cargarRutinas(userEmail, userId) {
+      const contenedor = document.getElementById('lista-rutinas');
+      
+      const { data, error } = await sb
+        .from('planificaciones')
+        .select('*')
+        .or(`alumno_id.eq.${userEmail},alumno_id.eq.${userId}`)
+        .order('created_at', { ascending: false });
+
+      if (error || !data || data.length === 0) {
+        contenedor.innerHTML = '<div class="p-8 bg-slate-800 rounded-2xl border border-slate-700 text-center text-slate-400">Todavía no tenés planificaciones cargadas para tu cuenta. Tu entrenador te la asignará a la brevedad.</div>';
+        return;
+      }
+
+      contenedor.innerHTML = data.map(r => {
+        const detalles = r.ejercicios_detalle || [];
+        const bloques = {};
+        detalles.forEach((ej, idx) => {
+          const bloqueNombre = ej.bloque || "Bloque General";
+          if (!bloques[bloqueNombre]) bloques[bloqueNombre] = [];
+          bloques[bloqueNombre].push({ ...ej, originalIndex: idx });
+        });
+
+        return `
+          <div class="bg-slate-800 border border-slate-700 p-5 md:p-6 rounded-2xl shadow-xl space-y-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-700/80 pb-3">
+              <div>
+                <span class="text-xs uppercase font-extrabold tracking-wider bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">${r.semana || 'Planificación'}</span>
+                <h4 class="text-xl font-black text-white mt-1.5">${r.dia || 'Entrenamiento'}</h4>
+              </div>
+              <span class="text-xs text-slate-400 font-medium">${new Date(r.created_at).toLocaleDateString()}</span>
+            </div>
+
+            <div class="space-y-6">
+              ${Object.keys(bloques).map(nombreBloque => `
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60 space-y-3">
+                  <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
+                    <h5 class="text-sm font-bold uppercase tracking-wide text-emerald-300">${nombreBloque}</h5>
+                  </div>
+
+                  <div class="space-y-3">
+                    ${bloques[nombreBloque].map(item => {
+                      const cantSeries = parseInt(item.series) || 1;
+                      const segs = parseSegundos(item.descanso);
+                      return `
+                        <div class="bg-slate-800/90 border border-slate-700/80 p-3.5 rounded-xl space-y-3">
+                          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                            <div>
+                              <h6 class="font-bold text-white text-base">${item.ejercicio}</h6>
+                              <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300 mt-1">
+                                <span class="bg-slate-700/80 px-2 py-0.5 rounded font-medium">${item.series} series x ${item.reps}</span>
+                                <span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">${item.rir}</span>
+                                <button onclick="iniciarTimerDescanso(${segs})" class="bg-slate-700 hover:bg-slate-600 px-2 py-0.5 rounded text-slate-200 font-medium flex items-center gap-1 active:scale-95 transition">
+                                  ⏱️ Pausa: ${item.descanso}
+                                </button>
+                              </div>
+                            </div>
+                            ${item.video ? `<a href="${item.video}" target="_blank" class="text-xs bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 self-start md:self-auto transition">▶ Video Demostración</a>` : ''}
+                          </div>
+
+                          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-slate-700/50">
+                            ${Array.from({ length: cantSeries }).map((_, sIdx) => {
+                              const doneKey = `done_${r.id}_${item.originalIndex}_${sIdx}`;
+                              const isDone = localStorage.getItem(doneKey) === 'true';
+                              const cargaKey = `carga_${r.id}_${item.originalIndex}_${sIdx}`;
+                              const cargaGuardada = localStorage.getItem(cargaKey) || '';
+
+                              return `
+                                <div class="flex items-center gap-2 bg-slate-900/80 p-2 rounded-lg border border-slate-700 ${isDone ? 'serie-done' : ''}">
+                                  <button onclick="toggleSerieCompletada(this.parentElement, '${r.id}', ${item.originalIndex},${sIdx})" class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 flex items-center justify-center text-xs font-black transition">
+                                    ✓
+                                  </button>
+                                  <span class="text-[11px] text-slate-400 font-bold">S${sIdx + 1}:</span>
+                                  <input type="text" placeholder="Kg / RPE" value="${cargaGuardada}" onchange="guardarCargaAlumno('${r.id}', ${item.originalIndex},${sIdx}, this.value)" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-400">
+                                </div>
+                              `;
+                            }).join('')}
+                          </div>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function refrescarRutinas() {
+      if (usuarioActual) cargarRutinas(usuarioActual.email, usuarioActual.id);
+    }
+
+    // AUTH
     sb.auth.onAuthStateChange((event, session) => {
       if (session) {
+        usuarioActual = session.user;
         mostrarPanel(session.user);
       } else {
+        usuarioActual = null;
         mostrarLogin();
       }
     });
@@ -338,7 +677,7 @@
     async function iniciarSesion() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      if (!email || !password) return mostrarMensaje("Ingresa correo y contraseña", true);
+      if (!email || !password) return mostrarMensaje("Ingresá correo y contraseña", true);
 
       mostrarMensaje("Conectando...");
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
@@ -348,12 +687,12 @@
     async function registrarse() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      if (!email || !password) return mostrarMensaje("Ingresa correo y contraseña", true);
+      if (!email || !password) return mostrarMensaje("Ingresá correo y contraseña", true);
 
       mostrarMensaje("Creando cuenta...");
       const { data, error } = await sb.auth.signUp({ email, password });
       if (error) mostrarMensaje("Error: " + error.message, true);
-      else mostrarMensaje("Cuenta creada. Ya podés ingresar.");
+      else mostrarMensaje("Cuenta creada. Ya podés iniciar sesión.");
     }
 
     async function cerrarSesion() {
@@ -374,70 +713,12 @@
       document.getElementById('usuario-info').classList.add('flex');
       document.getElementById('user-email').innerText = user.email;
 
-      // Habilitar modo coach
       if (user.email === 'axiss.training@gmail.com' || user.email === 'axiss.trainig@gmail.com') {
         document.getElementById('seccion-admin').classList.remove('hidden');
       }
 
       inicializarSelectores();
       cargarRutinas(user.email, user.id);
-    }
-
-    async function cargarRutinas(userEmail, userId) {
-      const contenedor = document.getElementById('lista-rutinas');
-      
-      // Busca rutinas asignadas por correo o por ID
-      const { data, error } = await sb
-        .from('planificaciones')
-        .select('*')
-        .or(`alumno_id.eq.${userEmail},alumno_id.eq.${userId}`)
-        .order('created_at', { ascending: false });
-
-      if (error || !data || data.length === 0) {
-        contenedor.innerHTML = '<div class="p-6 bg-slate-800 rounded-xl text-slate-400">No hay planificaciones activas asignadas a tu cuenta.</div>';
-        return;
-      }
-
-      contenedor.innerHTML = data.map(r => `
-        <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl space-y-4">
-          <div class="flex justify-between items-center">
-            <span class="text-xs uppercase tracking-wide bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded font-bold">${r.semana || 'Plan'}</span>
-            <span class="text-xs text-slate-400">${new Date(r.created_at).toLocaleDateString()}</span>
-          </div>
-          <h4 class="text-lg font-bold text-white">${r.dia || 'Entrenamiento'}</h4>
-          
-          ${r.ejercicios_detalle && r.ejercicios_detalle.length > 0 ? `
-            <div class="overflow-x-auto">
-              <table class="w-full text-xs text-left border border-slate-700 rounded-lg overflow-hidden">
-                <thead class="bg-slate-900 text-slate-400 uppercase">
-                  <tr>
-                    <th class="p-2">Bloque</th>
-                    <th class="p-2">Ejercicio</th>
-                    <th class="p-2">Series</th>
-                    <th class="p-2">Reps</th>
-                    <th class="p-2">RIR</th>
-                    <th class="p-2">Pausa</th>
-                    <th class="p-2">Video</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-700/60 bg-slate-900/40">
-                  ${r.ejercicios_detalle.map(d => `
-                    <tr>
-                      <td class="p-2 font-bold text-emerald-400">${d.bloque}</td>
-                      <td class="p-2 text-slate-200">${d.ejercicio}</td>
-                      <td class="p-2">${d.series}</td>
-                      <td class="p-2">${d.reps}</td>
-                      <td class="p-2 text-emerald-300 font-semibold">${d.rir}</td>
-                      <td class="p-2">${d.descanso}</td>
-                      <td class="p-2">${d.video ? `<a href="${d.video}" target="_blank" class="text-emerald-400 underline">▶ Ver</a>` : '-'}</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          ` : `<p class="text-slate-300 whitespace-pre-line text-sm">${r.ejercicios || ''}</p>`}
-        </div>
-      `).join('');
     }
   </script>
 </body>
