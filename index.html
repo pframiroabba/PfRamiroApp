@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <style>
     .serie-done {
-      background-color: rgba(16, 185, 129, 0.18) !important;
+      background-color: rgba(16, 185, 129, 0.2) !important;
       border-color: rgba(16, 185, 129, 0.6) !important;
     }
     .sortable-ghost {
@@ -19,9 +19,6 @@
     .cursor-grab {
       cursor: grab;
       touch-action: none;
-    }
-    .cursor-grab:active {
-      cursor: grabbing;
     }
   </style>
 </head>
@@ -34,8 +31,8 @@
       <span id="timer-display" class="text-3xl font-black text-emerald-400 font-mono">01:30</span>
     </div>
     <div class="flex gap-1.5">
-      <button onclick="pausarReanudarTimer()" id="btn-timer-toggle" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white">Pausa</button>
-      <button onclick="cerrarTimer()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-2.5 py-1.5 rounded-lg text-xs font-bold">✕</button>
+      <button type="button" id="btn-timer-toggle" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white">Pausa</button>
+      <button type="button" onclick="cerrarTimer()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-2.5 py-1.5 rounded-lg text-xs font-bold">✕</button>
     </div>
   </div>
 
@@ -50,16 +47,15 @@
     </div>
     
     <div class="flex items-center gap-2">
-      <!-- BOTÓN DIRECTO QUE NO SOBRECARGA LA MEMORIA -->
       <a href="https://calculadorarmramiropf.netlify.app" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 text-xs px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5">
-        🏋️ Calculadora 1RM
+        🏋️ 1RM
       </a>
-      <button onclick="solicitarClaveAdmin()" id="btn-admin-access" class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-lg font-bold transition">
-        🔒 Modo Coach
+      <button type="button" id="btn-admin-access" class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-lg font-bold transition">
+        🔒 Coach
       </button>
       <div id="usuario-info" class="hidden items-center gap-2">
         <span id="user-email" class="text-xs text-slate-400 hidden md:inline font-mono"></span>
-        <button onclick="cerrarSesion()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Salir</button>
+        <button type="button" onclick="cerrarSesion()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Salir</button>
       </div>
     </div>
   </header>
@@ -83,16 +79,16 @@
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Contraseña</label>
         <input type="password" id="password" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="••••••••">
       </div>
-      <button type="button" id="btn-login" onclick="iniciarSesion()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3 rounded-xl transition active:scale-95 shadow-lg shadow-emerald-500/20 text-sm uppercase tracking-wider">
+      <button type="button" id="btn-login" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3 rounded-xl transition active:scale-95 shadow-lg shadow-emerald-500/20 text-sm uppercase tracking-wider">
         Ingresar a mi Plan
       </button>
-      <button type="button" id="btn-registro" onclick="registrarse()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl transition text-xs active:scale-95">
+      <button type="button" id="btn-registro" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl transition text-xs active:scale-95">
         Crear cuenta nueva de alumno
       </button>
     </div>
 
     <div class="pt-2 border-t border-slate-800">
-      <button onclick="solicitarClaveAdmin()" class="text-xs text-slate-400 hover:text-emerald-400 font-medium transition">
+      <button type="button" id="btn-link-coach" class="text-xs text-slate-400 hover:text-emerald-400 font-medium transition">
         ¿Sos Ramiro? Accedé con tu clave de entrenador
       </button>
     </div>
@@ -112,7 +108,7 @@
         </div>
         <div class="flex items-center gap-2">
           <span class="text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">Coach</span>
-          <button onclick="cerrarModoAdmin()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg">Cerrar</button>
+          <button type="button" onclick="cerrarModoAdmin()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg">Cerrar</button>
         </div>
       </div>
 
@@ -137,8 +133,8 @@
         <div class="flex justify-between items-center">
           <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">1. Configurar Bloque y Ejercicio</span>
           <div class="flex gap-2">
-            <button onclick="crearNuevoEjercicio()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg text-emerald-300 font-bold">+ Crear Ejercicio</button>
-            <button onclick="eliminarEjercicioSeleccionado()" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-300 px-3 py-1 rounded-lg font-bold">Eliminar</button>
+            <button type="button" onclick="crearNuevoEjercicio()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg text-emerald-300 font-bold">+ Crear Ejercicio</button>
+            <button type="button" onclick="eliminarEjercicioSeleccionado()" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-300 px-3 py-1 rounded-lg font-bold">Eliminar</button>
           </div>
         </div>
 
@@ -215,7 +211,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
           <input type="text" id="inp-video" placeholder="Link de Video YouTube (opcional)" class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
-          <button onclick="agregarFilaRutina()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black p-2.5 rounded-xl text-sm transition active:scale-95">＋ Agregar Ejercicio</button>
+          <button type="button" onclick="agregarFilaRutina()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black p-2.5 rounded-xl text-sm transition active:scale-95">＋ Agregar Ejercicio</button>
         </div>
       </div>
 
@@ -245,10 +241,10 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <button onclick="guardarPlanificacionCompleta(false)" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3.5 rounded-2xl transition shadow-xl shadow-emerald-500/20 active:scale-98 text-sm uppercase tracking-wider">
+        <button type="button" onclick="guardarPlanificacionCompleta(false)" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3.5 rounded-2xl transition shadow-xl shadow-emerald-500/20 active:scale-98 text-sm uppercase tracking-wider">
           🚀 Asignar al Alumno
         </button>
-        <button onclick="guardarPlanificacionCompleta(true)" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 font-bold py-3.5 rounded-2xl transition active:scale-98 text-sm uppercase tracking-wider">
+        <button type="button" onclick="guardarPlanificacionCompleta(true)" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 font-bold py-3.5 rounded-2xl transition active:scale-98 text-sm uppercase tracking-wider">
           💾 Guardar como Plantilla Maestra
         </button>
       </div>
@@ -258,7 +254,7 @@
     <div>
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-black text-white flex items-center gap-2">📋 Tu Rutina de Entrenamiento</h3>
-        <button onclick="refrescarRutinas()" class="text-xs bg-slate-900 border border-slate-800 hover:bg-slate-800 px-3 py-1.5 rounded-lg text-slate-300 font-bold transition">Actualizar</button>
+        <button type="button" onclick="refrescarRutinas()" class="text-xs bg-slate-900 border border-slate-800 hover:bg-slate-800 px-3 py-1.5 rounded-lg text-slate-300 font-bold transition">Actualizar</button>
       </div>
       <div id="lista-rutinas" class="space-y-6">
         <p class="text-slate-500 text-sm">Cargando tus entrenamientos...</p>
@@ -277,74 +273,74 @@
 
     const BIBLIOTECA_DEFAULT = {
       mov_tobillo: [
-        "Dorsiflexión contra pared con rodilla adelantada",
-        "Movilidad de tobillo con banda elástica en tracción anterior",
-        "Círculos articulares lentos en apoyo monopodal",
-        "Descensos excéntricos de gemelos en escalón / cajón"
+        "Dorsiflexion contra pared con rodilla adelantada",
+        "Movilidad de tobillo con banda elastica en traccion anterior",
+        "Circulos articulares lentos en apoyo monopodal",
+        "Descensos excentricos de gemelos en escalon / cajon"
       ],
       mov_cadera: [
-        "90/90 Rotación interna y externa de cadera",
-        "Psoas Stretch dinámico con alcance torácico",
-        "World's Greatest Stretch (El mejor estiramiento del mundo)",
+        "90/90 Rotacion interna y externa de cadera",
+        "Psoas Stretch dinamico con alcance toracico",
+        "Worlds Greatest Stretch (Movilidad Integral)",
         "Frog Pose (Postura de la rana para aductores)",
-        "Deslizamiento lateral Cossack Squat dinámico",
-        "Círculos controlados de cadera en cuadrupedia (CARs)"
+        "Deslizamiento lateral Cossack Squat dinamico",
+        "Circulos controlados de cadera en cuadrupedia (CARs)"
       ],
       mov_toracica: [
-        "Rotaciones torácicas en cuadrupedia con mano en nuca",
+        "Rotaciones toracicas en cuadrupedia con mano en nuca",
         "Gato - Camello (Cat-Cow) controlado respiratorio",
-        "Thread the Needle (Pasar la aguja) torácico",
-        "Extensión torácica sobre Foam Roller con brazos en cruz",
-        "Rotación torácica con brazo en pared (Open Book)"
+        "Thread the Needle (Pasar la aguja) toracico",
+        "Extension toracica sobre Foam Roller con brazos en cruz",
+        "Rotacion toracica con brazo en pared (Open Book)"
       ],
       mov_hombros: [
-        "Dislocaciones de hombro con pica / banda elástica",
+        "Dislocaciones de hombro con pica / banda elastica",
         "CARs articulares de hombro completos",
-        "Y-T-W en banco inclinado o suelo para escápulas",
+        "Y-T-W en banco inclinado o suelo para escapulas",
         "Wall Slides (Deslizamientos de brazos contra pared)",
-        "Rotación externa con codo pegado y banda elástica",
-        "Sleeper Stretch dinámico y suave"
+        "Rotacion externa con codo pegado y banda elastica",
+        "Sleeper Stretch dinamico y suave"
       ],
       mov_muneca: [
         "Extensiones y flexiones en cuadrupedia palmas apoyadas",
-        "Círculos de muñecas con puño cerrado",
+        "Circulos de muñecas con puño cerrado",
         "Apoyo invertido de manos con descarga progresiva de peso",
-        "Tracción suave en flexores con codo extendido"
+        "Traccion suave en flexores con codo extendido"
       ],
       olimpicos: [
         "Power Clean (Cargada de potencia)",
         "Hang Clean (Cargada desde colgante)",
-        "Snatch (Arrancada olímpica completa)",
+        "Snatch (Arrancada olimpica completa)",
         "Power Snatch (Arrancada de potencia)",
-        "Split Jerk (Envión en tijera)",
+        "Split Jerk (Envion en tijera)",
         "Push Jerk",
-        "Clean Pull (Tirón de cargada)",
-        "Snatch Pull (Tirón de arrancada)"
+        "Clean Pull (Tiron de cargada)",
+        "Snatch Pull (Tiron de arrancada)"
       ],
       balisticos: [
-        "Saltos al Cajón (Box Jump) con recepción suave",
+        "Saltos al Cajon (Box Jump) con recepcion suave",
         "Trap Bar Jump (Saltos con barra hexagonal lastrada)",
-        "Lanzamiento de Balón Medicinal contra el piso (Slam Ball)",
-        "Lanzamiento de Balón Medicinal al pecho contra pared",
+        "Lanzamiento de Balon Medicinal contra el piso (Slam Ball)",
+        "Lanzamiento de Balon Medicinal al pecho contra pared",
         "Kettlebell Swing estilo Ruso",
-        "Saltos Pliométricos Unilaterales en vallas bajas"
+        "Saltos Pliometricos Unilaterales en vallas bajas"
       ],
       inferior_rodilla: [
-        "Sentadilla Trasera con Barra Olímpica",
+        "Sentadilla Trasera con Barra Olimpica",
         "Sentadilla Frontal (Front Squat)",
-        "Sentadilla Búlgara con Mancuernas",
+        "Sentadilla Bulgara con Mancuernas",
         "Prensa a 45 Grados",
         "Estocadas Caminando con Mancuernas",
         "Goblet Squat con Kettlebell pesado",
-        "Sillón de Cuádriceps (Extensión de rodilla)"
+        "Sillon de Cuadriceps (Extension de rodilla)"
       ],
       inferior_cadera: [
         "Peso Muerto Convencional",
         "Peso Muerto Rumano con Barra o Mancuernas",
-        "Hip Thrust con Barra Olímpica y almohadilla",
+        "Hip Thrust con Barra Olimpica y almohadilla",
         "Peso Muerto Sumo",
         "Curl Femoral Tumbado o Sentado",
-        "Buenos Días con Barra en la espalda"
+        "Buenos Dias con Barra en la espalda"
       ],
       superior_empuje: [
         "Press de Banca Plano con Barra",
@@ -360,15 +356,15 @@
         "Dominadas Supinas (Chin-ups)",
         "Remo Pendlay con Barra desde el piso",
         "Remo Unilateral con Mancuerna apoyado en banco",
-        "Jalón al Pecho en Polea Alta",
+        "Jalon al Pecho en Polea Alta",
         "Remo Gironda (Polea baja al abdomen)",
         "Face Pull con cuerda en polea para deltoides posterior",
-        "Remo en suspensión TRX"
+        "Remo en suspension TRX"
       ],
       core: [
         "Rueda Abdominal (Ab Wheel Rollout)",
-        "Press Pallof anti-rotación en polea o banda",
-        "Paseo del Granjero (Farmer's Walk pesado)",
+        "Press Pallof anti-rotacion en polea o banda",
+        "Paseo del Granjero (Farmers Walk pesado)",
         "Plancha Prona con disco en la espalda",
         "Copenhagen Plank (Plancha para aductores)",
         "Hollow Body Hold",
@@ -382,19 +378,28 @@
     let usuarioActual = null;
     let sortableInstance = null;
     let esAdminVerificado = false;
+    let rutinasCargadasMemoria = [];
 
-    // CONTROL EXCLUSIVO DE MODO COACH
+    // ASIGNACIÓN EXPLÍCITA DE EVENTOS PRINCIPALES
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('btn-admin-access').addEventListener('click', solicitarClaveAdmin);
+      document.getElementById('btn-link-coach').addEventListener('click', solicitarClaveAdmin);
+      document.getElementById('btn-login').addEventListener('click', iniciarSesion);
+      document.getElementById('btn-registro').addEventListener('click', registrarse);
+      document.getElementById('btn-timer-toggle').addEventListener('click', pausarReanudarTimer);
+      inicializarSelectores();
+    });
+
     function solicitarClaveAdmin() {
       const clave = prompt("Ingresá la Clave de Administrador / Coach:");
       if (!clave) return;
 
-      if (clave === CLAVE_ADMIN_MASTER) {
+      if (clave.trim() === CLAVE_ADMIN_MASTER) {
         esAdminVerificado = true;
         document.getElementById('seccion-admin').classList.remove('hidden');
         document.getElementById('seccion-auth').classList.add('hidden');
         document.getElementById('seccion-panel').classList.remove('hidden');
-        inicializarSelectores();
-        alert("¡Acceso correcto! Panel de Entrenador activado.");
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         alert("Clave incorrecta.");
       }
@@ -457,20 +462,22 @@
 
     function inicializarSelectores() {
       const selReps = document.getElementById('inp-reps');
-      selReps.innerHTML = '';
-      for (let i = 100; i >= 1; i--) {
-        selReps.innerHTML += `<option value="${i}">${i} reps</option>`;
+      if (selReps && selReps.options.length === 0) {
+        for (let i = 100; i >= 1; i--) {
+          selReps.innerHTML += `<option value="${i}">${i} reps</option>`;
+        }
+        selReps.value = "10";
       }
-      selReps.value = "10";
 
       const selRir = document.getElementById('inp-rir');
-      selRir.innerHTML = '';
-      for (let r = 10; r >= 1; r--) {
-        selRir.innerHTML += `<option value="RIR ${r}">RIR ${r}</option>`;
+      if (selRir && selRir.options.length === 0) {
+        for (let r = 10; r >= 1; r--) {
+          selRir.innerHTML += `<option value="RIR ${r}">RIR ${r}</option>`;
+        }
+        selRir.innerHTML += `<option value="RPE 10 / Al Fallo">Al Fallo (RIR 0)</option>`;
+        selRir.innerHTML += `<option value="Movilidad">Movilidad / Fluido</option>`;
+        selRir.value = "RIR 2";
       }
-      selRir.innerHTML += `<option value="RPE 10 / Al Fallo">Al Fallo (RIR 0)</option>`;
-      selRir.innerHTML += `<option value="Movilidad">Movilidad / Fluido</option>`;
-      selRir.value = "RIR 2";
 
       cargarEjerciciosPorCategoria();
       inicializarDragAndDrop();
@@ -541,6 +548,7 @@
 
     function inicializarDragAndDrop() {
       const el = document.getElementById('tabla-ejercicios-body');
+      if (!el) return;
       if (sortableInstance) sortableInstance.destroy();
 
       sortableInstance = new Sortable(el, {
@@ -572,7 +580,7 @@
           <td class="p-3 text-emerald-300 font-semibold">${f.rir}</td>
           <td class="p-3 text-slate-300">${f.descanso}</td>
           <td class="p-3">${f.video ? `<a href="${f.video}" target="_blank" class="text-emerald-400 hover:underline font-bold">Ver</a>` : '-'}</td>
-          <td class="p-3 text-center"><button onclick="eliminarFila(${i})" class="text-red-400 hover:text-red-300 font-bold px-2 py-1">✕</button></td>
+          <td class="p-3 text-center"><button type="button" onclick="eliminarFila(${i})" class="text-red-400 hover:text-red-300 font-bold px-2 py-1">✕</button></td>
         </tr>
       `).join('');
     }
@@ -612,32 +620,31 @@
       }
     }
 
-    function cargarRutinaAlEditor(detalles, semana, dia) {
-      if (confirm(`¿Cargar "${dia}" en el diseñador para editarla o clonarla para otro alumno?`)) {
-        sesionActual = JSON.parse(JSON.stringify(detalles));
-        document.getElementById('admin-semana').value = semana || '';
-        document.getElementById('admin-dia').value = dia ? dia + " (Copia)" : '';
-        document.getElementById('seccion-admin').classList.remove('hidden');
-        renderTablaSesion();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+    function clonarRutinaDesdeIndice(idx) {
+      const r = rutinasCargadasMemoria[idx];
+      if (!r) return;
+      sesionActual = JSON.parse(JSON.stringify(r.ejercicios_detalle || []));
+      document.getElementById('admin-semana').value = r.semana || '';
+      document.getElementById('admin-dia').value = r.dia ? r.dia + " (Copia)" : '';
+      document.getElementById('seccion-admin').classList.remove('hidden');
+      renderTablaSesion();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // REGISTRO DE CARGAS OPTIMIZADO
-    async function guardarCargaNube(rutinaId, ejercicio, serieIdx, valor) {
+    async function guardarCargaNube(rutinaId, ejIndex, serieIdx, valor) {
       const email = usuarioActual ? usuarioActual.email : 'anonimo';
-      localStorage.setItem(`carga_${rutinaId}_${ejercicio}_${serieIdx}`, valor);
+      localStorage.setItem(`carga_${rutinaId}_${ejIndex}_${serieIdx}`, valor);
 
       try {
         await sb.from('registros_cargas').insert([{
           planificacion_id: String(rutinaId),
           alumno_id: email,
-          ejercicio: ejercicio,
+          ejercicio: String(ejIndex),
           serie_numero: serieIdx + 1,
           carga: valor
         }]);
       } catch (e) {
-        console.warn("Aviso al guardar carga en nube:", e);
+        console.warn("Error guardando carga:", e);
       }
     }
 
@@ -667,7 +674,9 @@
         return;
       }
 
-      contenedor.innerHTML = data.map(r => {
+      rutinasCargadasMemoria = data;
+
+      contenedor.innerHTML = data.map((r, rIdx) => {
         const detalles = r.ejercicios_detalle || [];
         const bloques = {};
         detalles.forEach((ej, idx) => {
@@ -690,7 +699,7 @@
               </div>
               <div class="flex items-center gap-2">
                 ${esAdminVerificado ? `
-                  <button onclick='cargarRutinaAlEditor(${JSON.stringify(detalles)}, "${r.semana \vert{}\vert{} ''}", "${r.dia || ''}")' class="text-xs bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/20 px-3 py-1.5 rounded-lg font-bold transition">
+                  <button type="button" onclick="clonarRutinaDesdeIndice(${rIdx})" class="text-xs bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/20 px-3 py-1.5 rounded-lg font-bold transition">
                     📋 Clonar / Editar
                   </button>
                 ` : ''}
@@ -718,28 +727,28 @@
                               <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300 mt-1">
                                 <span class="bg-slate-800 px-2.5 py-0.5 rounded font-medium">${item.series} series x ${item.reps}</span>
                                 <span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">${item.rir}</span>
-                                <button onclick="iniciarTimerDescanso(${segs})" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-0.5 rounded text-slate-200 font-medium flex items-center gap-1 active:scale-95 transition">
+                                <button type="button" onclick="iniciarTimerDescanso(${segs})" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-0.5 rounded text-slate-200 font-medium flex items-center gap-1 active:scale-95 transition">
                                   ⏱️ Pausa: ${item.descanso}
                                 </button>
                               </div>
                             </div>
-                            ${item.video ? `<a href="${item.video}" target="_blank" class="text-xs bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 self-start md:self-auto transition">▶ Video Demostración</a>` : ''}
+                            ${item.video ? `<a href="${item.video}" target="_blank" class="text-xs bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 self-start md:self-auto transition">▶ Video</a>` : ''}
                           </div>
 
                           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-slate-800">
                             ${Array.from({ length: cantSeries }).map((_, sIdx) => {
                               const doneKey = `done_${r.id}_${item.originalIndex}_${sIdx}`;
                               const isDone = localStorage.getItem(doneKey) === 'true';
-                              const cargaKey = `carga_${r.id}_${item.ejercicio}_${sIdx}`;
+                              const cargaKey = `carga_${r.id}_${item.originalIndex}_${sIdx}`;
                               const cargaGuardada = localStorage.getItem(cargaKey) || '';
 
                               return `
                                 <div class="flex items-center gap-2 bg-slate-950 p-2 rounded-lg border border-slate-800 ${isDone ? 'serie-done' : ''}">
-                                  <button onclick="toggleSerieCompletada(this.parentElement, '${r.id}', ${item.originalIndex},${sIdx})" class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 flex items-center justify-center text-xs font-black transition">
+                                  <button type="button" onclick="toggleSerieCompletada(this.parentElement, '${r.id}', ${item.originalIndex},${sIdx})" class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 flex items-center justify-center text-xs font-black transition">
                                     ✓
                                   </button>
                                   <span class="text-[11px] text-slate-400 font-bold">S${sIdx + 1}:</span>
-                                  <input type="text" placeholder="Kg / RPE" value="${cargaGuardada}" onchange="guardarCargaNube('${r.id}', '${item.ejercicio}',${sIdx}, this.value)" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-400">
+                                  <input type="text" placeholder="Kg / RPE" value="${cargaGuardada}" onchange="guardarCargaNube('${r.id}', ${item.originalIndex},${sIdx}, this.value)" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-400">
                                 </div>
                               `;
                             }).join('')}
@@ -752,10 +761,9 @@
               `).join('')}
             </div>
 
-            <!-- BOTÓN DE FEEDBACK WHATSAPP -->
             <div class="pt-2 border-t border-slate-800/60 flex justify-end">
-              <button onclick="enviarWhatsappFeedback('${r.dia || 'Entrenamiento'}', '${r.semana || ''}')" class="text-xs bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-3.5 py-2 rounded-xl font-bold flex items-center gap-1.5 transition">
-                💬 Consultar al Coach por WhatsApp
+              <button type="button" onclick="enviarWhatsappFeedback('${r.dia || 'Entrenamiento'}', '${r.semana || ''}')" class="text-xs bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 px-3.5 py-2 rounded-xl font-bold flex items-center gap-1.5 transition">
+                💬 WhatsApp Coach
               </button>
             </div>
           </div>
@@ -767,7 +775,7 @@
       if (usuarioActual) cargarRutinas(usuarioActual.email, usuarioActual.id);
     }
 
-    // AUTENTICACIÓN
+    // AUTH
     sb.auth.onAuthStateChange((event, session) => {
       if (session) {
         usuarioActual = session.user;
@@ -835,7 +843,6 @@
 
       if (esAdminVerificado) {
         document.getElementById('seccion-admin').classList.remove('hidden');
-        inicializarSelectores();
       } else {
         document.getElementById('seccion-admin').classList.add('hidden');
       }
