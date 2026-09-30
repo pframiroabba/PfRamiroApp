@@ -1,0 +1,17 @@
+{
+  "name": "PF Ramiro Abbattista",
+  "short_name": "PF Ramiro",
+  "description": "Plataforma de Entrenamiento y Preparación Física",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "icons": [
+    {
+      "src": "logo-icono.webp",
+      "sizes": "192x192 512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ]
+}
