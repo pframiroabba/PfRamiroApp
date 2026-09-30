@@ -71,7 +71,6 @@
     </div>
     
     <div class="flex items-center gap-2">
-      <!-- BOTÓN PANTALLA SIEMPRE ENCENDIDA -->
       <button type="button" onclick="alternarWakeLock()" id="btn-wake-lock" class="bg-slate-800 border border-slate-700 text-slate-400 hover:text-emerald-400 text-xs px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1">
         💡 <span class="hidden sm:inline">Pantalla:</span> <span id="txt-wake-status">Off</span>
       </button>
@@ -196,7 +195,7 @@
         <div class="flex flex-wrap gap-2">
           <button type="button" onclick="cambiarSolapaCoach('alumnos')" id="tab-c-alumnos" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition">👥 Alumnos & Cargas en Vivo</button>
           <button type="button" onclick="cambiarSolapaCoach('plantillas')" id="tab-c-plantillas" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📑 Plantillas Inteligentes</button>
-          <button type="button" onclick="cambiarSolapaCoach('creador')" id="tab-c-creador" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">🛠️️ Creador Mensual</button>
+          <button type="button" onclick="cambiarSolapaCoach('creador')" id="tab-c-creador" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">🛠️ Creador Mensual</button>
         </div>
         <button type="button" onclick="cerrarModoAdmin()" class="text-xs bg-red-500/20 text-red-300 px-3 py-2 rounded-xl font-bold">Cerrar Coach</button>
       </div>
@@ -238,8 +237,8 @@
       <!-- SECTOR 3: CREADOR / EDITOR DE PLANIFICACIÓN MENSUAL -->
       <div id="vista-c-creador" class="hidden bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-6">
         <div class="border-b border-slate-800 pb-3">
-          <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🛠 Diseñador de Planificación Mensual</h3>
-          <p class="text-xs text-slate-400">Armá mesociclos completos, asigná semanas y días específicos.</p>
+          <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🛠️ Diseñador de Planificación Mensual</h3>
+          <p class="text-xs text-slate-400">Armá mesociclos completos, prescribí las cargas deseadas y asigná días.</p>
         </div>
 
         <div class="space-y-4 bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
@@ -272,10 +271,10 @@
           </div>
         </div>
 
-        <!-- SELECTOR DE EJERCICIOS Y BLOQUES -->
+        <!-- SELECTOR DE EJERCICIOS Y BLOQUES CON CAMPO DE CARGA PLANIFICADA -->
         <div class="bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 space-y-4">
           <div class="flex justify-between items-center">
-            <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio por Bloque</span>
+            <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio y Cargas</span>
             <div class="flex gap-2">
               <button type="button" onclick="crearNuevoEjercicio()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg text-emerald-300 font-bold">+ Crear Ejercicio</button>
               <button type="button" onclick="eliminarEjercicioSeleccionado()" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-300 px-3 py-1 rounded-lg font-bold">Eliminar</button>
@@ -332,7 +331,7 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
             <div>
               <label class="text-[11px] text-slate-400 font-semibold">Series</label>
               <input type="number" id="inp-series" value="3" min="1" max="20" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
@@ -340,6 +339,10 @@
             <div>
               <label class="text-[11px] text-slate-400 font-semibold">Repeticiones</label>
               <select id="inp-reps" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white"></select>
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold">Carga Asignada (Coach)</label>
+              <input type="text" id="inp-carga-coach" placeholder="ej: 60kg o 75%" class="w-full bg-slate-900 border border-emerald-500/40 rounded-xl p-2.5 text-sm text-emerald-300 font-bold focus:outline-none focus:border-emerald-500">
             </div>
             <div>
               <label class="text-[11px] text-slate-400 font-semibold">RIR / Esfuerzo</label>
@@ -361,7 +364,7 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-            <input type="text" id="inp-video" placeholder="Link YouTube Demostración (opcional)" class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
+            <input type="text" id="inp-video" placeholder="Link YouTube o Drive Demostración (ej: https://...)" class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
             <button type="button" onclick="agregarFilaRutina()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black p-2.5 rounded-xl text-sm transition active:scale-95">＋ Agregar Ejercicio</button>
           </div>
         </div>
@@ -378,6 +381,7 @@
                   <th class="p-3">Ejercicio</th>
                   <th class="p-3">Series</th>
                   <th class="p-3">Reps</th>
+                  <th class="p-3 text-emerald-400">Carga Coach</th>
                   <th class="p-3">RIR</th>
                   <th class="p-3">Pausa</th>
                   <th class="p-3">Video</th>
@@ -385,7 +389,7 @@
                 </tr>
               </thead>
               <tbody id="tabla-ejercicios-body" class="divide-y divide-slate-800">
-                <tr id="fila-vacia"><td colspan="9" class="p-4 text-center text-slate-500">Todavía no agregaste ejercicios a la sesión.</td></tr>
+                <tr id="fila-vacia"><td colspan="10" class="p-4 text-center text-slate-500">Todavía no agregaste ejercicios a la sesión.</td></tr>
               </tbody>
             </table>
           </div>
@@ -433,7 +437,6 @@
 
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // BIBLIOTECA EXTENDIDA ESPECIALIZADA KOENA
     const BIBLIOTECA_DEFAULT = {
       calentamiento_dinamico: [
         "Inching Worm (Gusano de pies a manos con empuje)",
@@ -582,7 +585,6 @@
     let todasLasPlantillasAdmin = [];
     let wakeLockSentinel = null;
 
-    // CONTROL DE PANTALLA SIEMPRE ENCENDIDA (WAKE LOCK API)
     async function alternarWakeLock() {
       const txtStatus = document.getElementById('txt-wake-status');
       const btn = document.getElementById('btn-wake-lock');
@@ -608,7 +610,7 @@
             wakeLockSentinel = null;
           });
         } catch (err) {
-          console.warn("Error con WakeLock:", err);
+          console.warn("WakeLock error:", err);
         }
       }
     }
@@ -959,6 +961,7 @@
       }
     }
 
+    // AGREGAR FILA CON CARGA ASIGNADA POR EL COACH
     function agregarFilaRutina() {
       const ejercicio = document.getElementById('sel-ejercicio').value;
       if (!ejercicio) return alert("Seleccioná un ejercicio válido.");
@@ -968,6 +971,7 @@
         ejercicio: ejercicio,
         series: parseInt(document.getElementById('inp-series').value) || 3,
         reps: document.getElementById('inp-reps').value,
+        cargaCoach: document.getElementById('inp-carga-coach').value.trim() || 'A elección',
         rir: document.getElementById('inp-rir').value,
         descanso: document.getElementById('inp-descanso').value,
         video: document.getElementById('inp-video').value.trim()
@@ -976,6 +980,7 @@
       sesionActual.push(item);
       renderTablaSesion();
       document.getElementById('inp-video').value = '';
+      document.getElementById('inp-carga-coach').value = '';
     }
 
     function eliminarFila(index) {
@@ -1003,7 +1008,7 @@
     function renderTablaSesion() {
       const tbody = document.getElementById('tabla-ejercicios-body');
       if (sesionActual.length === 0) {
-        tbody.innerHTML = '<tr id="fila-vacia"><td colspan="9" class="p-4 text-center text-slate-500">Todavía no agregaste ejercicios a la sesión.</td></tr>';
+        tbody.innerHTML = '<tr id="fila-vacia"><td colspan="10" class="p-4 text-center text-slate-500">Todavía no agregaste ejercicios a la sesión.</td></tr>';
         return;
       }
 
@@ -1014,6 +1019,7 @@
           <td class="p-3 text-white font-medium">${f.ejercicio}</td>
           <td class="p-3 text-slate-300">${f.series}</td>
           <td class="p-3 text-slate-300">${f.reps}</td>
+          <td class="p-3 font-bold text-emerald-300">${f.cargaCoach || 'Libre'}</td>
           <td class="p-3 text-emerald-300 font-semibold">${f.rir}</td>
           <td class="p-3 text-slate-300">${f.descanso}</td>
           <td class="p-3">${f.video ? `<a href="${f.video}" target="_blank" class="text-emerald-400 hover:underline font-bold">Ver</a>` : '-'}</td>
@@ -1036,7 +1042,7 @@
       }
 
       const encabezadoCiclo = mes ? `${mes} • ${semana || 'Semana 1'}` : (semana || 'Plan');
-      const resumenTexto = sesionActual.map(e => `[${e.bloque}] ${e.ejercicio} | ${e.series} x ${e.reps} (${e.rir}) - Descanso: ${e.descanso}`).join('\n');
+      const resumenTexto = sesionActual.map(e => `[${e.bloque}] ${e.ejercicio} | ${e.series} x ${e.reps} (${e.rir}) - Carga: ${e.cargaCoach || 'Libre'} - Descanso: ${e.descanso}`).join('\n');
 
       const { error } = await sb.from('planificaciones').insert([{
         alumno_id: alumno,
@@ -1093,7 +1099,6 @@
       localStorage.setItem(`fecha_ejecucion_${rutinaId}`, fecha);
     }
 
-    // FEEDBACK CON WELLNESS Y VIDEO
     async function guardarFeedbackSesion(rutinaId, dia, semana) {
       const selRpe = document.getElementById(`sel-rpe-${rutinaId}`);
       const txtComentario = document.getElementById(`txt-feedback-${rutinaId}`);
@@ -1101,7 +1106,6 @@
       const selDiaReal = document.getElementById(`sel-dia-real-${rutinaId}`);
       const txtFechaReal = document.getElementById(`txt-fecha-real-${rutinaId}`);
 
-      // Wellness
       const sueno = document.getElementById(`check-sueno-${rutinaId}`)?.value || '4';
       const energia = document.getElementById(`check-energia-${rutinaId}`)?.value || '4';
       const dolor = document.getElementById(`check-dolor-${rutinaId}`)?.value || '1';
@@ -1139,7 +1143,7 @@
           comentario: `[${wellnessResumen}] ` + comentario + (videoUrl ? ` | Video Técnica: ${videoUrl}` : '')
         }]);
       } catch (e) {
-        console.warn("Feedback guardado localmente");
+        console.warn("Feedback guardado");
       }
 
       alert("🎉 ¡Entrenamiento y Wellness registrados con éxito!");
@@ -1267,7 +1271,7 @@
               </div>
             </div>
 
-            <!-- BLOQUES DE EJERCICIOS -->
+            <!-- BLOQUES DE EJERCICIOS CON BOTÓN DE VIDEO Y CARGA COACH VISIBLES -->
             <div class="space-y-4">
               ${Object.keys(bloques).map((nombreBloque, bIdx) => {
                 const bloqueId = `bloque_c_${r.id}_${bIdx}`;
@@ -1286,14 +1290,16 @@
                       const cantSeries = parseInt(item.series) || 1;
                       const segs = parseSegundos(item.descanso);
                       const cargaAnterior = localStorage.getItem(`last_weight_${item.ejercicio}`) || '';
+                      const cargaAsignadaCoach = item.cargaCoach || '';
 
                       return `
                         <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3">
                           <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                             <div>
-                              <div class="flex items-center gap-2">
+                              <div class="flex flex-wrap items-center gap-2">
                                 <h6 class="font-bold text-white text-base">${item.ejercicio}</h6>
-                                ${cargaAnterior ? `<span class="text-[10px] text-emerald-400/80 bg-emerald-500/10 px-2 py-0.5 rounded font-mono">Última: ${cargaAnterior}</span>` : ''}
+                                ${cargaAsignadaCoach ? `<span class="text-[11px] text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg font-bold">🎯 Carga Coach: ${cargaAsignadaCoach}</span>` : ''}
+                                ${cargaAnterior ? `<span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded font-mono">Última: ${cargaAnterior}</span>` : ''}
                               </div>
                               <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300 mt-1">
                                 <span class="bg-slate-800 px-2.5 py-0.5 rounded font-medium">${item.series} series x ${item.reps}</span>
@@ -1303,7 +1309,13 @@
                                 </button>
                               </div>
                             </div>
-                            ${item.video ? `<a href="${item.video}" target="_blank" class="text-xs bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 self-start md:self-auto transition no-print">▶ Video</a>` : ''}
+                            
+                            <!-- BOTÓN DE VIDEO DIRECTAMENTE VISIBLE PARA EL ALUMNO -->
+                            ${item.video ? `
+                              <a href="${item.video}" target="_blank" rel="noopener noreferrer" class="text-xs bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30 px-3.5 py-2 rounded-xl font-bold flex items-center gap-1.5 self-start md:self-auto transition no-print shadow-sm">
+                                ▶ Ver Video Demostrativo
+                              </a>
+                            ` : ''}
                           </div>
 
                           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-slate-800">
@@ -1319,7 +1331,7 @@
                                     ✓
                                   </button>
                                   <span class="text-[11px] text-slate-400 font-bold">S${sIdx + 1}:</span>
-                                  <input type="text" placeholder="${cargaAnterior || 'Kg / RPE'}" value="${cargaGuardada}" onchange="guardarCargaNube('${r.id}', '${item.ejercicio}',${sIdx}, this.value)" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
+                                  <input type="text" placeholder="${cargaAsignadaCoach || cargaAnterior || 'Kg / RPE'}" value="${cargaGuardada}" onchange="guardarCargaNube('${r.id}', '${item.ejercicio}',${sIdx}, this.value)" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
                                 </div>
                               `;
                             }).join('')}
