@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PF Ramiro Abbattista - Rendimiento & Fuerza</title>
   
-  <!-- MANIFIESTO PWA PARA APP NATIVA -->
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,8 +28,14 @@
       cursor: grab;
       touch-action: none;
     }
+    .tab-dia-active {
+      background-color: #10b981 !important;
+      color: #020617 !important;
+      font-weight: 900 !important;
+      box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.35);
+    }
     @media print {
-      header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print {
+      header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container {
         display: none !important;
       }
       body {
@@ -42,6 +47,7 @@
         background: transparent !important;
         color: black !important;
         box-shadow: none !important;
+        display: block !important;
       }
     }
   </style>
@@ -76,7 +82,7 @@
       </button>
 
       <a href="https://calculadorarmramiropf.netlify.app" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 text-xs px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5">
-        🏋️ 1RM
+        🏋️ 1RM Externa
       </a>
       <button type="button" id="btn-admin-access" class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-lg font-bold transition">
         🔒 Coach
@@ -194,6 +200,7 @@
       <div class="flex items-center justify-between bg-slate-900 p-3 rounded-2xl border border-slate-800">
         <div class="flex flex-wrap gap-2">
           <button type="button" onclick="cambiarSolapaCoach('alumnos')" id="tab-c-alumnos" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition">👥 Alumnos & Cargas en Vivo</button>
+          <button type="button" onclick="cambiarSolapaCoach('rms')" id="tab-c-rms" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📊 Planilla RMs Alumnos</button>
           <button type="button" onclick="cambiarSolapaCoach('plantillas')" id="tab-c-plantillas" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📑 Plantillas Inteligentes</button>
           <button type="button" onclick="cambiarSolapaCoach('creador')" id="tab-c-creador" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">🛠️ Creador Mensual</button>
         </div>
@@ -220,6 +227,22 @@
         </div>
       </div>
 
+      <!-- SECTOR: SUPERVISIÓN DE RMs POR EL COACH -->
+      <div id="vista-c-rms" class="hidden bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <div>
+            <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">📊 Monitoreo y Edición de RMs de Alumnos</h3>
+            <p class="text-xs text-slate-400">Seleccioná un alumno para consultar o editar sus RMs y porcentajes calculados.</p>
+          </div>
+          <select id="sel-filtro-rm-alumno" onchange="cargarRMsAdminParaAlumno(this.value)" class="bg-slate-950 border border-slate-700 text-emerald-400 text-xs rounded-xl p-2.5 font-bold focus:outline-none focus:border-emerald-500">
+            <option value="">▼ Elegir Alumno...</option>
+          </select>
+        </div>
+        <div id="contenedor-rms-admin" class="space-y-4">
+          <p class="text-slate-500 text-xs">Seleccioná un alumno arriba para ver su planilla de 1RM.</p>
+        </div>
+      </div>
+
       <!-- SECTOR 2: BANCO DE PLANTILLAS INTELIGENTES -->
       <div id="vista-c-plantillas" class="hidden bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-4">
         <div class="flex justify-between items-center border-b border-slate-800 pb-3">
@@ -238,7 +261,7 @@
       <div id="vista-c-creador" class="hidden bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-6">
         <div class="border-b border-slate-800 pb-3">
           <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🛠️ Diseñador de Planificación Mensual</h3>
-          <p class="text-xs text-slate-400">Armá mesociclos completos, prescribí las cargas deseadas y asigná días.</p>
+          <p class="text-xs text-slate-400">Podés armar todos los bloques del día juntos (Recomendado) o enviarlos de forma independiente.</p>
         </div>
 
         <div class="space-y-4 bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
@@ -265,16 +288,16 @@
               <input type="text" id="admin-semana" placeholder="Semana 1 de 4" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
             </div>
             <div>
-              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Día / Enfoque</label>
-              <input type="text" id="admin-dia" placeholder="Día 1 - Tren Inferior" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Día de Rutina / Solapa</label>
+              <input type="text" id="admin-dia" placeholder="Lunes (o Día 1)" class="w-full bg-slate-900 border border-emerald-500/50 rounded-xl p-2.5 text-xs text-emerald-300 font-bold focus:outline-none focus:border-emerald-400">
             </div>
           </div>
         </div>
 
-        <!-- SELECTOR DE EJERCICIOS Y BLOQUES CON CAMPO DE CARGA PLANIFICADA -->
+        <!-- SELECTOR DE EJERCICIOS Y BLOQUES -->
         <div class="bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 space-y-4">
           <div class="flex justify-between items-center">
-            <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio y Cargas</span>
+            <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio por Bloque</span>
             <div class="flex gap-2">
               <button type="button" onclick="crearNuevoEjercicio()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg text-emerald-300 font-bold">+ Crear Ejercicio</button>
               <button type="button" onclick="eliminarEjercicioSeleccionado()" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-300 px-3 py-1 rounded-lg font-bold">Eliminar</button>
@@ -283,18 +306,15 @@
 
           <div class="grid grid-cols-1 md:grid-cols-6 gap-2.5">
             <div class="md:col-span-2">
-              <label class="text-[11px] text-slate-400 font-semibold">Bloque de la Sesión</label>
+              <label class="text-[11px] text-slate-400 font-semibold">Sección / Bloque del Día</label>
               <select id="inp-bloque" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-emerald-300 font-bold mt-1">
-                <option value="Entrada en Calor & Activación Dinámica">Entrada en Calor & Activación Dinámica</option>
-                <option value="Activación de Glúteos & Cadera">Activación de Glúteos & Cadera</option>
-                <option value="Movilidad Articular Específica">Movilidad Articular Específica</option>
-                <option value="Propiocepción & Amortiguaciones">Propiocepción & Amortiguaciones</option>
-                <option value="Coordinación & Agilidad">Coordinación & Agilidad</option>
-                <option value="Bloque A - Olímpico / Potencia">Bloque A - Olímpico / Potencia</option>
-                <option value="Bloque B - Fuerza Principal">Bloque B - Fuerza Principal</option>
-                <option value="Bloque C - Tracciones & Empujes">Bloque C - Tracciones & Empujes</option>
-                <option value="Bloque D - Zona Media & Core">Bloque D - Zona Media & Core</option>
-                <option value="Acondicionamiento / Finisher">Acondicionamiento / Finisher</option>
+                <option value="BLOQUE A — FUERZA PRINCIPAL">BLOQUE A — FUERZA PRINCIPAL</option>
+                <option value="BLOQUE B — LEVANTAMIENTO & POTENCIA">BLOQUE B — LEVANTAMIENTO & POTENCIA</option>
+                <option value="BLOQUE C — ACCESORIOS & HIPERTROFIA">BLOQUE C — ACCESORIOS & HIPERTROFIA</option>
+                <option value="BLOQUE D — CORE & ZONA MEDIA">BLOQUE D — CORE & ZONA MEDIA</option>
+                <option value="ACTIVACIÓN & MOVILIDAD ARTICULAR">ACTIVACIÓN & MOVILIDAD ARTICULAR</option>
+                <option value="PROPIOCEPCIÓN & RECEPCIONES">PROPIOCEPCIÓN & RECEPCIONES</option>
+                <option value="FINISHER & METABÓLICO">FINISHER & METABÓLICO</option>
               </select>
             </div>
 
@@ -365,19 +385,22 @@
 
           <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
             <input type="text" id="inp-video" placeholder="Link YouTube o Drive Demostración (ej: https://...)" class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
-            <button type="button" onclick="agregarFilaRutina()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black p-2.5 rounded-xl text-sm transition active:scale-95">＋ Agregar Ejercicio</button>
+            <button type="button" onclick="agregarFilaRutina()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black p-2.5 rounded-xl text-sm transition active:scale-95">＋ Agregar a la Lista</button>
           </div>
         </div>
 
         <!-- TABLA REORDENABLE -->
         <div class="space-y-2">
-          <span class="text-xs uppercase font-extrabold text-slate-400 tracking-wider">Vista Previa de la Sesión</span>
+          <div class="flex justify-between items-center">
+            <span class="text-xs uppercase font-extrabold text-slate-400 tracking-wider">Ejercicios de la Sesión (Podés mezclar varios bloques acá)</span>
+            <span id="contador-ejercicios-sesion" class="text-xs font-bold text-emerald-400">0 ejercicios listos</span>
+          </div>
           <div class="overflow-x-auto border border-slate-800 rounded-2xl overflow-hidden bg-slate-950">
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-900 text-slate-400 uppercase font-black">
                 <tr>
                   <th class="p-3 w-8 text-center">↕</th>
-                  <th class="p-3">Bloque</th>
+                  <th class="p-3">Sección / Bloque</th>
                   <th class="p-3">Ejercicio</th>
                   <th class="p-3">Series</th>
                   <th class="p-3">Reps</th>
@@ -395,33 +418,62 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <button type="button" onclick="guardarPlanificacionCompleta(false)" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3.5 rounded-2xl transition shadow-xl shadow-emerald-500/20 active:scale-98 text-sm uppercase tracking-wider">
-            🚀 Asignar al Alumno
+        <!-- MODOS DE GUARDADO -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <button type="button" onclick="guardarPlanificacionCompleta(false, 'unir')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3.5 rounded-2xl transition shadow-xl shadow-emerald-500/20 active:scale-98 text-xs sm:text-sm uppercase tracking-wider">
+            🚀 Asignar Día Completo (Todos los bloques juntos)
           </button>
-          <button type="button" onclick="guardarPlanificacionCompleta(true)" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 font-bold py-3.5 rounded-2xl transition active:scale-98 text-sm uppercase tracking-wider">
-            💾 Guardar como Plantilla Inteligente
+          <button type="button" onclick="guardarPlanificacionCompleta(false, 'separado')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3.5 rounded-2xl transition active:scale-98 text-xs sm:text-sm uppercase tracking-wider">
+            📦 Asignar como Bloque Suelto / Separado
+          </button>
+          <button type="button" onclick="guardarPlanificacionCompleta(true, 'plantilla')" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 font-bold py-3.5 rounded-2xl transition active:scale-98 text-xs sm:text-sm uppercase tracking-wider">
+            💾 Guardar como Plantilla
           </button>
         </div>
       </div>
     </div>
 
-    <!-- PESTAÑAS Y LISTADO DE PLANIFICACIONES DEL ALUMNO -->
+    <!-- PESTAÑAS PRINCIPALES DEL ALUMNO (RUTINA / RMs / HISTORIAL) -->
     <div>
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <div class="flex items-center gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
-          <button type="button" onclick="cambiarSolapaAlumno('actual')" id="tab-a-actual" class="text-xs px-4 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition">🔥 Rutina Actual</button>
-          <button type="button" onclick="cambiarSolapaAlumno('historial')" id="tab-a-historial" class="text-xs px-4 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition">📁 Historial / Rutinas Viejas</button>
+        <div class="flex flex-wrap items-center gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
+          <button type="button" onclick="cambiarSolapaAlumno('actual')" id="tab-a-actual" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition">🔥 Rutina Actual</button>
+          <button type="button" onclick="cambiarSolapaAlumno('rms')" id="tab-a-rms" class="text-xs px-3.5 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition">📊 Mis RMs & Porcentajes</button>
+          <button type="button" onclick="cambiarSolapaAlumno('historial')" id="tab-a-historial" class="text-xs px-3.5 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition">📁 Historial / Viejas</button>
         </div>
         <button type="button" onclick="refrescarRutinas()" class="text-xs bg-slate-900 border border-slate-800 hover:bg-slate-800 px-3 py-2 rounded-xl text-slate-300 font-bold transition">Actualizar</button>
       </div>
 
-      <!-- CONTENEDOR RUTINA ACTUAL -->
+      <!-- SOLAPAS TIPO EXCEL POR DÍA (DENTRO DE RUTINA ACTUAL) -->
+      <div id="contenedor-tabs-dias" class="tabs-dias-container hidden mb-4 overflow-x-auto pb-1">
+        <div class="flex items-center gap-2" id="barra-solapas-dias"></div>
+      </div>
+
+      <!-- SECCIÓN 1: CONTENEDOR RUTINA ACTUAL -->
       <div id="lista-rutinas" class="space-y-6">
         <p class="text-slate-500 text-sm">Cargando tus entrenamientos...</p>
       </div>
 
-      <!-- CONTENEDOR HISTORIAL DE RUTINAS VIEJAS -->
+      <!-- SECCIÓN 2: PLANILLA DE RMs Y PORCENTAJES DEL ALUMNO (EPLEY) -->
+      <div id="seccion-rms-alumno" class="hidden space-y-6">
+        <div class="bg-slate-900 p-5 md:p-6 rounded-3xl border border-emerald-500/40 shadow-xl space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div>
+              <h3 class="text-lg font-black text-emerald-400">📊 Planilla de Fuerza Máxima (1RM) & Porcentajes</h3>
+              <p class="text-xs text-slate-400">Cargá el peso que levantaste y cuántas repeticiones lograste. La planilla calcula tu 1RM estimado y la tabla completa de porcentajes.</p>
+            </div>
+            <button type="button" onclick="agregarFilaRMManual()" class="text-xs bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-3.5 py-2 rounded-xl transition self-start md:self-auto">
+              ＋ Agregar Ejercicio
+            </button>
+          </div>
+
+          <div id="lista-tabla-rms" class="space-y-4">
+            <p class="text-slate-500 text-xs">Cargando tus ejercicios de fuerza...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 3: CONTENEDOR HISTORIAL DE RUTINAS VIEJAS -->
       <div id="lista-historial" class="hidden space-y-4">
         <p class="text-slate-500 text-sm">Cargando historial de rutinas anteriores...</p>
       </div>
@@ -584,6 +636,18 @@
     let todasLasPlanificacionesAdmin = [];
     let todasLasPlantillasAdmin = [];
     let wakeLockSentinel = null;
+    let rutinasActivasAlumno = [];
+    let listaEjerciciosRM = [];
+
+    // FÓRMULA DE EPLEY PURA Y EXACTA: 1RM = PESO * (1 + REPS / 30)
+    function calcularEpley(peso, reps) {
+      const p = parseFloat(peso);
+      const r = parseInt(reps);
+      if (isNaN(p) || p <= 0) return 0;
+      if (isNaN(r) || r <= 1) return p;
+      const rm = p * (1 + (r / 30));
+      return Math.round(rm * 10) / 10;
+    }
 
     async function alternarWakeLock() {
       const txtStatus = document.getElementById('txt-wake-status');
@@ -644,21 +708,26 @@
 
     function cambiarSolapaCoach(vista) {
       const vAlumnos = document.getElementById('vista-c-alumnos');
+      const vRms = document.getElementById('vista-c-rms');
       const vPlantillas = document.getElementById('vista-c-plantillas');
       const vCreador = document.getElementById('vista-c-creador');
 
       const tAlumnos = document.getElementById('tab-c-alumnos');
+      const tRms = document.getElementById('tab-c-rms');
       const tPlantillas = document.getElementById('tab-c-plantillas');
       const tCreador = document.getElementById('tab-c-creador');
 
-      [vAlumnos, vPlantillas, vCreador].forEach(el => el.classList.add('hidden'));
-      [tAlumnos, tPlantillas, tCreador].forEach(el => {
+      [vAlumnos, vRms, vPlantillas, vCreador].forEach(el => el.classList.add('hidden'));
+      [tAlumnos, tRms, tPlantillas, tCreador].forEach(el => {
         el.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition";
       });
 
       if (vista === 'alumnos') {
         vAlumnos.classList.remove('hidden');
         tAlumnos.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition";
+      } else if (vista === 'rms') {
+        vRms.classList.remove('hidden');
+        tRms.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
       } else if (vista === 'plantillas') {
         vPlantillas.classList.remove('hidden');
         tPlantillas.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
@@ -670,20 +739,31 @@
 
     function cambiarSolapaAlumno(solapa) {
       const lActual = document.getElementById('lista-rutinas');
+      const sRms = document.getElementById('seccion-rms-alumno');
       const lHistorial = document.getElementById('lista-historial');
       const tActual = document.getElementById('tab-a-actual');
+      const tRms = document.getElementById('tab-a-rms');
       const tHistorial = document.getElementById('tab-a-historial');
+      const tabsDias = document.getElementById('contenedor-tabs-dias');
+
+      [lActual, sRms, lHistorial].forEach(el => el.classList.add('hidden'));
+      [tActual, tRms, tHistorial].forEach(el => {
+        el.className = "text-xs px-3.5 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition";
+      });
 
       if (solapa === 'actual') {
         lActual.classList.remove('hidden');
-        lHistorial.classList.add('hidden');
+        if (rutinasActivasAlumno.length > 1) tabsDias.classList.remove('hidden');
         tActual.className = "text-xs px-4 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
-        tHistorial.className = "text-xs px-4 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition";
+      } else if (solapa === 'rms') {
+        sRms.classList.remove('hidden');
+        tabsDias.classList.add('hidden');
+        tRms.className = "text-xs px-4 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+        if (usuarioActual) cargarPlanillaRMsAlumno(usuarioActual.email);
       } else {
-        lActual.classList.add('hidden');
         lHistorial.classList.remove('hidden');
+        tabsDias.classList.add('hidden');
         tHistorial.className = "text-xs px-4 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
-        tActual.className = "text-xs px-4 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition";
       }
     }
 
@@ -734,6 +814,11 @@
       const selRapido = document.getElementById('sel-alumno-rapido');
       selRapido.innerHTML = '<option value="">▼ Elegir de la lista de alumnos...</option>';
       listaAlumnos.forEach(a => selRapido.innerHTML += `<option value="${a}">${a}</option>`);
+
+      // Selector de alumnos para el sector de RMs del Coach
+      const selRmCoach = document.getElementById('sel-filtro-rm-alumno');
+      selRmCoach.innerHTML = '<option value="">▼ Elegir Alumno...</option>';
+      listaAlumnos.forEach(a => selRmCoach.innerHTML += `<option value="${a}">👤 ${a}</option>`);
 
       renderizarPlanesAdmin(todasLasPlanificacionesAdmin);
       renderizarPlantillasAdmin(todasLasPlantillasAdmin);
@@ -961,7 +1046,6 @@
       }
     }
 
-    // AGREGAR FILA CON CARGA ASIGNADA POR EL COACH
     function agregarFilaRutina() {
       const ejercicio = document.getElementById('sel-ejercicio').value;
       if (!ejercicio) return alert("Seleccioná un ejercicio válido.");
@@ -1007,6 +1091,9 @@
 
     function renderTablaSesion() {
       const tbody = document.getElementById('tabla-ejercicios-body');
+      const contador = document.getElementById('contador-ejercicios-sesion');
+      contador.innerText = `${sesionActual.length} ejercicios listos`;
+
       if (sesionActual.length === 0) {
         tbody.innerHTML = '<tr id="fila-vacia"><td colspan="10" class="p-4 text-center text-slate-500">Todavía no agregaste ejercicios a la sesión.</td></tr>';
         return;
@@ -1028,26 +1115,63 @@
       `).join('');
     }
 
-    async function guardarPlanificacionCompleta(comoPlantilla = false) {
+    async function guardarPlanificacionCompleta(comoPlantilla = false, modo = 'unir') {
       let alumno = document.getElementById('admin-alumno').value.trim();
       const mes = document.getElementById('admin-mes').value.trim();
       const semana = document.getElementById('admin-semana').value.trim();
-      const dia = document.getElementById('admin-dia').value.trim();
+      let dia = document.getElementById('admin-dia').value.trim() || 'Lunes';
 
       if (comoPlantilla) alumno = "PLANTILLA_MAESTRA";
 
       if (!alumno || sesionActual.length === 0) {
-        alert("Completá el alumno/título y agregá al menos un ejercicio.");
+        alert("Completá el alumno/título y agregá al menos un ejercicio a la sesión.");
         return;
       }
 
       const encabezadoCiclo = mes ? `${mes} • ${semana || 'Semana 1'}` : (semana || 'Plan');
       const resumenTexto = sesionActual.map(e => `[${e.bloque}] ${e.ejercicio} | ${e.series} x ${e.reps} (${e.rir}) - Carga: ${e.cargaCoach || 'Libre'} - Descanso: ${e.descanso}`).join('\n');
 
+      if (modo === 'unir' && !comoPlantilla) {
+        const { data: existente } = await sb
+          .from('planificaciones')
+          .select('*')
+          .eq('alumno_id', alumno)
+          .eq('semana', encabezadoCiclo)
+          .eq('dia', dia)
+          .maybeSingle();
+
+        if (existente) {
+          const detallesPrevios = existente.ejercicios_detalle || [];
+          const detallesCombinados = [...detallesPrevios, ...sesionActual];
+          const textoCombinado = detallesCombinados.map(e => `[${e.bloque}] ${e.ejercicio} | ${e.series} x ${e.reps} (${e.rir}) - Carga: ${e.cargaCoach || 'Libre'}`).join('\n');
+
+          const { error: errUpdate } = await sb
+            .from('planificaciones')
+            .update({
+              ejercicios: textoCombinado,
+              ejercicios_detalle: detallesCombinados
+            })
+            .eq('id', existente.id);
+
+          if (!errUpdate) {
+            alert(`¡Se anexaron los ejercicios al ${dia} existente del alumno! Todo en el mismo día.`);
+            sesionActual = [];
+            renderTablaSesion();
+            cargarPlanesAdmin();
+            refrescarRutinas();
+            return;
+          }
+        }
+      }
+
+      if (modo === 'separado') {
+        dia = `${dia} (Bloque ${new Date().toLocaleTimeString().slice(0, 5)})`;
+      }
+
       const { error } = await sb.from('planificaciones').insert([{
         alumno_id: alumno,
         semana: encabezadoCiclo,
-        dia: dia || 'Sesión',
+        dia: dia,
         ejercicios: resumenTexto,
         ejercicios_detalle: sesionActual,
         es_plantilla: comoPlantilla
@@ -1056,7 +1180,7 @@
       if (error) {
         alert("Error al guardar: " + error.message);
       } else {
-        alert(comoPlantilla ? "¡Plantilla inteligente guardada con éxito!" : "¡Planificación asignada con éxito al alumno!");
+        alert(comoPlantilla ? "¡Plantilla inteligente guardada con éxito!" : `¡Planificación asignada con éxito al alumno para el día ${dia}!`);
         sesionActual = [];
         renderTablaSesion();
         cargarPlanesAdmin();
@@ -1161,9 +1285,209 @@
       document.getElementById('stat-racha').innerText = `${racha} ${racha === 1 ? 'Sesión' : 'Sesiones'}`;
     }
 
+    function activarSolapaDia(rutinaId) {
+      rutinasActivasAlumno.forEach(r => {
+        const tarjeta = document.getElementById(`tarjeta-rutina-${r.id}`);
+        const botonTab = document.getElementById(`btn-tab-dia-${r.id}`);
+        if (tarjeta) tarjeta.classList.add('hidden');
+        if (botonTab) {
+          botonTab.classList.remove('tab-dia-active');
+          botonTab.classList.add('bg-slate-900', 'text-slate-300', 'border-slate-800');
+        }
+      });
+
+      const tarjetaActiva = document.getElementById(`tarjeta-rutina-${rutinaId}`);
+      const botonActivo = document.getElementById(`btn-tab-dia-${rutinaId}`);
+      if (tarjetaActiva) tarjetaActiva.classList.remove('hidden');
+      if (botonActivo) {
+        botonActivo.classList.remove('bg-slate-900', 'text-slate-300', 'border-slate-800');
+        botonActivo.classList.add('tab-dia-active');
+      }
+    }
+
+    // ====== PLANILLA DE RMs & PORCENTAJES (EPLEY) ======
+
+    // Recalcular y actualizar tarjeta de RM
+    function recalcularYGuardarRM(alumnoId, ejNombre, pesoInput, repsInput, notasInput) {
+      const p = parseFloat(pesoInput.value) || 0;
+      const r = parseInt(repsInput.value) || 1;
+      const rm = calcularEpley(p, r);
+
+      const labelRM = document.getElementById(`rm-valor-${alumnoId}-${ejNombre}`);
+      if (labelRM) labelRM.innerText = `${rm} kg`;
+
+      // Actualizar tabla de porcentajes
+      const porcentajes = [95, 90, 85, 80, 75, 70, 65, 60];
+      porcentajes.forEach(pct => {
+        const cell = document.getElementById(`pct-${alumnoId}-${ejNombre}-${pct}`);
+        if (cell) cell.innerText = `${Math.round(rm * (pct / 100) * 10) / 10} kg`;
+      });
+
+      // Guardado local
+      const dataObj = {
+        peso: p,
+        reps: r,
+        rm: rm,
+        notas: notasInput ? notasInput.value : ''
+      };
+      localStorage.setItem(`rm_data_${alumnoId}_${ejNombre}`, JSON.stringify(dataObj));
+
+      // Guardado en Supabase
+      sb.from('registros_rm').upsert({
+        alumno_id: alumnoId,
+        ejercicio: ejNombre,
+        peso: p,
+        reps: r,
+        rm_calculado: rm,
+        notas: dataObj.notas
+      }, { onConflict: 'alumno_id,ejercicio' }).then();
+    }
+
+    // Extraer ejercicios de fuerza de la planificación activa para armar la lista de RMs
+    function extraerEjerciciosFuerzaPlanificacion(planificaciones) {
+      const setEjercicios = new Set();
+      planificaciones.forEach(p => {
+        (p.ejercicios_detalle || []).forEach(e => {
+          const blk = (e.bloque || '').toUpperCase();
+          if (blk.includes('FUERZA') || blk.includes('OLÍMPICO') || blk.includes('OLIMPICO') || blk.includes('POTENCIA') || blk.includes('TRACCIONES')) {
+            setEjercicios.add(e.ejercicio);
+          }
+        });
+      });
+      // Si no hay ninguno específico, agregamos los pilares básicos
+      if (setEjercicios.size === 0) {
+        setEjercicios.add("Sentadilla Trasera con Barra Olímpica");
+        setEjercicios.add("Press de Banca Plano con Barra");
+        setEjercicios.add("Peso Muerto Convencional");
+        setEjercicios.add("Power Clean (Cargada de potencia)");
+      }
+      return Array.from(setEjercicios);
+    }
+
+    function renderizarTarjetaRM(alumnoId, ejNombre, editable = true) {
+      const guardado = JSON.parse(localStorage.getItem(`rm_data_${alumnoId}_${ejNombre}`)) || { peso: '', reps: '', rm: 0, notas: '' };
+      const rmActual = guardado.rm || 0;
+      const porcentajes = [95, 90, 85, 80, 75, 70, 65, 60];
+
+      return `
+        <div class="bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 space-y-4 shadow-lg">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            <div>
+              <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">Fuerza & Rendimiento</span>
+              <h4 class="text-base font-black text-white">${ejNombre}</h4>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-900 border border-emerald-500/30 px-3 py-1.5 rounded-xl self-start sm:self-auto">
+              <span class="text-xs text-slate-400 font-bold">1RM Estimado:</span>
+              <span id="rm-valor-${alumnoId}-${ejNombre}" class="text-base font-black text-emerald-400 font-mono">${rmActual} kg</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Carga Levantada (kg):</label>
+              <input type="number" id="rm-p-${alumnoId}-${ejNombre}" value="${guardado.peso}" placeholder="ej: 80" ${!editable ? 'disabled' : ''} oninput="recalcularYGuardarRM('${alumnoId}', '${ejNombre}', this, document.getElementById('rm-r-${alumnoId}-${ejNombre}'), document.getElementById('rm-n-${alumnoId}-${ejNombre}'))" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Repeticiones Logradas:</label>
+              <input type="number" id="rm-r-${alumnoId}-${ejNombre}" value="${guardado.reps}" placeholder="ej: 5" ${!editable ? 'disabled' : ''} oninput="recalcularYGuardarRM('${alumnoId}', '${ejNombre}', document.getElementById('rm-p-${alumnoId}-${ejNombre}'), this, document.getElementById('rm-n-${alumnoId}-${ejNombre}'))" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Anotaciones / Sensaciones:</label>
+              <input type="text" id="rm-n-${alumnoId}-${ejNombre}" value="${guardado.notas}" placeholder="ej: Buen control de barra" ${!editable ? 'disabled' : ''} onchange="recalcularYGuardarRM('${alumnoId}', '${ejNombre}', document.getElementById('rm-p-${alumnoId}-${ejNombre}'), document.getElementById('rm-r-${alumnoId}-${ejNombre}'), this)" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+            </div>
+          </div>
+
+          <!-- TABLA DE PORCENTAJES DE CARGA -->
+          <div class="space-y-1.5">
+            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tabla de Porcentajes de Carga:</span>
+            <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 text-center">
+              ${porcentajes.map(pct => {
+                const kgPct = rmActual ? Math.round(rmActual * (pct / 100) * 10) / 10 : 0;
+                return `
+                  <div class="bg-slate-900/90 border border-slate-800 p-1.5 rounded-lg">
+                    <span class="text-[9px] text-slate-400 font-bold block">${pct}%</span>
+                    <span id="pct-${alumnoId}-${ejNombre}-${pct}" class="text-xs font-black text-emerald-300 font-mono">${kgPct} kg</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function cargarPlanillaRMsAlumno(email) {
+      const cont = document.getElementById('lista-tabla-rms');
+      
+      // Consultar RMs guardados en Supabase para sincronizar
+      const { data: rmsNube } = await sb.from('registros_rm').select('*').eq('alumno_id', email);
+      if (rmsNube && rmsNube.length > 0) {
+        rmsNube.forEach(r => {
+          localStorage.setItem(`rm_data_${email}_${r.ejercicio}`, JSON.stringify({
+            peso: r.peso,
+            reps: r.reps,
+            rm: r.rm_calculado,
+            notas: r.notas || ''
+          }));
+        });
+      }
+
+      const ejercicios = extraerEjerciciosFuerzaPlanificacion(rutinasActivasAlumno);
+      cont.innerHTML = ejercicios.map(ej => renderizarTarjetaRM(email, ej, true)).join('');
+    }
+
+    function agregarFilaRMManual() {
+      const nombre = prompt("Nombre del ejercicio para calcular su 1RM:");
+      if (!nombre || !nombre.trim()) return;
+      const cont = document.getElementById('lista-tabla-rms');
+      const email = usuarioActual ? usuarioActual.email : 'alumno';
+      cont.insertAdjacentHTML('afterbegin', renderizarTarjetaRM(email, nombre.trim(), true));
+    }
+
+    // MONITOREO Y EDICIÓN DE RMs DESDE EL MODO COACH
+    async function cargarRMsAdminParaAlumno(alumnoEmail) {
+      const cont = document.getElementById('contenedor-rms-admin');
+      if (!alumnoEmail) {
+        cont.innerHTML = '<p class="text-slate-500 text-xs">Seleccioná un alumno arriba para ver su planilla de 1RM.</p>';
+        return;
+      }
+
+      const { data: planes } = await sb.from('planificaciones').select('*').eq('alumno_id', alumnoEmail).order('created_at', { ascending: false });
+      const { data: rmsNube } = await sb.from('registros_rm').select('*').eq('alumno_id', alumnoEmail);
+
+      if (rmsNube && rmsNube.length > 0) {
+        rmsNube.forEach(r => {
+          localStorage.setItem(`rm_data_${alumnoEmail}_${r.ejercicio}`, JSON.stringify({
+            peso: r.peso,
+            reps: r.reps,
+            rm: r.rm_calculado,
+            notas: r.notas || ''
+          }));
+        });
+      }
+
+      const ejercicios = extraerEjerciciosFuerzaPlanificacion(planes || []);
+      cont.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-xs font-bold text-white">Planilla de 1RM de <strong class="text-emerald-400">${alumnoEmail}</strong></span>
+          <button type="button" onclick="agregarFilaRMCoach('${alumnoEmail}')" class="text-xs bg-slate-800 hover:bg-slate-700 text-emerald-300 px-3 py-1 rounded-lg font-bold border border-emerald-500/20">＋ Agregar Ejercicio</button>
+        </div>
+        ${ejercicios.map(ej => renderizarTarjetaRM(alumnoEmail, ej, true)).join('')}
+      `;
+    }
+
+    function agregarFilaRMCoach(alumnoEmail) {
+      const nombre = prompt(`Nombre del ejercicio para calcular el 1RM de ${alumnoEmail}:`);
+      if (!nombre || !nombre.trim()) return;
+      const cont = document.getElementById('contenedor-rms-admin');
+      cont.insertAdjacentHTML('beforeend', renderizarTarjetaRM(alumnoEmail, nombre.trim(), true));
+    }
+
     async function cargarRutinas(userEmail, userId) {
       const contActual = document.getElementById('lista-rutinas');
       const contHistorial = document.getElementById('lista-historial');
+      const contTabsDias = document.getElementById('contenedor-tabs-dias');
+      const barraSolapas = document.getElementById('barra-solapas-dias');
 
       const tot = parseInt(localStorage.getItem(`stats_total_${userEmail}`) || "1");
       const rac = parseInt(localStorage.getItem(`stats_racha_${userEmail}`) || "1");
@@ -1179,22 +1503,39 @@
       if (error || !data || data.length === 0) {
         contActual.innerHTML = '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-400">Todavía no tenés planificaciones cargadas para tu cuenta. Tu entrenador te la asignará a la brevedad.</div>';
         contHistorial.innerHTML = '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-500">Sin rutinas en el historial.</div>';
+        contTabsDias.classList.add('hidden');
         return;
       }
 
-      const rutinaActiva = data.slice(0, 1);
-      const rutinasViejas = data.slice(1);
+      const ultimaSemana = data[0].semana;
+      rutinasActivasAlumno = data.filter(d => d.semana === ultimaSemana);
+      const rutinasViejas = data.filter(d => d.semana !== ultimaSemana);
 
-      contActual.innerHTML = renderizarListaTarjetas(rutinaActiva, false);
+      if (rutinasActivasAlumno.length > 1) {
+        contTabsDias.classList.remove('hidden');
+        barraSolapas.innerHTML = rutinasActivasAlumno.map((r, idx) => `
+          <button type="button" id="btn-tab-dia-${r.id}" onclick="activarSolapaDia('${r.id}')" class="px-4 py-2 rounded-xl text-xs font-bold border transition whitespace-nowrap ${idx === 0 ? 'tab-dia-active' : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'}">
+            📑 ${r.dia || `Día ${idx + 1}`}
+          </button>
+        `).join('');
+      } else {
+        contTabsDias.classList.add('hidden');
+      }
+
+      contActual.innerHTML = renderizarListaTarjetas(rutinasActivasAlumno, false);
       contHistorial.innerHTML = rutinasViejas.length > 0 ? renderizarListaTarjetas(rutinasViejas, true) : '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-500">Todavía no tenés rutinas archivadas.</div>';
+
+      if (rutinasActivasAlumno.length > 0) {
+        activarSolapaDia(rutinasActivasAlumno[0].id);
+      }
     }
 
     function renderizarListaTarjetas(lista, esHistorial = false) {
-      return lista.map(r => {
+      return lista.map((r, rIdx) => {
         const detalles = r.ejercicios_detalle || [];
         const bloques = {};
         detalles.forEach((ej, idx) => {
-          const bloqueNombre = ej.bloque || "Bloque General";
+          const bloqueNombre = ej.bloque || "BLOQUE GENERAL";
           if (!bloques[bloqueNombre]) bloques[bloqueNombre] = [];
           bloques[bloqueNombre].push({ ...ej, originalIndex: idx });
         });
@@ -1206,13 +1547,12 @@
         const fechaRealGuardada = localStorage.getItem(`fecha_ejecucion_${r.id}`) || new Date().toISOString().split('T')[0];
 
         return `
-          <div class="bg-slate-900 border ${esHistorial ? 'border-slate-800/80 opacity-90' : 'border-slate-800'} p-5 md:p-6 rounded-3xl shadow-xl space-y-5 print-clean">
+          <div id="tarjeta-rutina-${r.id}" class="${!esHistorial && rIdx > 0 ? 'hidden' : ''} bg-slate-900 border ${esHistorial ? 'border-slate-800/80 opacity-90' : 'border-slate-800'} p-5 md:p-6 rounded-3xl shadow-xl space-y-6 print-clean">
             
-            <!-- ENCABEZADO CON SELECTOR DE DÍA Y BOTÓN PDF -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
               <div>
                 <span class="text-xs uppercase font-extrabold tracking-wider bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">${r.semana || 'Planificación'}</span>
-                <h4 class="text-xl font-black text-white mt-1.5">${r.dia || 'Entrenamiento'}</h4>
+                <h4 class="text-2xl font-black text-white mt-1.5">${r.dia || 'Entrenamiento'}</h4>
               </div>
 
               <div class="flex items-center gap-2 self-start md:self-auto">
@@ -1234,7 +1574,6 @@
               </div>
             </div>
 
-            <!-- CHECK-IN DE BIENESTAR PREVIO AL ENTRENO -->
             <div class="bg-slate-950/90 border border-blue-500/30 p-4 rounded-2xl space-y-2 no-print">
               <span class="text-[11px] font-bold text-blue-400 uppercase tracking-wider block">🩺 Check-in Diario de Bienestar (Previo al entreno)</span>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
@@ -1271,21 +1610,22 @@
               </div>
             </div>
 
-            <!-- BLOQUES DE EJERCICIOS CON BOTÓN DE VIDEO Y CARGA COACH VISIBLES -->
-            <div class="space-y-4">
+            <div class="space-y-6">
               ${Object.keys(bloques).map((nombreBloque, bIdx) => {
                 const bloqueId = `bloque_c_${r.id}_${bIdx}`;
                 return `
-                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-                  <div onclick="toggleBloqueAlumno('${bloqueId}')" class="flex items-center justify-between border-b border-slate-800 pb-2 cursor-pointer">
-                    <div class="flex items-center gap-2">
-                      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
-                      <h5 class="text-sm font-bold uppercase tracking-wide text-emerald-300">${nombreBloque}</h5>
+                <div class="bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 shadow-md space-y-4">
+                  <div onclick="toggleBloqueAlumno('${bloqueId}')" class="flex items-center justify-between border-b border-slate-800/80 pb-3 cursor-pointer select-none">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-3 h-3 rounded-full bg-emerald-400 inline-block shadow-sm shadow-emerald-400/50"></span>
+                      <h5 class="text-sm md:text-base font-black uppercase tracking-wider text-emerald-300">${nombreBloque}</h5>
                     </div>
-                    <span class="text-[10px] text-slate-500 hover:text-slate-300 no-print">▼ Plegar</span>
+                    <span class="text-[10px] text-slate-500 hover:text-slate-300 font-bold bg-slate-900 border border-slate-800 px-2 py-1 rounded-lg no-print">
+                      ▼ Plegar
+                    </span>
                   </div>
 
-                  <div id="${bloqueId}" class="space-y-3">
+                  <div id="${bloqueId}" class="space-y-3.5">
                     ${bloques[nombreBloque].map(item => {
                       const cantSeries = parseInt(item.series) || 1;
                       const segs = parseSegundos(item.descanso);
@@ -1293,7 +1633,7 @@
                       const cargaAsignadaCoach = item.cargaCoach || '';
 
                       return `
-                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3">
+                        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl space-y-3">
                           <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                             <div>
                               <div class="flex flex-wrap items-center gap-2">
@@ -1301,7 +1641,7 @@
                                 ${cargaAsignadaCoach ? `<span class="text-[11px] text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg font-bold">🎯 Carga Coach: ${cargaAsignadaCoach}</span>` : ''}
                                 ${cargaAnterior ? `<span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded font-mono">Última: ${cargaAnterior}</span>` : ''}
                               </div>
-                              <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300 mt-1">
+                              <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300 mt-1.5">
                                 <span class="bg-slate-800 px-2.5 py-0.5 rounded font-medium">${item.series} series x ${item.reps}</span>
                                 <span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">${item.rir}</span>
                                 <button type="button" onclick="iniciarTimerDescanso(${segs})" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-0.5 rounded text-slate-200 font-medium flex items-center gap-1 active:scale-95 transition no-print">
@@ -1310,7 +1650,6 @@
                               </div>
                             </div>
                             
-                            <!-- BOTÓN DE VIDEO DIRECTAMENTE VISIBLE PARA EL ALUMNO -->
                             ${item.video ? `
                               <a href="${item.video}" target="_blank" rel="noopener noreferrer" class="text-xs bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30 px-3.5 py-2 rounded-xl font-bold flex items-center gap-1.5 self-start md:self-auto transition no-print shadow-sm">
                                 ▶ Ver Video Demostrativo
