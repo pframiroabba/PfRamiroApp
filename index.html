@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PF Ramiro - Planificaciones Koena</title>
+  <title>PF Ramiro Abbattista - Planificaciones Online</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-  <!-- Soporte para arrastrar y soltar (Drag and Drop) -->
+  <!-- Drag and Drop para reordenar ejercicios -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <style>
     .serie-done {
@@ -26,95 +26,122 @@
     }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-20">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 antialiased">
 
   <!-- CRONÓMETRO FLOTANTE -->
-  <div id="timer-box" class="hidden fixed bottom-4 right-4 bg-slate-800 border-2 border-emerald-500 shadow-2xl rounded-2xl p-4 z-50 flex items-center gap-4">
+  <div id="timer-box" class="hidden fixed bottom-4 right-4 bg-slate-900 border-2 border-emerald-500 shadow-2xl rounded-2xl p-4 z-50 flex items-center gap-4">
     <div>
       <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Pausa de descanso</span>
       <span id="timer-display" class="text-3xl font-black text-emerald-400 font-mono">01:30</span>
     </div>
     <div class="flex gap-1.5">
-      <button onclick="pausarReanudarTimer()" id="btn-timer-toggle" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold">Pausa</button>
+      <button onclick="pausarReanudarTimer()" id="btn-timer-toggle" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white">Pausa</button>
       <button onclick="cerrarTimer()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-2.5 py-1.5 rounded-lg text-xs font-bold">✕</button>
     </div>
   </div>
 
-  <!-- BARRA DE NAVEGACIÓN -->
-  <header class="bg-slate-800 border-b border-slate-700 px-4 md:px-6 py-4 flex justify-between items-center sticky top-0 z-40">
-    <div class="flex items-center gap-2">
-      <span class="text-xl">⚡</span>
-      <h1 class="text-lg md:text-xl font-bold tracking-wide text-emerald-400">PF Ramiro</h1>
+  <!-- ENCABEZADO SUPERIOR -->
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 md:px-8 py-3 flex justify-between items-center sticky top-0 z-40">
+    <div class="flex items-center gap-3">
+      <img src="logo.png" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-10 w-10 md:h-12 md:w-12 object-contain rounded-lg border border-slate-700">
+      <div>
+        <h1 class="text-base md:text-lg font-black tracking-wide text-white leading-tight">PF RAMIRO ABBATTISTA</h1>
+        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Preparación Física & Rendimiento</span>
+      </div>
     </div>
-    <div id="usuario-info" class="hidden items-center gap-3">
-      <span id="user-email" class="text-xs md:text-sm text-slate-300 font-medium truncate max-w-[150px] md:max-w-none"></span>
-      <button onclick="cerrarSesion()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Salir</button>
+    
+    <div class="flex items-center gap-2">
+      <button onclick="solicitarClaveAdmin()" id="btn-admin-access" class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-lg font-bold transition">
+        🔒 Modo Entrenador
+      </button>
+      <div id="usuario-info" class="hidden items-center gap-2">
+        <span id="user-email" class="text-xs text-slate-400 hidden md:inline font-mono"></span>
+        <button onclick="cerrarSesion()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Salir</button>
+      </div>
     </div>
   </header>
 
-  <!-- PANTALLA INICIO DE SESIÓN -->
-  <main id="seccion-auth" class="max-w-md mx-auto mt-14 p-6 bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl mx-4 md:mx-auto">
-    <h2 class="text-2xl font-bold text-center mb-1">Entrenamientos Online</h2>
-    <p class="text-sm text-slate-400 text-center mb-6">Ingresá a tu planificación personalizada</p>
-    
-    <div class="space-y-4">
+  <!-- PANTALLA INICIO / ACCESO -->
+  <main id="seccion-auth" class="max-w-md mx-auto mt-10 p-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl mx-4 md:mx-auto text-center space-y-6">
+    <!-- LOGO DESTACADO EN EL INICIO -->
+    <div class="flex flex-col items-center">
+      <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 shadow-inner mb-3">
+        <img src="logo.png" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-28 w-28 md:h-32 md:w-32 object-contain">
+      </div>
+      <h2 class="text-2xl font-black text-white tracking-wide">PF Ramiro Abbattista</h2>
+      <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma de Alumnos</p>
+    </div>
+
+    <!-- FORMULARIO DE ACCESO -->
+    <div class="space-y-4 text-left">
       <div>
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Correo Electrónico</label>
-        <input type="email" id="email" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="tu@email.com">
+        <input type="email" id="email" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="tu@email.com">
       </div>
       <div>
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Contraseña</label>
-        <input type="password" id="password" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500" placeholder="••••••••">
+        <input type="password" id="password" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="••••••••">
       </div>
-      <button type="button" id="btn-login" onclick="iniciarSesion()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-2.5 rounded-lg transition active:scale-95 shadow-lg shadow-emerald-500/10">Iniciar Sesión</button>
-      <button type="button" id="btn-registro" onclick="registrarse()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-2.5 rounded-lg transition text-sm active:scale-95">Crear cuenta nueva</button>
+      <button type="button" id="btn-login" onclick="iniciarSesion()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3 rounded-xl transition active:scale-95 shadow-lg shadow-emerald-500/20 text-sm uppercase tracking-wider">
+        Ingresar a mi Plan
+      </button>
+      <button type="button" id="btn-registro" onclick="registrarse()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl transition text-xs active:scale-95">
+        Crear cuenta nueva de alumno
+      </button>
     </div>
-    <p id="auth-mensaje" class="text-center text-sm mt-4 text-emerald-400 font-semibold"></p>
+
+    <div class="pt-2 border-t border-slate-800">
+      <button onclick="solicitarClaveAdmin()" class="text-xs text-slate-400 hover:text-emerald-400 font-medium transition">
+        ¿Sos Ramiro? Accedé con tu clave de entrenador
+      </button>
+    </div>
+    
+    <p id="auth-mensaje" class="text-center text-xs text-emerald-400 font-semibold"></p>
   </main>
 
-  <!-- PANTALLA PRINCIPAL -->
+  <!-- PANTALLA PRINCIPAL: PLANIFICACIONES Y GESTIÓN -->
   <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- PANEL DEL ENTRENADOR -->
-    <div id="seccion-admin" class="hidden bg-slate-800 p-5 md:p-6 rounded-2xl border border-emerald-500/40 shadow-xl space-y-6">
-      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+    <!-- PANEL DEL ENTRENADOR (PROTEGIDO CON CONTRASEÑA MAESTRA) -->
+    <div id="seccion-admin" class="hidden bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-6">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div>
-          <h3 class="text-lg font-bold text-emerald-400 flex items-center gap-2">🛠️ Diseñador de Planificación</h3>
-          <p class="text-xs text-slate-400">Armá la sesión por bloques, agregá ejercicios y arrastralos para ordenar.</p>
+          <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🛠️ Creador de Rutinas Personalizadas</h3>
+          <p class="text-xs text-slate-400">Arma las sesiones por bloques, arrastra para ordenar y asigna al instante.</p>
         </div>
-        <span class="text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">Coach</span>
+        <span class="text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">Modo Coach Activo</span>
       </div>
 
-      <!-- DATOS DE ASIGNACIÓN -->
+      <!-- CAMPOS PRINCIPALES -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
           <label class="text-xs text-slate-400 font-semibold">Correo o Nombre del Alumno</label>
-          <input type="text" id="admin-alumno" placeholder="ej: imanol@gmail.com" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1 text-white">
+          <input type="text" id="admin-alumno" placeholder="ej: imanol@gmail.com o Imanol" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
         </div>
         <div>
-          <label class="text-xs text-slate-400 font-semibold">Semana / Microciclo</label>
-          <input type="text" id="admin-semana" placeholder="Semana 1 - Fuerza y Potencia" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1 text-white">
+          <label class="text-xs text-slate-400 font-semibold">Semana / Ciclo</label>
+          <input type="text" id="admin-semana" placeholder="Semana 1 - Fuerza y Potencia" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
         </div>
         <div>
           <label class="text-xs text-slate-400 font-semibold">Día / Enfoque</label>
-          <input type="text" id="admin-dia" placeholder="Día 1 - Tren Inferior + Oly" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mt-1 text-white">
+          <input type="text" id="admin-dia" placeholder="Día 1 - Tren Inferior & Arranque" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
         </div>
       </div>
 
-      <!-- SELECTOR Y CONFIGURADOR DE BLOQUES -->
-      <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 space-y-4">
+      <!-- SELECTOR Y DETALLES -->
+      <div class="bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 space-y-4">
         <div class="flex justify-between items-center">
-          <span class="text-xs uppercase font-bold text-emerald-400 tracking-wider">1. Configurar Bloque y Ejercicio</span>
+          <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">1. Seleccionar Ejercicio por Patrón / Movilidad</span>
           <div class="flex gap-2">
-            <button onclick="crearNuevoEjercicio()" class="text-xs bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded text-emerald-300 font-medium">+ Crear Ejercicio</button>
-            <button onclick="eliminarEjercicioSeleccionado()" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-300 px-2.5 py-1 rounded font-medium">Eliminar Ejercicio</button>
+            <button onclick="crearNuevoEjercicio()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg text-emerald-300 font-bold">+ Crear Ejercicio</button>
+            <button onclick="eliminarEjercicioSeleccionado()" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-300 px-3 py-1 rounded-lg font-bold">Eliminar</button>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-6 gap-2.5">
           <div class="md:col-span-2">
-            <label class="text-[11px] text-slate-400 font-medium">Bloque de Entrenamiento</label>
-            <select id="inp-bloque" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-emerald-300 font-semibold mt-1">
+            <label class="text-[11px] text-slate-400 font-semibold">Bloque de la Sesión</label>
+            <select id="inp-bloque" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-emerald-300 font-bold mt-1">
               <option value="Movilidad Articular">Movilidad Articular</option>
               <option value="Entrada en Calor / Warm-up">Entrada en Calor / Warm-up</option>
               <option value="Bloque A - Olímpico / Potencia">Bloque A - Olímpico / Potencia</option>
@@ -126,16 +153,16 @@
           </div>
 
           <div class="md:col-span-2">
-            <label class="text-[11px] text-slate-400 font-medium">Categoría / Patrón</label>
-            <select id="sel-categoria" onchange="cargarEjerciciosPorCategoria()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 mt-1">
-              <optgroup label="Movilidad Articular">
+            <label class="text-[11px] text-slate-400 font-semibold">Patrón / Categoría</label>
+            <select id="sel-categoria" onchange="cargarEjerciciosPorCategoria()" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-slate-200 mt-1">
+              <optgroup label="Movilidad Articular Específica">
                 <option value="mov_tobillo">Movilidad - Tobillo</option>
                 <option value="mov_cadera">Movilidad - Cadera y Pelvis</option>
                 <option value="mov_toracica">Movilidad - Columna Torácica</option>
                 <option value="mov_hombros">Movilidad - Hombro y Escápula</option>
                 <option value="mov_muneca">Movilidad - Muñeca</option>
               </optgroup>
-              <optgroup label="Fuerza y Rendimiento">
+              <optgroup label="Fuerza, Rendimiento & Surf">
                 <option value="olimpicos">Levantamiento Olímpico y Derivados</option>
                 <option value="balisticos">Potencia y Balísticos</option>
                 <option value="inferior_rodilla">Tren Inferior - Dom. Rodilla</option>
@@ -149,27 +176,28 @@
           </div>
 
           <div class="md:col-span-2">
-            <label class="text-[11px] text-slate-400 font-medium">Ejercicio Específico</label>
-            <select id="sel-ejercicio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 mt-1"></select>
+            <label class="text-[11px] text-slate-400 font-semibold">Ejercicio</label>
+            <select id="sel-ejercicio" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-slate-200 mt-1"></select>
           </div>
         </div>
 
+        <!-- SERIES, REPS, RIR, DESCANSO -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
           <div>
-            <label class="text-[11px] text-slate-400">Series</label>
-            <input type="number" id="inp-series" value="3" min="1" max="20" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white">
+            <label class="text-[11px] text-slate-400 font-semibold">Series</label>
+            <input type="number" id="inp-series" value="3" min="1" max="20" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
           </div>
           <div>
-            <label class="text-[11px] text-slate-400">Repeticiones (1 a 100)</label>
-            <select id="inp-reps" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white"></select>
+            <label class="text-[11px] text-slate-400 font-semibold">Repeticiones (1 a 100)</label>
+            <select id="inp-reps" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white"></select>
           </div>
           <div>
-            <label class="text-[11px] text-slate-400">RIR (1 a 10) / Esfuerzo</label>
-            <select id="inp-rir" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white"></select>
+            <label class="text-[11px] text-slate-400 font-semibold">RIR (1 a 10) / Esfuerzo</label>
+            <select id="inp-rir" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white"></select>
           </div>
           <div>
-            <label class="text-[11px] text-slate-400">Descanso (segundos)</label>
-            <select id="inp-descanso" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white">
+            <label class="text-[11px] text-slate-400 font-semibold">Descanso (seg)</label>
+            <select id="inp-descanso" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
               <option value="30s">30 seg</option>
               <option value="45s">45 seg</option>
               <option value="60s">60 seg (1 min)</option>
@@ -183,49 +211,48 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-          <input type="text" id="inp-video" placeholder="Link de Video YouTube (opcional)" class="md:col-span-3 bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white">
-          <button onclick="agregarFilaRutina()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-2.5 rounded-lg text-sm transition active:scale-95">＋ Agregar Ejercicio</button>
+          <input type="text" id="inp-video" placeholder="Link de Video YouTube (opcional)" class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
+          <button onclick="agregarFilaRutina()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black p-2.5 rounded-xl text-sm transition active:scale-95">＋ Agregar Ejercicio</button>
         </div>
       </div>
 
-      <!-- TABLA PREVIA REORDENABLE CON DRAG & DROP -->
+      <!-- TABLA REORDENABLE -->
       <div class="space-y-2">
         <div class="flex justify-between items-center">
-          <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">2. Resumen de Sesión (Arrastrá ☰ para reordenar)</span>
-          <span class="text-[11px] text-emerald-400">☰ Arrastrar filas</span>
+          <span class="text-xs uppercase font-extrabold text-slate-400 tracking-wider">2. Vista Previa de la Sesión (Arrastrá ☰ para ordenar)</span>
         </div>
-        <div class="overflow-x-auto border border-slate-700 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto border border-slate-800 rounded-2xl overflow-hidden bg-slate-950">
           <table class="w-full text-left text-xs">
-            <thead class="bg-slate-900 text-slate-400 uppercase font-bold">
+            <thead class="bg-slate-900 text-slate-400 uppercase font-black">
               <tr>
-                <th class="p-2.5 w-8 text-center">↕</th>
-                <th class="p-2.5">Bloque</th>
-                <th class="p-2.5">Ejercicio</th>
-                <th class="p-2.5">Series</th>
-                <th class="p-2.5">Reps</th>
-                <th class="p-2.5">RIR</th>
-                <th class="p-2.5">Descanso</th>
-                <th class="p-2.5">Video</th>
-                <th class="p-2.5 text-center">Quitar</th>
+                <th class="p-3 w-8 text-center">↕</th>
+                <th class="p-3">Bloque</th>
+                <th class="p-3">Ejercicio</th>
+                <th class="p-3">Series</th>
+                <th class="p-3">Reps</th>
+                <th class="p-3">RIR</th>
+                <th class="p-3">Pausa</th>
+                <th class="p-3">Video</th>
+                <th class="p-3 text-center">Quitar</th>
               </tr>
             </thead>
-            <tbody id="tabla-ejercicios-body" class="divide-y divide-slate-800 bg-slate-800/40">
+            <tbody id="tabla-ejercicios-body" class="divide-y divide-slate-800">
               <tr id="fila-vacia"><td colspan="9" class="p-4 text-center text-slate-500">Todavía no agregaste ejercicios a la sesión.</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <button onclick="guardarPlanificacionCompleta()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3.5 rounded-xl transition shadow-lg shadow-emerald-500/10 active:scale-98 text-sm uppercase tracking-wide">
-        🚀 Asignar y Publicar Planificación
+      <button onclick="guardarPlanificacionCompleta()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-4 rounded-2xl transition shadow-xl shadow-emerald-500/20 active:scale-98 text-sm uppercase tracking-wider">
+        🚀 Asignar y Guardar Planificación
       </button>
     </div>
 
-    <!-- VISTA ALUMNO -->
+    <!-- LISTADO DE PLANIFICACIONES DEL ALUMNO -->
     <div>
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold flex items-center gap-2">📋 Tu Rutina de Entrenamiento</h3>
-        <button onclick="refrescarRutinas()" class="text-xs bg-slate-800 border border-slate-700 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-slate-300 font-medium">Actualizar</button>
+        <h3 class="text-xl font-black text-white flex items-center gap-2">📋 Tu Rutina de Entrenamiento</h3>
+        <button onclick="refrescarRutinas()" class="text-xs bg-slate-900 border border-slate-800 hover:bg-slate-800 px-3 py-1.5 rounded-lg text-slate-300 font-bold transition">Actualizar</button>
       </div>
       <div id="lista-rutinas" class="space-y-6">
         <p class="text-slate-500 text-sm">Cargando tus entrenamientos...</p>
@@ -237,8 +264,12 @@
     const SUPABASE_URL = 'https://zuwqfzfncybtwvzwlqmw.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1d3FmemZuY3lidHd2endscW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2OTgzMTYsImV4cCI6MjEwNjI3NDMxNn0.B2NPB2q5Blni4KNcBoyvfp8yW70hC0KqOgm3O2q1gGI';
 
+    // CLAVE MAESTRA ÚNICA DE ENTRENADOR
+    const CLAVE_ADMIN_MASTER = 'ramiro2026';
+
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // BIBLIOTECA EXTENSA CON MOVILIDAD Y FUERZA
     const BIBLIOTECA_DEFAULT = {
       mov_tobillo: [
         "Dorsiflexión contra pared con rodilla adelantada",
@@ -345,8 +376,27 @@
     let sesionActual = [];
     let usuarioActual = null;
     let sortableInstance = null;
+    let esAdminVerificado = sessionStorage.getItem('admin_master_ok') === 'true';
 
-    // TEMPORIZADOR
+    // SOLICITUD DE CLAVE MAESTRA
+    function solicitarClaveAdmin() {
+      const clave = prompt("Ingresá la Clave de Administrador:");
+      if (!clave) return;
+
+      if (clave === CLAVE_ADMIN_MASTER) {
+        esAdminVerificado = true;
+        sessionStorage.setItem('admin_master_ok', 'true');
+        alert("¡Acceso concedido! Panel de Entrenador activado.");
+        document.getElementById('seccion-admin').classList.remove('hidden');
+        document.getElementById('seccion-auth').classList.add('hidden');
+        document.getElementById('seccion-panel').classList.remove('hidden');
+        inicializarSelectores();
+      } else {
+        alert("Clave incorrecta. Intentalo nuevamente.");
+      }
+    }
+
+    // TIMER
     let timerInterval = null;
     let tiempoRestante = 90;
     let timerEnPausa = false;
@@ -458,7 +508,7 @@
 
     function agregarFilaRutina() {
       const ejercicio = document.getElementById('sel-ejercicio').value;
-      if (!ejercicio) return alert("Selecciona un ejercicio válido.");
+      if (!ejercicio) return alert("Seleccioná un ejercicio válido.");
 
       const item = {
         bloque: document.getElementById('inp-bloque').value,
@@ -480,7 +530,6 @@
       renderTablaSesion();
     }
 
-    // INICIALIZADOR DRAG & DROP
     function inicializarDragAndDrop() {
       const el = document.getElementById('tabla-ejercicios-body');
       if (sortableInstance) sortableInstance.destroy();
@@ -505,16 +554,16 @@
       }
 
       tbody.innerHTML = sesionActual.map((f, i) => `
-        <tr class="hover:bg-slate-800 transition select-none">
-          <td class="p-2.5 text-center text-slate-400 font-bold handle-drag cursor-grab">☰</td>
-          <td class="p-2.5 font-bold text-emerald-400 text-xs">${f.bloque}</td>
-          <td class="p-2.5 text-white font-medium">${f.ejercicio}</td>
-          <td class="p-2.5 text-slate-300">${f.series}</td>
-          <td class="p-2.5 text-slate-300">${f.reps}</td>
-          <td class="p-2.5 text-emerald-300 font-semibold">${f.rir}</td>
-          <td class="p-2.5 text-slate-300">${f.descanso}</td>
-          <td class="p-2.5">${f.video ? `<a href="${f.video}" target="_blank" class="text-emerald-400 hover:underline">Ver</a>` : '-'}</td>
-          <td class="p-2.5 text-center"><button onclick="eliminarFila(${i})" class="text-red-400 hover:text-red-300 font-bold px-2 py-1">✕</button></td>
+        <tr class="hover:bg-slate-900 transition select-none">
+          <td class="p-3 text-center text-slate-400 font-bold handle-drag cursor-grab">☰</td>
+          <td class="p-3 font-bold text-emerald-400 text-xs">${f.bloque}</td>
+          <td class="p-3 text-white font-medium">${f.ejercicio}</td>
+          <td class="p-3 text-slate-300">${f.series}</td>
+          <td class="p-3 text-slate-300">${f.reps}</td>
+          <td class="p-3 text-emerald-300 font-semibold">${f.rir}</td>
+          <td class="p-3 text-slate-300">${f.descanso}</td>
+          <td class="p-3">${f.video ? `<a href="${f.video}" target="_blank" class="text-emerald-400 hover:underline font-bold">Ver</a>` : '-'}</td>
+          <td class="p-3 text-center"><button onclick="eliminarFila(${i})" class="text-red-400 hover:text-red-300 font-bold px-2 py-1">✕</button></td>
         </tr>
       `).join('');
     }
@@ -572,7 +621,7 @@
         .order('created_at', { ascending: false });
 
       if (error || !data || data.length === 0) {
-        contenedor.innerHTML = '<div class="p-8 bg-slate-800 rounded-2xl border border-slate-700 text-center text-slate-400">Todavía no tenés planificaciones cargadas para tu cuenta. Tu entrenador te la asignará a la brevedad.</div>';
+        contenedor.innerHTML = '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-400">Todavía no tenés planificaciones cargadas para tu cuenta. Tu entrenador te la asignará a la brevedad.</div>';
         return;
       }
 
@@ -586,8 +635,8 @@
         });
 
         return `
-          <div class="bg-slate-800 border border-slate-700 p-5 md:p-6 rounded-2xl shadow-xl space-y-5">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-700/80 pb-3">
+          <div class="bg-slate-900 border border-slate-800 p-5 md:p-6 rounded-3xl shadow-xl space-y-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-800 pb-3">
               <div>
                 <span class="text-xs uppercase font-extrabold tracking-wider bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">${r.semana || 'Planificación'}</span>
                 <h4 class="text-xl font-black text-white mt-1.5">${r.dia || 'Entrenamiento'}</h4>
@@ -597,7 +646,7 @@
 
             <div class="space-y-6">
               ${Object.keys(bloques).map(nombreBloque => `
-                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60 space-y-3">
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
                   <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
                     <h5 class="text-sm font-bold uppercase tracking-wide text-emerald-300">${nombreBloque}</h5>
@@ -608,14 +657,14 @@
                       const cantSeries = parseInt(item.series) || 1;
                       const segs = parseSegundos(item.descanso);
                       return `
-                        <div class="bg-slate-800/90 border border-slate-700/80 p-3.5 rounded-xl space-y-3">
+                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3">
                           <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                             <div>
                               <h6 class="font-bold text-white text-base">${item.ejercicio}</h6>
                               <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300 mt-1">
-                                <span class="bg-slate-700/80 px-2 py-0.5 rounded font-medium">${item.series} series x ${item.reps}</span>
+                                <span class="bg-slate-800 px-2.5 py-0.5 rounded font-medium">${item.series} series x ${item.reps}</span>
                                 <span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">${item.rir}</span>
-                                <button onclick="iniciarTimerDescanso(${segs})" class="bg-slate-700 hover:bg-slate-600 px-2 py-0.5 rounded text-slate-200 font-medium flex items-center gap-1 active:scale-95 transition">
+                                <button onclick="iniciarTimerDescanso(${segs})" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-0.5 rounded text-slate-200 font-medium flex items-center gap-1 active:scale-95 transition">
                                   ⏱️ Pausa: ${item.descanso}
                                 </button>
                               </div>
@@ -623,7 +672,7 @@
                             ${item.video ? `<a href="${item.video}" target="_blank" class="text-xs bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 self-start md:self-auto transition">▶ Video Demostración</a>` : ''}
                           </div>
 
-                          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-slate-700/50">
+                          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-slate-800">
                             ${Array.from({ length: cantSeries }).map((_, sIdx) => {
                               const doneKey = `done_${r.id}_${item.originalIndex}_${sIdx}`;
                               const isDone = localStorage.getItem(doneKey) === 'true';
@@ -631,12 +680,12 @@
                               const cargaGuardada = localStorage.getItem(cargaKey) || '';
 
                               return `
-                                <div class="flex items-center gap-2 bg-slate-900/80 p-2 rounded-lg border border-slate-700 ${isDone ? 'serie-done' : ''}">
+                                <div class="flex items-center gap-2 bg-slate-950 p-2 rounded-lg border border-slate-800 ${isDone ? 'serie-done' : ''}">
                                   <button onclick="toggleSerieCompletada(this.parentElement, '${r.id}', ${item.originalIndex},${sIdx})" class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 flex items-center justify-center text-xs font-black transition">
                                     ✓
                                   </button>
                                   <span class="text-[11px] text-slate-400 font-bold">S${sIdx + 1}:</span>
-                                  <input type="text" placeholder="Kg / RPE" value="${cargaGuardada}" onchange="guardarCargaAlumno('${r.id}', ${item.originalIndex},${sIdx}, this.value)" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-400">
+                                  <input type="text" placeholder="Kg / RPE" value="${cargaGuardada}" onchange="guardarCargaAlumno('${r.id}', ${item.originalIndex},${sIdx}, this.value)" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-400">
                                 </div>
                               `;
                             }).join('')}
@@ -657,21 +706,23 @@
       if (usuarioActual) cargarRutinas(usuarioActual.email, usuarioActual.id);
     }
 
-    // AUTH
+    // AUTENTICACIÓN
     sb.auth.onAuthStateChange((event, session) => {
       if (session) {
         usuarioActual = session.user;
         mostrarPanel(session.user);
       } else {
         usuarioActual = null;
-        mostrarLogin();
+        if (!esAdminVerificado) {
+          mostrarLogin();
+        }
       }
     });
 
     function mostrarMensaje(txt, esError = false) {
       const p = document.getElementById('auth-mensaje');
       p.innerText = txt;
-      p.className = esError ? "text-center text-sm mt-4 text-red-400 font-semibold" : "text-center text-sm mt-4 text-emerald-400 font-semibold";
+      p.className = esError ? "text-center text-xs text-red-400 font-semibold" : "text-center text-xs text-emerald-400 font-semibold";
     }
 
     async function iniciarSesion() {
@@ -692,10 +743,12 @@
       mostrarMensaje("Creando cuenta...");
       const { data, error } = await sb.auth.signUp({ email, password });
       if (error) mostrarMensaje("Error: " + error.message, true);
-      else mostrarMensaje("Cuenta creada. Ya podés iniciar sesión.");
+      else mostrarMensaje("Cuenta creada con éxito. Ya podés iniciar sesión.");
     }
 
     async function cerrarSesion() {
+      sessionStorage.removeItem('admin_master_ok');
+      esAdminVerificado = false;
       await sb.auth.signOut();
       mostrarLogin();
     }
@@ -704,6 +757,7 @@
       document.getElementById('seccion-auth').classList.remove('hidden');
       document.getElementById('seccion-panel').classList.add('hidden');
       document.getElementById('usuario-info').classList.add('hidden');
+      document.getElementById('seccion-admin').classList.add('hidden');
     }
 
     async function mostrarPanel(user) {
@@ -713,12 +767,20 @@
       document.getElementById('usuario-info').classList.add('flex');
       document.getElementById('user-email').innerText = user.email;
 
-      if (user.email === 'axiss.training@gmail.com' || user.email === 'axiss.trainig@gmail.com') {
+      if (esAdminVerificado || user.email === 'axiss.training@gmail.com' || user.email === 'axiss.trainig@gmail.com' || user.email === 'pf.ramiroabba@gmail.com') {
         document.getElementById('seccion-admin').classList.remove('hidden');
       }
 
       inicializarSelectores();
       cargarRutinas(user.email, user.id);
+    }
+
+    // Auto-restaurar sesión admin si ya colocó la clave
+    if (esAdminVerificado) {
+      document.getElementById('seccion-admin').classList.remove('hidden');
+      document.getElementById('seccion-auth').classList.add('hidden');
+      document.getElementById('seccion-panel').classList.remove('hidden');
+      inicializarSelectores();
     }
   </script>
 </body>
