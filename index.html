@@ -3,14 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PF Ramiro - Entrenamientos Personalizados</title>
+  <title>PF Ramiro - Planificaciones Koena</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Versión estable de Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
-  <!-- BARRA SUPERIOR -->
   <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
     <h1 class="text-xl font-bold tracking-wide text-emerald-400">⚡ PF Ramiro</h1>
     <div id="usuario-info" class="hidden items-center gap-3">
@@ -19,10 +17,10 @@
     </div>
   </header>
 
-  <!-- PANTALLA 1: LOGIN -->
+  <!-- PANTALLA LOGIN -->
   <main id="seccion-auth" class="max-w-md mx-auto mt-16 p-6 bg-slate-800 rounded-2xl border border-slate-700 shadow-xl">
     <h2 class="text-2xl font-bold text-center mb-2">Ingresar a tus Entrenamientos</h2>
-    <p class="text-sm text-slate-400 text-center mb-6">Ingresá tu correo y contraseña para ver tu plan</p>
+    <p class="text-sm text-slate-400 text-center mb-6">Ingresá tu correo y contraseña</p>
     
     <div class="space-y-4">
       <div>
@@ -39,43 +37,290 @@
     <p id="auth-mensaje" class="text-center text-sm mt-4 text-emerald-400 font-semibold"></p>
   </main>
 
-  <!-- PANTALLA 2: PANEL DEL ALUMNO / ADMIN -->
-  <main id="seccion-panel" class="hidden max-w-4xl mx-auto p-6 space-y-8">
+  <!-- PANEL ALUMNO / ENTRENADOR -->
+  <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
     <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-      <h2 class="text-2xl font-bold text-white mb-1">¡Hola de nuevo! 👋</h2>
-      <p class="text-slate-400 text-sm">Acá tenés tus rutinas asignadas y el historial de entrenamientos.</p>
+      <h2 class="text-2xl font-bold text-white mb-1">¡Bienvenido! 👋</h2>
+      <p class="text-slate-400 text-sm">Panel de entrenamientos y rutinas personalizadas.</p>
     </div>
 
-    <!-- SECCIÓN DE CARGA (SOLO ADMIN/PROFESOR) -->
-    <div id="seccion-admin" class="hidden bg-slate-800/60 p-6 rounded-2xl border border-emerald-500/30">
-      <h3 class="text-lg font-bold text-emerald-400 mb-3">Panel de Entrenador (Asignar Rutina)</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <input type="text" id="admin-alumno-id" placeholder="ID del Alumno (uuid)" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-        <input type="text" id="admin-semana" placeholder="Semana o Mes (Ej: Semana 1)" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-        <input type="text" id="admin-dia" placeholder="Día (Ej: Lunes - Tren Superior)" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
-        <input type="text" id="admin-video" placeholder="Link de Video (YouTube)" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm">
+    <!-- PANEL ENTRENADOR -->
+    <div id="seccion-admin" class="hidden bg-slate-800 p-6 rounded-2xl border border-emerald-500/40 space-y-6">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <h3 class="text-lg font-bold text-emerald-400">📋 Armar Planificación (Estilo Excel / App)</h3>
+        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded">Modo Coach</span>
       </div>
-      <textarea id="admin-ejercicios" rows="3" placeholder="Detalle de ejercicios, series y repeticiones..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm mb-4"></textarea>
-      <button onclick="guardarRutina()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm">Guardar Rutina para Alumno</button>
+
+      <!-- DATOS GENERALES -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <label class="text-xs text-slate-400 font-semibold">Correo o Nombre del Alumno</label>
+          <input type="text" id="admin-alumno" placeholder="ej: imanol@gmail.com" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm mt-1">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 font-semibold">Semana / Ciclo</label>
+          <input type="text" id="admin-semana" placeholder="Semana 1 - Fuerza" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm mt-1">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 font-semibold">Día / Foco</label>
+          <input type="text" id="admin-dia" placeholder="Día 1 - Tren Inferior" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm mt-1">
+        </div>
+      </div>
+
+      <!-- AGREGADOR DE EJERCICIOS -->
+      <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 space-y-4">
+        <div class="flex justify-between items-center">
+          <h4 class="text-sm font-bold text-slate-300">Seleccionar Ejercicio</h4>
+          <div class="flex gap-2">
+            <button onclick="crearNuevoEjercicio()" class="text-xs bg-slate-700 hover:bg-slate-600 px-2.5 py-1 rounded text-emerald-300">+ Crear Ejercicio</button>
+            <button onclick="eliminarEjercicioSeleccionado()" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-300 px-2.5 py-1 rounded">Eliminar de Biblioteca</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-2">
+          <!-- CATEGORÍA -->
+          <div class="md:col-span-2">
+            <select id="sel-categoria" onchange="cargarEjerciciosPorCategoria()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-200">
+              <option value="olimpicos">Levantamiento Olímpico y Derivados</option>
+              <option value="balisticos">Potencia y Balísticos</option>
+              <option value="inferior_rodilla">Tren Inferior - Dom. Rodilla</option>
+              <option value="inferior_cadera">Tren Inferior - Dom. Cadera</option>
+              <option value="superior_empuje">Tren Superior - Empujes</option>
+              <option value="superior_traccion">Tren Superior - Tracciones</option>
+              <option value="core">Zona Media & Funcional Koena</option>
+              <option value="personalizados">Mis Ejercicios Creados</option>
+            </select>
+          </div>
+
+          <!-- LISTA EJERCICIO -->
+          <div class="md:col-span-4">
+            <select id="sel-ejercicio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-slate-200"></select>
+          </div>
+        </div>
+
+        <!-- SERIES, REPS, RIR, PAUSA -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+          <div>
+            <label class="text-[11px] text-slate-400">Bloque (Ej: A1, B1)</label>
+            <input type="text" id="inp-bloque" value="A1" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm">
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400">Series</label>
+            <input type="number" id="inp-series" value="3" min="1" max="20" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm">
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400">Repeticiones (1 a 100)</label>
+            <select id="inp-reps" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm"></select>
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400">RIR (1 a 10)</label>
+            <select id="inp-rir" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm"></select>
+          </div>
+          <div class="col-span-2 md:col-span-1">
+            <label class="text-[11px] text-slate-400">Descanso (seg)</label>
+            <input type="text" id="inp-descanso" placeholder="90s" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+          <input type="text" id="inp-video" placeholder="Link de Video YouTube (opcional)" class="md:col-span-3 bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm">
+          <button onclick="agregarFilaRutina()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-2 rounded-lg text-sm transition">＋ Agregar a Sesión</button>
+        </div>
+      </div>
+
+      <!-- TABLA PREVIA DE LA RUTINA -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border border-slate-700 rounded-lg overflow-hidden">
+          <thead class="bg-slate-900 text-slate-400 uppercase">
+            <tr>
+              <th class="p-2.5">Bloque</th>
+              <th class="p-2.5">Ejercicio</th>
+              <th class="p-2.5">Series</th>
+              <th class="p-2.5">Reps</th>
+              <th class="p-2.5">RIR</th>
+              <th class="p-2.5">Pausa</th>
+              <th class="p-2.5">Video</th>
+              <th class="p-2.5 text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-ejercicios-body" class="divide-y divide-slate-800 bg-slate-800/40">
+            <tr id="fila-vacia"><td colspan="8" class="p-4 text-center text-slate-500">No hay ejercicios agregados a esta sesión.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <button onclick="guardarPlanificacionCompleta()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl transition">Guardar Planificación para el Alumno</button>
     </div>
 
-    <!-- LISTADO DE PLANIFICACIONES -->
+    <!-- LISTADO PLANIFICACIONES DEL ALUMNO -->
     <div>
       <h3 class="text-xl font-bold mb-4 flex items-center gap-2">📋 Tu Plan de Entrenamiento</h3>
-      <div id="lista-rutinas" class="grid grid-cols-1 gap-4">
+      <div id="lista-rutinas" class="space-y-4">
         <p class="text-slate-500">Cargando tus entrenamientos...</p>
       </div>
     </div>
   </main>
 
   <script>
-    // URL y Key oficiales extraídas directamente de tu Supabase
     const SUPABASE_URL = 'https://zuwqfzfncybtwvzwlqmw.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1d3FmemZuY3lidHd2endscW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2OTgzMTYsImV4cCI6MjEwNjI3NDMxNn0.B2NPB2q5Blni4KNcBoyvfp8yW70hC0KqOgm3O2q1gGI';
 
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Escuchar el estado de autenticación
+    // BIBLIOTECA DE EJERCICIOS KOENA
+    const BIBLIOTECA_DEFAULT = {
+      olimpicos: ["Power Clean", "Hang Clean", "Snatch (Arrancada)", "Power Snatch", "Split Jerk", "Push Jerk", "Clean Pull", "Snatch Pull"],
+      balisticos: ["Saltos en Cajón (Box Jump)", "Trap Bar Jump", "Lanzamiento Balón Medicinal al Pecho", "Slam Ball", "Kettlebell Swing Ruso", "Saltos Pliométricos Unilaterales"],
+      inferior_rodilla: ["Sentadilla Trasera Barra", "Sentadilla Frontal", "Sentadilla Búlgara c/ Mancuernas", "Prensa 45°", "Estocadas Caminando", "Goblet Squat c/ Kettlebell", "Sillón de Cuádriceps"],
+      inferior_cadera: ["Peso Muerto Convencional", "Peso Muerto Rumano Barra/Mancuernas", "Hip Thrust c/ Barra", "Peso Muerto Sumo", "Curl Femoral Tumbado/Sentado", "Buenos Días c/ Barra"],
+      superior_empuje: ["Press de Banca Plano Barra", "Press Inclinado c/ Mancuernas", "Press Militar Barra", "Push Press", "Fondos en Paralelas", "Press de Hombro c/ Mancuernas", "Aperturas en Polea"],
+      superior_traccion: ["Dominadas Pronas / Supinas", "Remo con Barra Pendlay", "Remo Unilateral c/ Mancuerna", "Jalón al Pecho en Polea", "Remo en Polea Baja (Gironda)", "Face Pull en Polea", "Remo en TRX"],
+      core: ["Rueda Abdominal", "Press Pallof en Polea/Banda", "Paseo del Granjero (Farmer Walk)", "Plancha Prona con Carga", "Hollow Hold", "Deadbug", "Copenhagen Plank (Aductores)"],
+      personalizados: []
+    };
+
+    let biblioteca = JSON.parse(localStorage.getItem('biblioteca_ejercicios')) || BIBLIOTECA_DEFAULT;
+    let sesionActual = [];
+
+    // Llenar Reps (100 a 1) y RIR (10 a 1)
+    function inicializarSelectores() {
+      const selReps = document.getElementById('inp-reps');
+      selReps.innerHTML = '';
+      for (let i = 100; i >= 1; i--) {
+        selReps.innerHTML += `<option value="${i}">${i} reps</option>`;
+      }
+      selReps.value = "10";
+
+      const selRir = document.getElementById('inp-rir');
+      selRir.innerHTML = '';
+      for (let r = 10; r >= 1; r--) {
+        selRir.innerHTML += `<option value="RIR ${r}">RIR ${r}</option>`;
+      }
+      selRir.value = "RIR 2";
+
+      cargarEjerciciosPorCategoria();
+    }
+
+    function guardarBibliotecaLocal() {
+      localStorage.setItem('biblioteca_ejercicios', JSON.stringify(biblioteca));
+    }
+
+    function cargarEjerciciosPorCategoria() {
+      const cat = document.getElementById('sel-categoria').value;
+      const selEj = document.getElementById('sel-ejercicio');
+      selEj.innerHTML = '';
+
+      const lista = biblioteca[cat] || [];
+      if (lista.length === 0) {
+        selEj.innerHTML = '<option value="">(No hay ejercicios en esta categoría)</option>';
+        return;
+      }
+
+      lista.forEach(ej => {
+        selEj.innerHTML += `<option value="${ej}">${ej}</option>`;
+      });
+    }
+
+    function crearNuevoEjercicio() {
+      const nombre = prompt("Ingresa el nombre del nuevo ejercicio:");
+      if (!nombre || !nombre.trim()) return;
+      const cat = document.getElementById('sel-categoria').value;
+      if (!biblioteca[cat]) biblioteca[cat] = [];
+      biblioteca[cat].push(nombre.trim());
+      guardarBibliotecaLocal();
+      cargarEjerciciosPorCategoria();
+      document.getElementById('sel-ejercicio').value = nombre.trim();
+    }
+
+    function eliminarEjercicioSeleccionado() {
+      const cat = document.getElementById('sel-categoria').value;
+      const ej = document.getElementById('sel-ejercicio').value;
+      if (!ej) return;
+
+      if (confirm(`¿Eliminar "${ej}" de la biblioteca?`)) {
+        biblioteca[cat] = biblioteca[cat].filter(item => item !== ej);
+        guardarBibliotecaLocal();
+        cargarEjerciciosPorCategoria();
+      }
+    }
+
+    function agregarFilaRutina() {
+      const ejercicio = document.getElementById('sel-ejercicio').value;
+      if (!ejercicio) return alert("Selecciona un ejercicio válido.");
+
+      const item = {
+        bloque: document.getElementById('inp-bloque').value || 'A1',
+        ejercicio: ejercicio,
+        series: document.getElementById('inp-series').value || '3',
+        reps: document.getElementById('inp-reps').value,
+        rir: document.getElementById('inp-rir').value,
+        descanso: document.getElementById('inp-descanso').value || '90s',
+        video: document.getElementById('inp-video').value.trim()
+      };
+
+      sesionActual.push(item);
+      renderTablaSesion();
+      document.getElementById('inp-video').value = '';
+    }
+
+    function eliminarFila(index) {
+      sesionActual.splice(index, 1);
+      renderTablaSesion();
+    }
+
+    function renderTablaSesion() {
+      const tbody = document.getElementById('tabla-ejercicios-body');
+      if (sesionActual.length === 0) {
+        tbody.innerHTML = '<tr id="fila-vacia"><td colspan="8" class="p-4 text-center text-slate-500">No hay ejercicios agregados a esta sesión.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = sesionActual.map((f, i) => `
+        <tr class="hover:bg-slate-800">
+          <td class="p-2.5 font-bold text-emerald-400">${f.bloque}</td>
+          <td class="p-2.5 text-white">${f.ejercicio}</td>
+          <td class="p-2.5">${f.series}</td>
+          <td class="p-2.5">${f.reps}</td>
+          <td class="p-2.5">${f.rir}</td>
+          <td class="p-2.5">${f.descanso}</td>
+          <td class="p-2.5">${f.video ? `<a href="${f.video}" target="_blank" class="text-emerald-400 underline">Link</a>` : '-'}</td>
+          <td class="p-2.5 text-center"><button onclick="eliminarFila(${i})" class="text-red-400 hover:text-red-300">✕</button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function guardarPlanificacionCompleta() {
+      const alumno = document.getElementById('admin-alumno').value.trim();
+      const semana = document.getElementById('admin-semana').value.trim();
+      const dia = document.getElementById('admin-dia').value.trim();
+
+      if (!alumno || sesionActual.length === 0) {
+        alert("Completa el alumno/correo y agrega al menos un ejercicio.");
+        return;
+      }
+
+      // Resumen textual para compatibilidad y JSON completo
+      const resumenTexto = sesionActual.map(e => `${e.bloque}: ${e.ejercicio} | ${e.series}x${e.reps} (${e.rir}) - Pausa: ${e.descanso}`).join('\n');
+
+      const { error } = await sb.from('planificaciones').insert([{
+        alumno_id: alumno,
+        semana: semana,
+        dia: dia,
+        ejercicios: resumenTexto,
+        ejercicios_detalle: sesionActual
+      }]);
+
+      if (error) {
+        alert("Error al guardar: " + error.message);
+      } else {
+        alert("¡Planificación guardada con éxito!");
+        sesionActual = [];
+        renderTablaSesion();
+        location.reload();
+      }
+    }
+
+    // AUTH & NAVEGACIÓN
     sb.auth.onAuthStateChange((event, session) => {
       if (session) {
         mostrarPanel(session.user);
@@ -87,68 +332,28 @@
     function mostrarMensaje(txt, esError = false) {
       const p = document.getElementById('auth-mensaje');
       p.innerText = txt;
-      p.className = esError 
-        ? "text-center text-sm mt-4 text-red-400 font-semibold" 
-        : "text-center text-sm mt-4 text-emerald-400 font-semibold";
+      p.className = esError ? "text-center text-sm mt-4 text-red-400 font-semibold" : "text-center text-sm mt-4 text-emerald-400 font-semibold";
     }
 
     async function iniciarSesion() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const btn = document.getElementById('btn-login');
+      if (!email || !password) return mostrarMensaje("Ingresa correo y contraseña", true);
 
-      if (!email || !password) {
-        mostrarMensaje("Ingresá correo y contraseña", true);
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = "Conectando...";
-      mostrarMensaje("Verificando credenciales...");
-
-      try {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) {
-          mostrarMensaje("Error: " + error.message, true);
-        } else {
-          mostrarMensaje("¡Acceso correcto! Cargando...");
-          mostrarPanel(data.user);
-        }
-      } catch (err) {
-        mostrarMensaje("Error: " + err.message, true);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "Iniciar Sesión";
-      }
+      mostrarMensaje("Conectando...");
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) mostrarMensaje("Error: " + error.message, true);
     }
 
     async function registrarse() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const btn = document.getElementById('btn-registro');
+      if (!email || !password) return mostrarMensaje("Ingresa correo y contraseña", true);
 
-      if (!email || !password) {
-        mostrarMensaje("Ingresá correo y contraseña", true);
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = "Registrando...";
       mostrarMensaje("Creando cuenta...");
-
-      try {
-        const { data, error } = await sb.auth.signUp({ email, password });
-        if (error) {
-          mostrarMensaje("Error: " + error.message, true);
-        } else {
-          mostrarMensaje("¡Cuenta creada con éxito! Ya podés iniciar sesión.");
-        }
-      } catch (err) {
-        mostrarMensaje("Error: " + err.message, true);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "Crear cuenta nueva";
-      }
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if (error) mostrarMensaje("Error: " + error.message, true);
+      else mostrarMensaje("Cuenta creada. Ya podés ingresar.");
     }
 
     async function cerrarSesion() {
@@ -160,7 +365,6 @@
       document.getElementById('seccion-auth').classList.remove('hidden');
       document.getElementById('seccion-panel').classList.add('hidden');
       document.getElementById('usuario-info').classList.add('hidden');
-      document.getElementById('usuario-info').classList.remove('flex');
     }
 
     async function mostrarPanel(user) {
@@ -170,59 +374,70 @@
       document.getElementById('usuario-info').classList.add('flex');
       document.getElementById('user-email').innerText = user.email;
 
-      if (user.email === 'axiss.training@gmail.com') {
+      // Habilitar modo coach
+      if (user.email === 'axiss.training@gmail.com' || user.email === 'axiss.trainig@gmail.com') {
         document.getElementById('seccion-admin').classList.remove('hidden');
       }
 
-      cargarRutinas(user.id);
+      inicializarSelectores();
+      cargarRutinas(user.email, user.id);
     }
 
-    async function cargarRutinas(userId) {
+    async function cargarRutinas(userEmail, userId) {
       const contenedor = document.getElementById('lista-rutinas');
+      
+      // Busca rutinas asignadas por correo o por ID
       const { data, error } = await sb
         .from('planificaciones')
         .select('*')
+        .or(`alumno_id.eq.${userEmail},alumno_id.eq.${userId}`)
         .order('created_at', { ascending: false });
 
       if (error || !data || data.length === 0) {
-        contenedor.innerHTML = '<div class="p-6 bg-slate-800 rounded-xl text-slate-400">Todavía no tenés planificaciones cargadas. Tu entrenador te la asignará pronto.</div>';
+        contenedor.innerHTML = '<div class="p-6 bg-slate-800 rounded-xl text-slate-400">No hay planificaciones activas asignadas a tu cuenta.</div>';
         return;
       }
 
       contenedor.innerHTML = data.map(r => `
-        <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl space-y-3">
+        <div class="bg-slate-800 border border-slate-700 p-5 rounded-2xl space-y-4">
           <div class="flex justify-between items-center">
-            <span class="text-xs uppercase tracking-wide bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded font-bold">${r.semana || 'Plan'}</span>
+            <span class="text-xs uppercase tracking-wide bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded font-bold">${r.semana || 'Plan'}</span>
             <span class="text-xs text-slate-400">${new Date(r.created_at).toLocaleDateString()}</span>
           </div>
           <h4 class="text-lg font-bold text-white">${r.dia || 'Entrenamiento'}</h4>
-          <p class="text-slate-300 whitespace-pre-line text-sm">${r.ejercicios || ''}</p>
-          ${r.url_video_ejemplo ? `<a href="${r.url_video_ejemplo}" target="_blank" class="inline-block text-sm text-emerald-400 hover:underline font-medium">▶ Ver Video de Referencia</a>` : ''}
+          
+          ${r.ejercicios_detalle && r.ejercicios_detalle.length > 0 ? `
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left border border-slate-700 rounded-lg overflow-hidden">
+                <thead class="bg-slate-900 text-slate-400 uppercase">
+                  <tr>
+                    <th class="p-2">Bloque</th>
+                    <th class="p-2">Ejercicio</th>
+                    <th class="p-2">Series</th>
+                    <th class="p-2">Reps</th>
+                    <th class="p-2">RIR</th>
+                    <th class="p-2">Pausa</th>
+                    <th class="p-2">Video</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/60 bg-slate-900/40">
+                  ${r.ejercicios_detalle.map(d => `
+                    <tr>
+                      <td class="p-2 font-bold text-emerald-400">${d.bloque}</td>
+                      <td class="p-2 text-slate-200">${d.ejercicio}</td>
+                      <td class="p-2">${d.series}</td>
+                      <td class="p-2">${d.reps}</td>
+                      <td class="p-2 text-emerald-300 font-semibold">${d.rir}</td>
+                      <td class="p-2">${d.descanso}</td>
+                      <td class="p-2">${d.video ? `<a href="${d.video}" target="_blank" class="text-emerald-400 underline">▶ Ver</a>` : '-'}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          ` : `<p class="text-slate-300 whitespace-pre-line text-sm">${r.ejercicios || ''}</p>`}
         </div>
       `).join('');
-    }
-
-    async function guardarRutina() {
-      const alumno_id = document.getElementById('admin-alumno-id').value;
-      const semana = document.getElementById('admin-semana').value;
-      const dia = document.getElementById('admin-dia').value;
-      const url_video_ejemplo = document.getElementById('admin-video').value;
-      const ejercicios = document.getElementById('admin-ejercicios').value;
-
-      const { error } = await sb.from('planificaciones').insert([{
-        alumno_id: alumno_id,
-        semana: semana,
-        dia: dia,
-        url_video_ejemplo: url_video_ejemplo,
-        ejercicios: ejercicios
-      }]);
-
-      if (error) {
-        alert("Error al guardar: " + error.message);
-      } else {
-        alert("¡Rutina cargada con éxito!");
-        location.reload();
-      }
     }
   </script>
 </body>
