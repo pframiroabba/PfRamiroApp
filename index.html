@@ -42,7 +42,7 @@
   <!-- ENCABEZADO SUPERIOR -->
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 md:px-8 py-3 flex justify-between items-center sticky top-0 z-40">
     <div class="flex items-center gap-3">
-      <img src="logo-icono.webp" alt="Logo PF Ramiro" class="h-10 w-10 md:h-12 md:w-12 object-contain rounded-lg border border-slate-700">
+      <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-10 w-10 md:h-12 md:w-12 object-contain rounded-lg border border-slate-700">
       <div>
         <h1 class="text-base md:text-lg font-black tracking-wide text-white leading-tight">PF RAMIRO ABBATTISTA</h1>
         <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Preparación Física & Rendimiento</span>
@@ -50,9 +50,10 @@
     </div>
     
     <div class="flex items-center gap-2">
-      <button onclick="abrirModalWebExterna()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 text-xs px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5">
+      <!-- BOTÓN DIRECTO QUE NO SOBRECARGA LA MEMORIA -->
+      <a href="https://calculadorarmramiropf.netlify.app" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 text-xs px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5">
         🏋️ Calculadora 1RM
-      </button>
+      </a>
       <button onclick="solicitarClaveAdmin()" id="btn-admin-access" class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-lg font-bold transition">
         🔒 Modo Coach
       </button>
@@ -63,23 +64,11 @@
     </div>
   </header>
 
-  <!-- MODAL INTEGRADO PARA LA CALCULADORA DE 1RM -->
-  <div id="modal-web-externa" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 p-2 md:p-6 flex flex-col">
-    <div class="flex justify-between items-center bg-slate-900 px-4 py-3 rounded-t-2xl border-t border-x border-slate-700">
-      <span class="text-sm font-bold text-emerald-400 flex items-center gap-2">🏋️ Calculadora de 1RM & Cargas Koena</span>
-      <div class="flex items-center gap-2">
-        <a href="https://calculadorarmramiropf.netlify.app" target="_blank" class="text-xs text-slate-400 hover:text-white underline">Abrir en pestaña nueva</a>
-        <button onclick="cerrarModalWebExterna()" class="bg-slate-800 text-slate-200 px-3 py-1 rounded-lg text-xs font-bold hover:bg-slate-700 ml-2">✕ Cerrar</button>
-      </div>
-    </div>
-    <iframe id="iframe-herramienta" src="https://calculadorarmramiropf.netlify.app" class="w-full flex-1 bg-slate-950 rounded-b-2xl border border-slate-700 shadow-2xl"></iframe>
-  </div>
-
   <!-- PANTALLA INICIO / ACCESO -->
   <main id="seccion-auth" class="max-w-md mx-auto mt-10 p-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl mx-4 md:mx-auto text-center space-y-6">
     <div class="flex flex-col items-center">
       <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800 shadow-inner mb-3">
-        <img src="logo-icono.webp" alt="Logo PF Ramiro" class="h-28 w-28 md:h-32 md:w-32 object-contain">
+        <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-28 w-28 md:h-32 md:w-32 object-contain">
       </div>
       <h2 class="text-2xl font-black text-white tracking-wide">PF Ramiro Abbattista</h2>
       <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma de Alumnos</p>
@@ -394,14 +383,6 @@
     let sortableInstance = null;
     let esAdminVerificado = false;
 
-    // MODAL DE LA CALCULADORA DE 1RM
-    function abrirModalWebExterna() {
-      document.getElementById('modal-web-externa').classList.remove('hidden');
-    }
-    function cerrarModalWebExterna() {
-      document.getElementById('modal-web-externa').classList.add('hidden');
-    }
-
     // CONTROL EXCLUSIVO DE MODO COACH
     function solicitarClaveAdmin() {
       const clave = prompt("Ingresá la Clave de Administrador / Coach:");
@@ -631,7 +612,6 @@
       }
     }
 
-    // CLONAR / CARGAR RUTINA AL DISEÑADOR
     function cargarRutinaAlEditor(detalles, semana, dia) {
       if (confirm(`¿Cargar "${dia}" en el diseñador para editarla o clonarla para otro alumno?`)) {
         sesionActual = JSON.parse(JSON.stringify(detalles));
@@ -643,18 +623,22 @@
       }
     }
 
-    // REGISTRO DE CARGAS EN LA NUBE (SUPABASE)
+    // REGISTRO DE CARGAS OPTIMIZADO
     async function guardarCargaNube(rutinaId, ejercicio, serieIdx, valor) {
       const email = usuarioActual ? usuarioActual.email : 'anonimo';
       localStorage.setItem(`carga_${rutinaId}_${ejercicio}_${serieIdx}`, valor);
 
-      await sb.from('registros_cargas').insert([{
-        planificacion_id: String(rutinaId),
-        alumno_id: email,
-        ejercicio: ejercicio,
-        serie_numero: serieIdx + 1,
-        carga: valor
-      }]);
+      try {
+        await sb.from('registros_cargas').insert([{
+          planificacion_id: String(rutinaId),
+          alumno_id: email,
+          ejercicio: ejercicio,
+          serie_numero: serieIdx + 1,
+          carga: valor
+        }]);
+      } catch (e) {
+        console.warn("Aviso al guardar carga en nube:", e);
+      }
     }
 
     function toggleSerieCompletada(btn, rutinaId, ejIndex, serieIndex) {
@@ -664,7 +648,6 @@
       localStorage.setItem(key, (!estadoActual).toString());
     }
 
-    // ABRIR WHATSAPP CON TU NÚMERO
     function enviarWhatsappFeedback(dia, semana) {
       const mensaje = encodeURIComponent(`Hola Ramiro, te escribo sobre mi entrenamiento "${dia}" (${semana}). Tengo una duda con un ejercicio: `);
       window.open(`https://wa.me/${WHATSAPP_COACH}?text=${mensaje}`, '_blank');
