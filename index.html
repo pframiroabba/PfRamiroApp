@@ -2,14 +2,22 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PF Ramiro Abbattista - Planificaciones Online</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PF Ramiro Abbattista - Rendimiento & Fuerza</title>
+  
+  <!-- CONFIGURACIÓN PWA PARA INSTALAR EN CELULARES -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PF Ramiro">
+  <meta name="theme-color" content="#020617">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
   <style>
     .serie-done {
-      background-color: rgba(16, 185, 129, 0.2) !important;
+      background-color: rgba(16, 185, 129, 0.22) !important;
       border-color: rgba(16, 185, 129, 0.6) !important;
     }
     .sortable-ghost {
@@ -22,12 +30,12 @@
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-28 antialiased">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-32 antialiased select-none">
 
-  <!-- CRONÓMETRO FLOTANTE -->
+  <!-- CRONÓMETRO FLOTANTE CON ALERTA SONORA NATIVA -->
   <div id="timer-box" class="hidden fixed bottom-4 right-4 bg-slate-900 border-2 border-emerald-500 shadow-2xl rounded-2xl p-4 z-50 flex items-center gap-4">
     <div>
-      <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Pausa de descanso</span>
+      <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Descanso</span>
       <span id="timer-display" class="text-3xl font-black text-emerald-400 font-mono">01:30</span>
     </div>
     <div class="flex gap-1.5">
@@ -97,19 +105,80 @@
   </main>
 
   <!-- PANTALLA PRINCIPAL -->
-  <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-8">
+  <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
+
+    <!-- DASHBOARD DEL ALUMNO: MEDALLAS, RACHAS Y LOGROS -->
+    <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 p-5 md:p-6 rounded-3xl border border-emerald-500/30 shadow-2xl space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div>
+          <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Panel de Rendimiento</span>
+          <h3 class="text-lg font-black text-white" id="dash-alumno-nombre">Bienvenido a tu Plan</h3>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
+            <span class="text-lg">🔥</span>
+            <div>
+              <span class="text-[9px] text-slate-400 uppercase font-bold block">Racha</span>
+              <span id="stat-racha" class="text-xs font-black text-emerald-400">1 Sesión</span>
+            </div>
+          </div>
+          <div class="bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
+            <span class="text-lg">🏆</span>
+            <div>
+              <span class="text-[9px] text-slate-400 uppercase font-bold block">Completadas</span>
+              <span id="stat-totales" class="text-xs font-black text-white">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INSIGNIAS Y PREMIOS DESBLOQUEADOS -->
+      <div>
+        <span class="text-[11px] text-slate-400 uppercase font-bold tracking-wider block mb-2">Tus Insignias y Logros Koena:</span>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="contenedor-insignias">
+          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2">
+            <span class="text-2xl">🌱</span>
+            <div>
+              <h5 class="text-xs font-bold text-white leading-tight">Iniciación</h5>
+              <span class="text-[10px] text-emerald-400">Primer entreno</span>
+            </div>
+          </div>
+          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2">
+            <span class="text-2xl">⚡</span>
+            <div>
+              <h5 class="text-xs font-bold text-slate-300 leading-tight">Disciplina</h5>
+              <span class="text-[10px] text-slate-500">5 completados</span>
+            </div>
+          </div>
+          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2">
+            <span class="text-2xl">🥇</span>
+            <div>
+              <h5 class="text-xs font-bold text-slate-300 leading-tight">Fuerza Élite</h5>
+              <span class="text-[10px] text-slate-500">10 completados</span>
+            </div>
+          </div>
+          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 flex items-center gap-2">
+            <span class="text-2xl">🌊</span>
+            <div>
+              <h5 class="text-xs font-bold text-slate-300 leading-tight">Surf Koena</h5>
+              <span class="text-[10px] text-slate-500">Potencia & Movilidad</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- PANEL DEL ENTRENADOR -->
     <div id="seccion-admin" class="hidden space-y-6">
 
       <!-- BOTONES DE NAVEGACIÓN COACH -->
       <div class="flex items-center justify-between bg-slate-900 p-3 rounded-2xl border border-slate-800">
-        <div class="flex gap-2">
-          <button type="button" onclick="cambiarSolapaCoach('alumnos')" id="tab-c-alumnos" class="text-xs px-3.5 py-1.5 rounded-xl font-bold bg-blue-500 text-slate-950 transition">👥 Alumnos Activos</button>
-          <button type="button" onclick="cambiarSolapaCoach('plantillas')" id="tab-c-plantillas" class="text-xs px-3.5 py-1.5 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📑 Plantillas Inteligentes</button>
-          <button type="button" onclick="cambiarSolapaCoach('creador')" id="tab-c-creador" class="text-xs px-3.5 py-1.5 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">🛠️ Creador Mensual</button>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" onclick="cambiarSolapaCoach('alumnos')" id="tab-c-alumnos" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition">👥 Alumnos Activos</button>
+          <button type="button" onclick="cambiarSolapaCoach('plantillas')" id="tab-c-plantillas" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📑 Plantillas Inteligentes</button>
+          <button type="button" onclick="cambiarSolapaCoach('creador')" id="tab-c-creador" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">🛠️ Creador Mensual</button>
         </div>
-        <button type="button" onclick="cerrarModoAdmin()" class="text-xs bg-red-500/20 text-red-300 px-3 py-1.5 rounded-xl font-bold">Cerrar Coach</button>
+        <button type="button" onclick="cerrarModoAdmin()" class="text-xs bg-red-500/20 text-red-300 px-3 py-2 rounded-xl font-bold">Cerrar Coach</button>
       </div>
 
       <!-- SECTOR 1: GESTOR DE ALUMNOS -->
@@ -137,7 +206,7 @@
         <div class="flex justify-between items-center border-b border-slate-800 pb-3">
           <div>
             <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">📑 Plantillas Inteligentes</h3>
-            <p class="text-xs text-slate-400">Modelos maestros de entrenamiento listos para clonar a alumnos con 1 clic.</p>
+            <p class="text-xs text-slate-400">Modelos maestros listos para asignar con 1 clic.</p>
           </div>
           <span class="text-xs font-bold text-slate-400" id="contador-plantillas">0 Plantillas</span>
         </div>
@@ -146,41 +215,47 @@
         </div>
       </div>
 
-      <!-- SECTOR 3: CREADOR / EDITOR DE SESIÓN Y PLANIFICACIÓN MENSUAL -->
+      <!-- SECTOR 3: CREADOR / EDITOR DE PLANIFICACIÓN MENSUAL -->
       <div id="vista-c-creador" class="hidden bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-6">
         <div class="border-b border-slate-800 pb-3">
-          <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🛠️ Diseñador de Planificación Mensual</h3>
+          <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🛠️️ Diseñador de Planificación Mensual</h3>
           <p class="text-xs text-slate-400">Armá mesociclos completos, asigná semanas y días específicos.</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="space-y-4 bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
           <div>
-            <div class="flex justify-between items-center">
-              <label class="text-xs text-slate-400 font-semibold">Alumno</label>
-              <select id="sel-alumno-rapido" onchange="seleccionarAlumnoRapido(this.value)" class="text-[11px] bg-slate-800 text-emerald-300 rounded px-1.5 py-0.5 border border-slate-700">
-                <option value="">▼ Alumno...</option>
-              </select>
+            <label class="text-xs font-bold text-emerald-400 uppercase tracking-wider block mb-1.5">
+              👤 Seleccionar Alumno Registrado (o escribir uno nuevo abajo):
+            </label>
+            <select id="sel-alumno-rapido" onchange="seleccionarAlumnoRapido(this.value)" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-3 text-xs md:text-sm font-semibold focus:outline-none focus:border-emerald-500">
+              <option value="">▼ Elegir de la lista de alumnos...</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-slate-800/60">
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Correo o Nombre Confirmado</label>
+              <input type="text" id="admin-alumno" placeholder="ej: imanol@gmail.com" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
             </div>
-            <input type="text" id="admin-alumno" placeholder="ej: imanol@gmail.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-          </div>
-          <div>
-            <label class="text-xs text-slate-400 font-semibold">Mes / Mesociclo</label>
-            <input type="text" id="admin-mes" placeholder="Mes 1 - Fuerza Base" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-          </div>
-          <div>
-            <label class="text-xs text-slate-400 font-semibold">Semana / Microciclo</label>
-            <input type="text" id="admin-semana" placeholder="Semana 1 de 4" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-          </div>
-          <div>
-            <label class="text-xs text-slate-400 font-semibold">Día / Enfoque</label>
-            <input type="text" id="admin-dia" placeholder="Día 1 - Tren Inferior & Core" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Mes / Mesociclo</label>
+              <input type="text" id="admin-mes" placeholder="Mes 1 - Fuerza Base" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Semana / Microciclo</label>
+              <input type="text" id="admin-semana" placeholder="Semana 1 de 4" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Día / Enfoque</label>
+              <input type="text" id="admin-dia" placeholder="Día 1 - Tren Inferior" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+            </div>
           </div>
         </div>
 
         <!-- SELECTOR DE EJERCICIOS Y BLOQUES -->
         <div class="bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 space-y-4">
           <div class="flex justify-between items-center">
-            <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">1. Configurar Ejercicio</span>
+            <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio por Bloque</span>
             <div class="flex gap-2">
               <button type="button" onclick="crearNuevoEjercicio()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg text-emerald-300 font-bold">+ Crear Ejercicio</button>
               <button type="button" onclick="eliminarEjercicioSeleccionado()" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-300 px-3 py-1 rounded-lg font-bold">Eliminar</button>
@@ -266,7 +341,7 @@
 
         <!-- TABLA REORDENABLE -->
         <div class="space-y-2">
-          <span class="text-xs uppercase font-extrabold text-slate-400 tracking-wider">2. Vista Previa de la Sesión</span>
+          <span class="text-xs uppercase font-extrabold text-slate-400 tracking-wider">Vista Previa de la Sesión</span>
           <div class="overflow-x-auto border border-slate-800 rounded-2xl overflow-hidden bg-slate-950">
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-900 text-slate-400 uppercase font-black">
@@ -438,9 +513,27 @@
     let usuarioActual = null;
     let sortableInstance = null;
     let esAdminVerificado = false;
-    let rutinasCargadasMemoria = [];
     let todasLasPlanificacionesAdmin = [];
     let todasLasPlantillasAdmin = [];
+
+    // SINTETIZADOR DE AUDIO PARA EL TIMER (SIN ARCHIVOS EXTERNOS)
+    function sonarBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // Tono agradable A5
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.6);
+      } catch (e) {
+        console.warn("AudioContext no habilitado aún");
+      }
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('btn-admin-access').addEventListener('click', solicitarClaveAdmin);
@@ -451,7 +544,6 @@
       inicializarSelectores();
     });
 
-    // PESTAÑAS COACH
     function cambiarSolapaCoach(vista) {
       const vAlumnos = document.getElementById('vista-c-alumnos');
       const vPlantillas = document.getElementById('vista-c-plantillas');
@@ -463,22 +555,21 @@
 
       [vAlumnos, vPlantillas, vCreador].forEach(el => el.classList.add('hidden'));
       [tAlumnos, tPlantillas, tCreador].forEach(el => {
-        el.className = "text-xs px-3.5 py-1.5 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition";
+        el.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition";
       });
 
       if (vista === 'alumnos') {
         vAlumnos.classList.remove('hidden');
-        tAlumnos.className = "text-xs px-3.5 py-1.5 rounded-xl font-bold bg-blue-500 text-slate-950 transition";
+        tAlumnos.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition";
       } else if (vista === 'plantillas') {
         vPlantillas.classList.remove('hidden');
-        tPlantillas.className = "text-xs px-3.5 py-1.5 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+        tPlantillas.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
       } else if (vista === 'creador') {
         vCreador.classList.remove('hidden');
-        tCreador.className = "text-xs px-3.5 py-1.5 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+        tCreador.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
       }
     }
 
-    // PESTAÑAS ALUMNO (ACTUAL VS HISTORIAL)
     function cambiarSolapaAlumno(solapa) {
       const lActual = document.getElementById('lista-rutinas');
       const lHistorial = document.getElementById('lista-historial');
@@ -520,7 +611,6 @@
       document.getElementById('seccion-admin').classList.add('hidden');
     }
 
-    // GESTOR DE ALUMNOS Y PLANTILLAS
     async function cargarPlanesAdmin() {
       const { data, error } = await sb
         .from('planificaciones')
@@ -533,7 +623,6 @@
       todasLasPlanificacionesAdmin = todos.filter(p => !p.es_plantilla && p.alumno_id !== 'PLANTILLA_MAESTRA');
       todasLasPlantillasAdmin = todos.filter(p => p.es_plantilla || p.alumno_id === 'PLANTILLA_MAESTRA');
 
-      // Selector de alumnos
       const alumnosSet = new Set();
       todasLasPlanificacionesAdmin.forEach(p => {
         if (p.alumno_id) alumnosSet.add(p.alumno_id);
@@ -545,7 +634,7 @@
       listaAlumnos.forEach(a => selFiltro.innerHTML += `<option value="${a}">👤 ${a}</option>`);
 
       const selRapido = document.getElementById('sel-alumno-rapido');
-      selRapido.innerHTML = '<option value="">▼ Alumno...</option>';
+      selRapido.innerHTML = '<option value="">▼ Elegir de la lista de alumnos...</option>';
       listaAlumnos.forEach(a => selRapido.innerHTML += `<option value="${a}">${a}</option>`);
 
       renderizarPlanesAdmin(todasLasPlanificacionesAdmin);
@@ -651,7 +740,6 @@
       window.scrollTo({ top: document.getElementById('admin-alumno').offsetTop - 80, behavior: 'smooth' });
     }
 
-    // TIMER
     let timerInterval = null;
     let tiempoRestante = 90;
     let timerEnPausa = false;
@@ -671,6 +759,7 @@
           actualizarDisplayTimer();
           if (tiempoRestante <= 0) {
             clearInterval(timerInterval);
+            sonarBeep();
             navigator.vibrate?.([200, 100, 200]);
             document.getElementById('timer-display').innerText = "¡TIEMPO!";
           }
@@ -855,15 +944,17 @@
       }
     }
 
-    async function guardarCargaNube(rutinaId, ejIndex, serieIdx, valor) {
+    async function guardarCargaNube(rutinaId, ejNombre, serieIdx, valor) {
       const email = usuarioActual ? usuarioActual.email : 'anonimo';
-      localStorage.setItem(`carga_${rutinaId}_${ejIndex}_${serieIdx}`, valor);
+      // Guardar carga actual y guardar historial del ejercicio para referencia futura
+      localStorage.setItem(`carga_${rutinaId}_${ejNombre}_${serieIdx}`, valor);
+      localStorage.setItem(`last_weight_${ejNombre}`, valor);
 
       try {
         await sb.from('registros_cargas').insert([{
           planificacion_id: String(rutinaId),
           alumno_id: email,
-          ejercicio: String(ejIndex),
+          ejercicio: ejNombre,
           serie_numero: serieIdx + 1,
           carga: valor
         }]);
@@ -872,14 +963,20 @@
       }
     }
 
-    function toggleSerieCompletada(btn, rutinaId, ejIndex, serieIndex) {
+    function toggleSerieCompletada(btn, rutinaId, ejNombre, serieIndex) {
       btn.classList.toggle('serie-done');
-      const key = `done_${rutinaId}_${ejIndex}_${serieIndex}`;
+      const key = `done_${rutinaId}_${ejNombre}_${serieIndex}`;
       const estadoActual = localStorage.getItem(key) === 'true';
       localStorage.setItem(key, (!estadoActual).toString());
     }
 
-    // FEEDBACK CON LINK DE VIDEO DE TÉCNICA
+    // PLEGADO / MODO FOCUS DE BLOQUES PARA EL ALUMNO
+    function toggleBloqueAlumno(idBloque) {
+      const el = document.getElementById(idBloque);
+      if (el) el.classList.toggle('hidden');
+    }
+
+    // FEEDBACK Y ACTUALIZACIÓN DE GAMIFICACIÓN
     async function guardarFeedbackSesion(rutinaId, dia, semana) {
       const selRpe = document.getElementById(`sel-rpe-${rutinaId}`);
       const txtComentario = document.getElementById(`txt-feedback-${rutinaId}`);
@@ -889,6 +986,14 @@
       const comentario = txtComentario ? txtComentario.value.trim() : "";
       const videoUrl = txtVideoAlumno ? txtVideoAlumno.value.trim() : "";
       const email = usuarioActual ? usuarioActual.email : 'alumno';
+
+      // Incrementar contador de sesiones del alumno
+      let totalSesiones = parseInt(localStorage.getItem(`stats_total_${email}`) || "0") + 1;
+      let racha = parseInt(localStorage.getItem(`stats_racha_${email}`) || "0") + 1;
+      localStorage.setItem(`stats_total_${email}`, totalSesiones.toString());
+      localStorage.setItem(`stats_racha_${email}`, racha.toString());
+
+      actualizarGamificacionUI(totalSesiones, racha);
 
       localStorage.setItem(`rpe_${rutinaId}`, rpeValor);
       if (comentario) localStorage.setItem(`comentario_${rutinaId}`, comentario);
@@ -907,7 +1012,7 @@
         console.warn("Feedback guardado localmente");
       }
 
-      alert("¡Sesión guardada con éxito! Abriendo WhatsApp para notificar a Ramiro...");
+      alert("🎉 ¡Entrenamiento registrado! Felicitaciones por sumar una sesión más.");
 
       let textoMensaje = `Hola Ramiro, terminé mi entrenamiento "${dia}" (${semana}).%0A%0A*Esfuerzo Percibido (RPE):* ${rpeValor}/10%0A*Sensaciones / Comentarios:* ${comentario || 'Sesión completada en orden.'}`;
       if (videoUrl) {
@@ -917,10 +1022,20 @@
       window.open(`https://wa.me/${WHATSAPP_COACH}?text=${textoMensaje}`, '_blank');
     }
 
-    // CARGAR RUTINAS ACTIVAS E HISTORIAL DE VIEJAS
+    function actualizarGamificacionUI(totales, racha) {
+      document.getElementById('stat-totales').innerText = totales;
+      document.getElementById('stat-racha').innerText = `${racha} ${racha === 1 ? 'Sesión' : 'Sesiones'}`;
+    }
+
     async function cargarRutinas(userEmail, userId) {
       const contActual = document.getElementById('lista-rutinas');
       const contHistorial = document.getElementById('lista-historial');
+
+      // Actualizar stats del alumno
+      const tot = parseInt(localStorage.getItem(`stats_total_${userEmail}`) || "1");
+      const rac = parseInt(localStorage.getItem(`stats_racha_${userEmail}`) || "1");
+      actualizarGamificacionUI(tot, rac);
+      document.getElementById('dash-alumno-nombre').innerText = `Plan de ${userEmail.split('@')[0]}`;
 
       const { data, error } = await sb
         .from('planificaciones')
@@ -934,7 +1049,6 @@
         return;
       }
 
-      // La primera es la activa, las anteriores van a historial
       const rutinaActiva = data.slice(0, 1);
       const rutinasViejas = data.slice(1);
 
@@ -966,23 +1080,33 @@
               <span class="text-xs text-slate-400 font-medium">${new Date(r.created_at).toLocaleDateString()}</span>
             </div>
 
-            <div class="space-y-6">
-              ${Object.keys(bloques).map(nombreBloque => `
+            <div class="space-y-4">
+              ${Object.keys(bloques).map((nombreBloque, bIdx) => {
+                const bloqueId = `bloque_c_${r.id}_${bIdx}`;
+                return `
                 <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-                  <div class="flex items-center gap-2 border-b border-slate-800 pb-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
-                    <h5 class="text-sm font-bold uppercase tracking-wide text-emerald-300">${nombreBloque}</h5>
+                  <div onclick="toggleBloqueAlumno('${bloqueId}')" class="flex items-center justify-between border-b border-slate-800 pb-2 cursor-pointer">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
+                      <h5 class="text-sm font-bold uppercase tracking-wide text-emerald-300">${nombreBloque}</h5>
+                    </div>
+                    <span class="text-[10px] text-slate-500 hover:text-slate-300">▼ Plegar</span>
                   </div>
 
-                  <div class="space-y-3">
+                  <div id="${bloqueId}" class="space-y-3">
                     ${bloques[nombreBloque].map(item => {
                       const cantSeries = parseInt(item.series) || 1;
                       const segs = parseSegundos(item.descanso);
+                      const cargaAnterior = localStorage.getItem(`last_weight_${item.ejercicio}`) || '';
+
                       return `
                         <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3">
                           <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                             <div>
-                              <h6 class="font-bold text-white text-base">${item.ejercicio}</h6>
+                              <div class="flex items-center gap-2">
+                                <h6 class="font-bold text-white text-base">${item.ejercicio}</h6>
+                                ${cargaAnterior ? `<span class="text-[10px] text-emerald-400/80 bg-emerald-500/10 px-2 py-0.5 rounded font-mono">Última: ${cargaAnterior}</span>` : ''}
+                              </div>
                               <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300 mt-1">
                                 <span class="bg-slate-800 px-2.5 py-0.5 rounded font-medium">${item.series} series x ${item.reps}</span>
                                 <span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">${item.rir}</span>
@@ -991,23 +1115,23 @@
                                 </button>
                               </div>
                             </div>
-                            ${item.video ? `<a href="${item.video}" target="_blank" class="text-xs bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 self-start md:self-auto transition">▶ Video</a>` : ''}
+                            ${item.video ? `<a href="${item.video}" target="_blank" class="text-xs bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 self-start md:self-auto transition">▶ Video Demostración</a>` : ''}
                           </div>
 
                           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-slate-800">
                             ${Array.from({ length: cantSeries }).map((_, sIdx) => {
-                              const doneKey = `done_${r.id}_${item.originalIndex}_${sIdx}`;
+                              const doneKey = `done_${r.id}_${item.ejercicio}_${sIdx}`;
                               const isDone = localStorage.getItem(doneKey) === 'true';
-                              const cargaKey = `carga_${r.id}_${item.originalIndex}_${sIdx}`;
+                              const cargaKey = `carga_${r.id}_${item.ejercicio}_${sIdx}`;
                               const cargaGuardada = localStorage.getItem(cargaKey) || '';
 
                               return `
                                 <div class="flex items-center gap-2 bg-slate-950 p-2 rounded-lg border border-slate-800 ${isDone ? 'serie-done' : ''}">
-                                  <button type="button" onclick="toggleSerieCompletada(this.parentElement, '${r.id}', ${item.originalIndex},${sIdx})" class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 flex items-center justify-center text-xs font-black transition">
+                                  <button type="button" onclick="toggleSerieCompletada(this.parentElement, '${r.id}', '${item.ejercicio}',${sIdx})" class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 flex items-center justify-center text-xs font-black transition">
                                     ✓
                                   </button>
                                   <span class="text-[11px] text-slate-400 font-bold">S${sIdx + 1}:</span>
-                                  <input type="text" placeholder="Kg / RPE" value="${cargaGuardada}" onchange="guardarCargaNube('${r.id}', ${item.originalIndex},${sIdx}, this.value)" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-400">
+                                  <input type="text" placeholder="${cargaAnterior || 'Kg / RPE'}" value="${cargaGuardada}" onchange="guardarCargaNube('${r.id}', '${item.ejercicio}',${sIdx}, this.value)" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
                                 </div>
                               `;
                             }).join('')}
@@ -1017,10 +1141,11 @@
                     }).join('')}
                   </div>
                 </div>
-              `).join('')}
+              `;
+              }).join('')}
             </div>
 
-            <!-- SECTOR DE RETROALIMENTACIÓN / RPE Y VIDEO TÉCNICA -->
+            <!-- FEEDBACK Y VIDEO -->
             <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-2xl space-y-3">
               <div class="flex items-center justify-between">
                 <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider flex items-center gap-1.5">
@@ -1073,7 +1198,6 @@
       if (usuarioActual) cargarRutinas(usuarioActual.email, usuarioActual.id);
     }
 
-    // AUTH
     sb.auth.onAuthStateChange((event, session) => {
       if (session) {
         usuarioActual = session.user;
