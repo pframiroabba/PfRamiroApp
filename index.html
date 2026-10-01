@@ -431,7 +431,7 @@
           </div>
         </div>
 
-        <!-- SELECTOR DE EJERCICIOS Y BLOQUES ORDENADOS METODOLÓGICAMENTE -->
+        <!-- SELECTOR DE EJERCICIOS Y BLOQUES -->
         <div class="bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 space-y-4">
           <div class="flex justify-between items-center">
             <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio por Bloque</span>
@@ -908,8 +908,9 @@
     </div>
   </main>
 
+  <!-- LÓGICA JAVASCRIPT COMPLETA Y FUNCIONAL -->
   <script>
-    // CONTINUACIÓN DE LÓGICA JAVASCRIPT
+    // CORE EXTENDIDO DE ZONA MEDIA PARA ACTIVACIÓN
     const BIBLIOTECA_CORE_AMPLIADA = [
       "Deadbug isométrico empujando Fitball contra rodillas (Contralateral)",
       "Bird-Dog con banda elástica y pausa isométrica de 2s",
@@ -928,10 +929,118 @@
       "Roll-up con disco ligero y control segmentario de columna"
     ];
 
-    // Integrar a la biblioteca por defecto
-    BIBLIOTECA_DEFAULT.zona_media_koena = BIBLIOTECA_CORE_AMPLIADA;
     biblioteca.zona_media_koena = BIBLIOTECA_CORE_AMPLIADA;
     localStorage.setItem('pf_biblioteca_v2', JSON.stringify(biblioteca));
+
+    // AUTENTICACIÓN
+    async function ejecutarAuth() {
+      if (modoAuthActual === 'login') {
+        await iniciarSesion();
+      } else {
+        await registrarse();
+      }
+    }
+
+    async function iniciarSesion() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      if (!email || !password) return mostrarMensaje("Ingresá correo y contraseña", true);
+
+      mostrarMensaje("Conectando...");
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) mostrarMensaje("Error: " + error.message, true);
+    }
+
+    async function registrarse() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const telInput = document.getElementById('reg-telefono').value.trim();
+      const nombreInput = document.getElementById('reg-nombre').value.trim();
+
+      if (!email || !password) return mostrarMensaje("Ingresá correo y contraseña", true);
+
+      esAdminVerificado = false;
+      document.getElementById('seccion-admin').classList.add('hidden');
+
+      mostrarMensaje("Creando cuenta de alumno...");
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if (error) {
+        mostrarMensaje("Error: " + error.message, true);
+      } else {
+        const perfilInicial = {
+          nombre: nombreInput || email.split('@')[0],
+          telefono: formatearTelefono(telInput),
+          peso: null,
+          altura: null,
+          edad: null,
+          diasSemana: '3 días semanales',
+          tiempoSesion: '60 - 75 minutos',
+          sede: 'Presencial Koena',
+          expFuerza: 'Intermedio (1 a 3 años)',
+          expOlimpico: 'Básica (Cargadas simples)',
+          deportes: '',
+          objetivo: 'Fuerza Máxima & Rendimiento Atlético',
+          equipamiento: '',
+          doloresActivos: '',
+          cirugiasPrevias: ''
+        };
+        localStorage.setItem(`perfil_atleta_${email}`, JSON.stringify(perfilInicial));
+        if (telInput) {
+          localStorage.setItem(`telefono_alumno_${email}`, formatearTelefono(telInput));
+        }
+
+        mostrarMensaje("¡Cuenta creada con éxito! Ya podés ingresar a tu plan.");
+        setTimeout(() => cambiarModoAuth('login'), 1200);
+      }
+    }
+
+    async function cerrarSesion() {
+      esAdminVerificado = false;
+      await sb.auth.signOut();
+      mostrarLogin();
+    }
+
+    function mostrarLogin() {
+      document.getElementById('seccion-auth').classList.remove('hidden');
+      document.getElementById('seccion-panel').classList.add('hidden');
+      document.getElementById('usuario-info').classList.add('hidden');
+      document.getElementById('seccion-admin').classList.add('hidden');
+    }
+
+    function mostrarPanel(user) {
+      document.getElementById('seccion-auth').classList.add('hidden');
+      document.getElementById('seccion-panel').classList.remove('hidden');
+      document.getElementById('usuario-info').classList.remove('hidden');
+      document.getElementById('usuario-info').classList.add('flex');
+      document.getElementById('user-email').innerText = user.email;
+
+      if (esAdminVerificado) {
+        document.getElementById('seccion-admin').classList.remove('hidden');
+        cargarPlanesAdmin();
+      } else {
+        document.getElementById('seccion-admin').classList.add('hidden');
+      }
+
+      cargarRutinas(user.email, user.id);
+    }
+
+    function mostrarMensaje(txt, esError = false) {
+      const p = document.getElementById('auth-mensaje');
+      p.innerText = txt;
+      p.className = esError ? "text-center text-xs text-red-400 font-semibold" : "text-center text-xs text-emerald-400 font-semibold";
+    }
+
+    sb.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        usuarioActual = session.user;
+        mostrarPanel(session.user);
+      } else {
+        usuarioActual = null;
+        if (!esAdminVerificado) {
+          mostrarLogin();
+        }
+      }
+    });
   </script>
 </body>
 </html>
