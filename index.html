@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PF Ramiro Abbattista - Koena & Online</title>
+  <title>PF Ramiro Abbattista - Rendimiento & Fuerza</title>
   
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,6 +14,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     .serie-done {
@@ -47,8 +48,21 @@
       box-shadow: 0 0 18px rgba(16, 185, 129, 0.3);
       transform: scale(1);
     }
+    .avatar-circulo {
+      width: 52px;
+      height: 52px;
+      border-radius: 9999px;
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      background-color: #0f172a;
+      border: 2px solid #10b981;
+      flex-shrink: 0;
+    }
     @media print {
-      header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container {
+      header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container, #modal-discos, #modal-ficha-coach {
         display: none !important;
       }
       body {
@@ -67,6 +81,37 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-32 antialiased select-none">
 
+  <!-- MODAL FICHA ANAMNESIS & ARCHIVOS PARA EL COACH -->
+  <div id="modal-ficha-coach" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 max-w-xl w-full rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h4 class="font-black text-white text-base flex items-center gap-2">📋 Ficha Deportiva, Salud & Archivos</h4>
+        <button type="button" onclick="cerrarModalFichaCoach()" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
+      </div>
+      <div id="contenido-ficha-coach" class="space-y-3 text-xs"></div>
+    </div>
+  </div>
+
+  <!-- MODAL CALCULADORA VISUAL DE DISCOS -->
+  <div id="modal-discos" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h4 class="font-black text-white text-base flex items-center gap-2">⚖️ Carga en Barra Olímpica</h4>
+        <button type="button" onclick="cerrarModalDiscos()" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
+      </div>
+      <div>
+        <span class="text-xs text-slate-400 block mb-1">Peso total objetivo:</span>
+        <div class="flex items-center gap-2">
+          <input type="number" id="inp-modal-kilos" step="0.5" class="bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-mono font-bold text-lg w-full" placeholder="ej: 82.5">
+          <button type="button" onclick="calcularDistribucionDiscos()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs">Calcular</button>
+        </div>
+      </div>
+      <div id="resultado-discos" class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs space-y-2">
+        <span class="text-slate-500">Ingresá el peso para ver qué discos cargar de cada lado.</span>
+      </div>
+    </div>
+  </div>
+
   <!-- CRONÓMETRO FLOTANTE -->
   <div id="timer-box" class="hidden fixed bottom-4 right-4 bg-slate-900 border-2 border-emerald-500 shadow-2xl rounded-2xl p-4 z-50 flex items-center gap-4">
     <div>
@@ -84,7 +129,7 @@
     <div class="flex items-center gap-3">
       <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-10 w-10 md:h-11 md:w-11 object-contain rounded-lg border border-slate-700">
       
-      <!-- LOGO KOENA ENCABEZADO -->
+      <!-- LOGO KOENA -->
       <div class="flex items-center pl-2 border-l border-slate-800">
         <img src="logo-koena.webp" onerror="this.onerror=null; this.src='logo-koena.png'; this.onerror=()=>{this.style.display='none'; document.getElementById('tag-koena-header').style.display='flex';};" alt="Logo Koena" class="h-9 w-auto object-contain rounded">
         <div id="tag-koena-header" class="hidden items-center bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
@@ -94,18 +139,19 @@
 
       <div class="hidden sm:block">
         <h1 class="text-base md:text-lg font-black tracking-wide text-white leading-tight">PF RAMIRO ABBATTISTA</h1>
-        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Rendimiento • Fuerza • Koena</span>
+        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Plataforma de Rendimiento & Fuerza</span>
       </div>
     </div>
     
     <div class="flex items-center gap-2">
+      <button type="button" onclick="abrirModalDiscos(0)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-emerald-400 text-xs px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1">
+        ⚖️ <span class="hidden sm:inline">Calculadora</span> Discos
+      </button>
+
       <button type="button" onclick="alternarWakeLock()" id="btn-wake-lock" class="bg-slate-800 border border-slate-700 text-slate-400 hover:text-emerald-400 text-xs px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1">
         💡 <span class="hidden sm:inline">Pantalla:</span> <span id="txt-wake-status">Off</span>
       </button>
 
-      <a href="https://calculadorarmramiropf.netlify.app" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 text-xs px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5">
-        🏋️ 1RM Externa
-      </a>
       <button type="button" id="btn-admin-access" class="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs px-3 py-1.5 rounded-lg font-bold transition">
         🔒 Coach
       </button>
@@ -123,7 +169,13 @@
         <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-24 w-24 object-contain">
       </div>
       <h2 class="text-2xl font-black text-white tracking-wide">PF Ramiro Abbattista</h2>
-      <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma de Planificación y Rendimiento</p>
+      <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma de Entrenamiento y Fuerza</p>
+    </div>
+
+    <!-- PESTAÑAS LOGIN / REGISTRO -->
+    <div class="flex bg-slate-950 p-1 rounded-2xl border border-slate-800">
+      <button type="button" id="tab-auth-login" onclick="cambiarModoAuth('login')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950">Ingresar</button>
+      <button type="button" id="tab-auth-registro" onclick="cambiarModoAuth('registro')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white">Crear Cuenta</button>
     </div>
 
     <div class="space-y-4 text-left">
@@ -135,11 +187,21 @@
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Contraseña</label>
         <input type="password" id="password" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="••••••••">
       </div>
-      <button type="button" id="btn-login" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3 rounded-xl transition active:scale-95 shadow-lg shadow-emerald-500/20 text-sm uppercase tracking-wider">
+      
+      <!-- CAMPO WHATSAPP Y NOMBRE EN EL REGISTRO -->
+      <div id="campo-whatsapp-registro" class="hidden space-y-3">
+        <div>
+          <label class="block text-xs font-semibold uppercase text-emerald-400 mb-1">Nombre Completo</label>
+          <input type="text" id="reg-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="ej: Imanol Gómez">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase text-emerald-400 mb-1">WhatsApp (para contacto con Ramiro)</label>
+          <input type="tel" id="reg-telefono" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm font-mono" placeholder="ej: 11 2345-6789">
+        </div>
+      </div>
+
+      <button type="button" id="btn-auth-accion" onclick="ejecutarAuth()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3 rounded-xl transition active:scale-95 shadow-lg shadow-emerald-500/20 text-sm uppercase tracking-wider">
         Ingresar a mi Plan
-      </button>
-      <button type="button" id="btn-registro" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl transition text-xs active:scale-95">
-        Crear cuenta nueva de alumno
       </button>
     </div>
 
@@ -155,22 +217,30 @@
   <!-- PANTALLA PRINCIPAL -->
   <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- DASHBOARD DEL ALUMNO CON RACHA DINÁMICA E INSIGNIAS CONDICIONALES -->
+    <!-- DASHBOARD DEL ALUMNO CON AVATAR / FOTO Y RACHA -->
     <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 p-5 md:p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-5">
       
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
-        <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span id="badge-modalidad-alumno" class="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border">
-              Modalidad
-            </span>
-            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block">Panel del Atleta</span>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        
+        <!-- FOTO / AVATAR + NOMBRE DEL ALUMNO -->
+        <div class="flex items-center gap-3.5">
+          <div id="avatar-alumno-display" class="avatar-circulo shadow-lg">
+            🏋️‍♂️
           </div>
-          <h3 class="text-xl font-black text-white" id="dash-alumno-nombre">Bienvenido a tu Plan</h3>
+          <div>
+            <div class="flex items-center gap-2 mb-0.5">
+              <span id="badge-modalidad-alumno" class="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border">
+                Modalidad
+              </span>
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block">Panel del Atleta</span>
+            </div>
+            <h3 class="text-xl font-black text-white leading-tight" id="dash-alumno-nombre">Bienvenido a tu Plan</h3>
+            <span class="text-xs text-emerald-400 font-medium block" id="dash-alumno-subtitulo">Completá tu ficha en "👤 Mi Perfil & Salud".</span>
+          </div>
         </div>
 
         <div class="flex items-center gap-3 self-start sm:self-auto">
-          <!-- BOTÓN CLIQUEABLE CON LOGO DE KOENA PARA FILTRAR -->
+          <!-- CONMUTADOR DE SEDE (KOENA VS ONLINE) -->
           <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1.5">
             <button type="button" onclick="cambiarEntornoAlumno('KOENA')" id="btn-env-koena" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5">
               <img src="logo-koena.webp" onerror="this.onerror=null; this.src='logo-koena.png'; this.onerror=()=>{this.style.display='none';};" class="h-4 w-auto object-contain">
@@ -196,15 +266,14 @@
         </div>
       </div>
 
-      <!-- MEDALLAS QUE SE PIERDEN SI SE CORTA LA RACHA -->
+      <!-- MEDALLAS CONDICIONALES -->
       <div>
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2.5">
-          <span class="text-[11px] text-slate-400 uppercase font-bold tracking-wider block">Insignias de Racha (¡Mantené tu ritmo semanal para no perderlas!):</span>
+          <span class="text-[11px] text-slate-400 uppercase font-bold tracking-wider block">Insignias de Racha (Se desactivan tras 8 días de inactividad):</span>
           <span id="lbl-rango-actual" class="text-xs font-black text-emerald-400">Racha inicial</span>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <!-- 2 A 3 SEMANAS -->
           <div id="medalla-bronce" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-amber-800/40 flex items-center gap-3 transition-all duration-300">
             <span class="text-3xl">🥉</span>
             <div>
@@ -212,8 +281,6 @@
               <span class="text-[10px] text-slate-400 font-medium">Adaptación Base</span>
             </div>
           </div>
-
-          <!-- 1 A 2 MESES -->
           <div id="medalla-plata" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-slate-400/40 flex items-center gap-3 transition-all duration-300">
             <span class="text-3xl">🥈</span>
             <div>
@@ -221,8 +288,6 @@
               <span class="text-[10px] text-slate-400 font-medium">Consolidación</span>
             </div>
           </div>
-
-          <!-- 3 A 6 MESES -->
           <div id="medalla-oro" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-yellow-500/40 flex items-center gap-3 transition-all duration-300">
             <span class="text-3xl">🥇</span>
             <div>
@@ -230,8 +295,6 @@
               <span class="text-[10px] text-slate-400 font-medium">Fuerza & Potencia</span>
             </div>
           </div>
-
-          <!-- +1 AÑO -->
           <div id="medalla-diamante" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-cyan-400/40 flex items-center gap-3 transition-all duration-300">
             <span class="text-3xl">💎</span>
             <div>
@@ -249,26 +312,26 @@
       <!-- BOTONES DE NAVEGACIÓN COACH -->
       <div class="flex items-center justify-between bg-slate-900 p-3 rounded-2xl border border-slate-800">
         <div class="flex flex-wrap gap-2">
-          <button type="button" onclick="cambiarSolapaCoach('alumnos')" id="tab-c-alumnos" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition">👥 Alumnos & Cargas</button>
+          <button type="button" onclick="cambiarSolapaCoach('alumnos')" id="tab-c-alumnos" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition">👥 Alumnos & Fichas</button>
           <button type="button" onclick="cambiarSolapaCoach('rms')" id="tab-c-rms" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📊 Planilla RMs Alumnos</button>
-          <button type="button" onclick="cambiarSolapaCoach('plantillas')" id="tab-c-plantillas" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📑 Plantillas Inteligentes</button>
+          <button type="button" onclick="cambiarSolapaCoach('plantillas')" id="tab-c-plantillas" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📑 Plantillas Maestras</button>
           <button type="button" onclick="cambiarSolapaCoach('creador')" id="tab-c-creador" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">🛠 Creador Mensual</button>
         </div>
         <button type="button" onclick="cerrarModoAdmin()" class="text-xs bg-red-500/20 text-red-300 px-3 py-2 rounded-xl font-bold">Cerrar Coach</button>
       </div>
 
-      <!-- SECTOR 1: GESTOR DE ALUMNOS CON SEGMENTACIÓN ONLINE VS KOENA -->
+      <!-- SECTOR 1: GESTOR DE ALUMNOS CON FOTO/ICONO & FICHA -->
       <div id="vista-c-alumnos" class="bg-slate-900 p-5 md:p-7 rounded-3xl border border-blue-500/40 shadow-2xl space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
           <div>
-            <h3 class="text-lg font-black text-blue-400 flex items-center gap-2">👥 Supervisión y Segmentación de Alumnos</h3>
-            <p class="text-xs text-slate-400">Filtrá entre tus alumnos presenciales de Koena y tus personalizados Online.</p>
+            <h3 class="text-lg font-black text-blue-400 flex items-center gap-2">👥 Supervisión de Alumnos & Fichas Anamnesis</h3>
+            <p class="text-xs text-slate-400">Consultá fotos, objetivos, lesiones, antropometrías y contactá directo por WhatsApp.</p>
           </div>
           
           <div class="flex flex-wrap items-center gap-2">
             <select id="sel-filtro-entorno" onchange="filtrarPlanesPorEntornoYAlumno()" class="bg-slate-950 border border-slate-700 text-cyan-400 text-xs rounded-xl p-2.5 font-bold focus:outline-none focus:border-cyan-400">
               <option value="TODOS">🏢 Todos los Entornos</option>
-              <option value="KOENA">Koena (Presencial)</option>
+              <option value="KOENA">Koena (Sede Presencial)</option>
               <option value="ONLINE">🌐 Personalizado Online</option>
             </select>
 
@@ -305,7 +368,7 @@
       <div id="vista-c-plantillas" class="hidden bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-4">
         <div class="flex justify-between items-center border-b border-slate-800 pb-3">
           <div>
-            <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">📑 Plantillas Inteligentes</h3>
+            <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">📑 Plantillas Maestras</h3>
             <p class="text-xs text-slate-400">Modelos maestros listos para asignar con 1 clic.</p>
           </div>
           <span class="text-xs font-bold text-slate-400" id="contador-plantillas">0 Plantillas</span>
@@ -319,8 +382,8 @@
       <div id="vista-c-creador" class="hidden bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-6">
         <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
           <div>
-            <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🛠️ Diseñador de Planificación Mensual</h3>
-            <p class="text-xs text-slate-400">Elegí la modalidad (Online o Koena) y armá el día con todos sus bloques.</p>
+            <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🛠 Diseñador de Planificación Mensual</h3>
+            <p class="text-xs text-slate-400">Elegí la modalidad (Online o Koena) y armá el día con todos sus bloques integrados.</p>
           </div>
         </div>
 
@@ -331,7 +394,7 @@
                 🏢 Modalidad / Entorno de Entrenamiento:
               </label>
               <select id="admin-entorno" class="w-full bg-slate-900 border border-cyan-500/40 text-cyan-300 rounded-xl p-2.5 text-xs md:text-sm font-bold focus:outline-none focus:border-cyan-400">
-                <option value="KOENA">Koena (Presencial)</option>
+                <option value="KOENA">Koena (Sede Presencial)</option>
                 <option value="ONLINE">🌐 Personalizado Online</option>
               </select>
             </div>
@@ -345,10 +408,14 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-slate-800/60">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 pt-2 border-t border-slate-800/60">
             <div>
               <label class="text-[11px] text-slate-400 font-semibold block mb-1">Correo o Nombre</label>
               <input type="text" id="admin-alumno" placeholder="ej: imanol@gmail.com" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[11px] text-emerald-400 font-semibold block mb-1">WhatsApp del Alumno</label>
+              <input type="tel" id="admin-alumno-tel" placeholder="ej: 11 2345-6789" class="w-full bg-slate-900 border border-emerald-500/40 rounded-xl p-2.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
             </div>
             <div>
               <label class="text-[11px] text-slate-400 font-semibold block mb-1">Mes / Mesociclo</label>
@@ -403,14 +470,14 @@
                   <option value="recepciones_amortiguacion">Recepciones & Amortiguaciones</option>
                   <option value="coordinacion_agilidad">Coordinación General & Pies Rápidos</option>
                 </optgroup>
-                <optgroup label="Fuerza, Rendimiento & Koena">
+                <optgroup label="Fuerza, Rendimiento & Potencia">
                   <option value="olimpicos_variantes">Levantamiento Olímpico (Variantes & Complejos)</option>
                   <option value="balisticos">Potencia & Pliometría</option>
                   <option value="tracciones_vertical_horizontal">Tracciones (Verticales & Horizontales)</option>
                   <option value="superior_empuje">Tren Superior - Empujes</option>
                   <option value="inferior_rodilla">Tren Inferior - Dominantes Rodilla</option>
                   <option value="inferior_cadera">Tren Inferior - Dominantes Cadera</option>
-                  <option value="zona_media_koena">Zona Media & Antirrotación (Core Koena)</option>
+                  <option value="zona_media_koena">Zona Media & Antirrotación</option>
                   <option value="personalizados">Mis Ejercicios Creados</option>
                 </optgroup>
               </select>
@@ -455,7 +522,7 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-            <input type="text" id="inp-video" placeholder="Link YouTube o Drive Demostración (ej: https://...)" class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
+            <input type="text" id="inp-video" placeholder="Link Demostración Técnica PF Ramiro (YouTube/Drive)" class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
             <button type="button" onclick="agregarFilaRutina()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black p-2.5 rounded-xl text-sm transition active:scale-95">＋ Agregar a la Lista</button>
           </div>
         </div>
@@ -504,13 +571,15 @@
       </div>
     </div>
 
-    <!-- PESTAÑAS PRINCIPALES DEL ALUMNO (RUTINA / RMs / HISTORIAL) -->
+    <!-- PESTAÑAS PRINCIPALES DEL ALUMNO (RUTINA / RMs / BIBLIOTECA / PERFIL / HISTORIAL) -->
     <div>
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div class="flex flex-wrap items-center gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
-          <button type="button" onclick="cambiarSolapaAlumno('actual')" id="tab-a-actual" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition">🔥 Rutina Actual</button>
-          <button type="button" onclick="cambiarSolapaAlumno('rms')" id="tab-a-rms" class="text-xs px-3.5 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition">📊 Mis RMs & Porcentajes</button>
-          <button type="button" onclick="cambiarSolapaAlumno('historial')" id="tab-a-historial" class="text-xs px-3.5 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition">📁 Historial / Viejas</button>
+          <button type="button" onclick="cambiarSolapaAlumno('actual')" id="tab-a-actual" class="text-xs px-3 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition">🔥 Rutina Actual</button>
+          <button type="button" onclick="cambiarSolapaAlumno('rms')" id="tab-a-rms" class="text-xs px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition">📊 Mis RMs</button>
+          <button type="button" onclick="cambiarSolapaAlumno('biblioteca')" id="tab-a-biblioteca" class="text-xs px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition">📖 Biblioteca</button>
+          <button type="button" onclick="cambiarSolapaAlumno('perfil')" id="tab-a-perfil" class="text-xs px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition">👤 Mi Perfil & Salud</button>
+          <button type="button" onclick="cambiarSolapaAlumno('historial')" id="tab-a-historial" class="text-xs px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition">📁 Historial</button>
         </div>
         <button type="button" onclick="refrescarRutinas()" class="text-xs bg-slate-900 border border-slate-800 hover:bg-slate-800 px-3 py-2 rounded-xl text-slate-300 font-bold transition">Actualizar</button>
       </div>
@@ -525,7 +594,7 @@
         <p class="text-slate-500 text-sm">Cargando tus entrenamientos...</p>
       </div>
 
-      <!-- SECCIÓN 2: PLANILLA DE RMs CON SELECTOR DESPLEGABLE -->
+      <!-- SECCIÓN 2: PLANILLA DE RMs CON SELECTOR DESPLEGABLE & GRÁFICO EVOLUTIVO -->
       <div id="seccion-rms-alumno" class="hidden space-y-6">
         <div class="bg-slate-900 p-5 md:p-6 rounded-3xl border border-emerald-500/40 shadow-xl space-y-5">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
@@ -577,13 +646,264 @@
             </div>
           </div>
 
+          <!-- GRÁFICO EVOLUTIVO DE FUERZA (CHART.JS) -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+            <span class="text-xs font-bold text-slate-300 block">📈 Curva de Progresión de Fuerza (1RM):</span>
+            <div class="h-52 w-full">
+              <canvas id="chart-rm-evolucion"></canvas>
+            </div>
+          </div>
+
           <div id="lista-tabla-rms" class="space-y-4">
             <p class="text-slate-500 text-xs">Cargando tus ejercicios de fuerza...</p>
           </div>
         </div>
       </div>
 
-      <!-- SECCIÓN 3: CONTENEDOR HISTORIAL DE RUTINAS VIEJAS -->
+      <!-- SECCIÓN 3: BIBLIOTECA TÉCNICA LIBRE PF RAMIRO ABBATTISTA -->
+      <div id="seccion-biblioteca-alumno" class="hidden space-y-6">
+        <div class="bg-slate-900 p-5 md:p-6 rounded-3xl border border-slate-800 shadow-xl space-y-5">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+            <div>
+              <h3 class="text-lg font-black text-white">📖 Biblioteca Técnica de Ejercicios — PF Ramiro Abbattista</h3>
+              <p class="text-xs text-slate-400">Consultá en cualquier momento los patrones motrices, variantes y pautas de ejecución técnica.</p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <input type="text" id="inp-buscar-biblio" oninput="filtrarBibliotecaTecnica()" placeholder="🔍 Buscar ejercicio..." class="bg-slate-950 border border-slate-700 text-white text-xs rounded-xl p-2.5 focus:outline-none focus:border-emerald-500">
+              <select id="sel-filtro-categoria-biblio" onchange="filtrarBibliotecaTecnica()" class="bg-slate-950 border border-slate-700 text-emerald-400 text-xs rounded-xl p-2.5 font-bold focus:outline-none focus:border-emerald-500">
+                <option value="TODOS">Todas las Categorías</option>
+                <option value="calentamiento_dinamico">Entrada en Calor & Activación</option>
+                <option value="activacion_gluteos">Activación de Glúteos</option>
+                <option value="olimpicos_variantes">Levantamiento Olímpico</option>
+                <option value="balisticos">Potencia & Pliometría</option>
+                <option value="inferior_rodilla">Tren Inferior - Rodilla</option>
+                <option value="inferior_cadera">Tren Inferior - Cadera</option>
+                <option value="superior_empuje">Tren Superior - Empujes</option>
+                <option value="tracciones_vertical_horizontal">Tren Superior - Tracciones</option>
+                <option value="zona_media_koena">Zona Media & Antirrotación</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="contenedor-grid-biblioteca" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[550px] overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 4: PERFIL PROPIO DEL ALUMNO CON FOTO/AVATAR, ANAMNESIS & ARCHIVOS -->
+      <div id="seccion-perfil-alumno" class="hidden space-y-6">
+        <div class="bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/30 shadow-2xl space-y-6">
+          <div class="border-b border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="text-xl font-black text-white flex items-center gap-2">👤 Anamnesis Deportiva, Salud & Archivos</h3>
+              <p class="text-xs text-slate-400">Personalizá tu foto, completá tus datos y subí tus estudios médicos o planillas viejas de RM.</p>
+            </div>
+            <button type="button" onclick="guardarMiPerfilDeportivo()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg active:scale-95 self-start sm:self-auto">
+              💾 Guardar Mi Ficha
+            </button>
+          </div>
+
+          <!-- BLOQUE DE FOTO DE PERFIL / SELECTOR DE AVATAR -->
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div id="preview-avatar-perfil" class="avatar-circulo">
+                🏋️‍♂️
+              </div>
+              <div>
+                <span class="text-xs font-bold text-white block">Foto o Icono de Perfil</span>
+                <span class="text-[11px] text-slate-400">Elegí tu foto real desde tu celular o seleccioná un icono deportivo.</span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <label class="bg-slate-900 border border-slate-700 text-emerald-400 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition">
+                📷 Subir Foto
+                <input type="file" accept="image/*" onchange="cargarFotoPerfilAlumno(this)" class="hidden">
+              </label>
+
+              <!-- SELECTOR RÁPIDO DE ICONOS -->
+              <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+                <button type="button" onclick="seleccionarEmojiAvatar('🏋️‍♂️')" class="hover:scale-125 transition text-base px-1">🏋️‍♂️</button>
+                <button type="button" onclick="seleccionarEmojiAvatar('🏄‍♂️️')" class="hover:scale-125 transition text-base px-1">🏄‍♂️</button>
+                <button type="button" onclick="seleccionarEmojiAvatar('⚡')" class="hover:scale-125 transition text-base px-1">⚡</button>
+                <button type="button" onclick="seleccionarEmojiAvatar('🥇')" class="hover:scale-125 transition text-base px-1">🥇</button>
+                <button type="button" onclick="seleccionarEmojiAvatar('🥊')" class="hover:scale-125 transition text-base px-1">🥊</button>
+                <button type="button" onclick="seleccionarEmojiAvatar('🏃‍♂️')" class="hover:scale-125 transition text-base px-1">🏃‍♂️</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- BLOQUE 1: BIOMETRÍA & DISPONIBILIDAD -->
+          <div class="space-y-3">
+            <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider block">1. Datos Físicos & Disponibilidad de Tiempo</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Nombre Completo</label>
+                <input type="text" id="perfil-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Tu nombre">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">WhatsApp de Contacto</label>
+                <input type="tel" id="perfil-telefono" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono" placeholder="ej: 11 2345-6789">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-emerald-400 block mb-1">Peso Corporal (kg)</label>
+                <input type="number" step="0.1" id="perfil-peso" class="w-full bg-slate-950 border border-emerald-500/40 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono font-bold" placeholder="ej: 76.5">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Altura (cm)</label>
+                <input type="number" id="perfil-altura" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono" placeholder="ej: 178">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Edad</label>
+                <input type="number" id="perfil-edad" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono" placeholder="ej: 26">
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Días Disponibles por Semana</label>
+                <select id="perfil-dias-semana" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                  <option value="2 días semanales">2 días semanales</option>
+                  <option value="3 días semanales" selected>3 días semanales (Recomendado)</option>
+                  <option value="4 días semanales">4 días semanales</option>
+                  <option value="5 o más días">5 o más días semanales</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Tiempo Máximo por Sesión</label>
+                <select id="perfil-tiempo-sesion" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                  <option value="45 - 60 minutos">45 - 60 minutos</option>
+                  <option value="60 - 75 minutos" selected>60 - 75 minutos</option>
+                  <option value="90 minutos o más">90 minutos o más</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Sede / Entorno Habitual</label>
+                <select id="perfil-sede" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                  <option value="Presencial Koena">🌊 Presencial en Koena</option>
+                  <option value="Personalizado Online">🌐 Personalizado Online</option>
+                  <option value="Ambos entornos">🔄 Ambos Entornos</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- BLOQUE 2: EXPERIENCIA MOTRIZ & DEPORTES -->
+          <div class="space-y-3 pt-3 border-t border-slate-800">
+            <span class="text-xs uppercase font-extrabold text-cyan-400 tracking-wider block">2. Experiencia Motriz, Fuerza & Deportes</span>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Experiencia en Entrenamiento de Fuerza</label>
+                <select id="perfil-exp-fuerza" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                  <option value="Principiante (menos de 6 meses)">Principiante (menos de 6 meses)</option>
+                  <option value="Intermedio (1 a 3 años)" selected>Intermedio (1 a 3 años constante)</option>
+                  <option value="Avanzado (+3 años continuos)">Avanzado (+3 años continuos)</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Levantamiento Olímpico (Cargadas/Arranques)</label>
+                <select id="perfil-exp-olimpico" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                  <option value="Cero experiencia / Nunca hice">Cero experiencia / Nunca hice</option>
+                  <option value="Básica (Cargadas de potencia simples)" selected>Básica (Cargadas simples)</option>
+                  <option value="Dominio técnico completo (Clean & Snatch)">Dominio técnico completo</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Deportes que practicás</label>
+                <input type="text" id="perfil-deportes" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="ej: Surf, Running 10k, Pádel...">
+              </div>
+            </div>
+          </div>
+
+          <!-- BLOQUE 3: OBJETIVOS & LUGAR -->
+          <div class="space-y-3 pt-3 border-t border-slate-800">
+            <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider block">3. Objetivos & Material Disponible</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Objetivo Primario del Ciclo</label>
+                <select id="perfil-objetivo" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                  <option value="Fuerza Máxima & Rendimiento Atlético">Fuerza Máxima & Rendimiento Atlético</option>
+                  <option value="Potencia, Salto & Transferencia a Surf">Potencia, Salto & Transferencia a Surf</option>
+                  <option value="Hipertrofia & Estética Funcional">Hipertrofia & Estética Funcional</option>
+                  <option value="Salud Postural, Movilidad & Prevención">Salud Postural, Movilidad & Prevención</option>
+                  <option value="Acondicionamiento Físico General & Grasa">Acondicionamiento Físico General</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Equipamiento habitual disponible</label>
+                <input type="text" id="perfil-equipamiento" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="ej: Box Koena, Gimnasio comercial completo, Mancuernas en casa...">
+              </div>
+            </div>
+          </div>
+
+          <!-- BLOQUE 4: SALUD, DOLORES & PREVENCIÓN DE LESIONES -->
+          <div class="space-y-3 pt-3 border-t border-slate-800">
+            <span class="text-xs uppercase font-extrabold text-amber-400 tracking-wider block">4. Historial Médico, Lesiones & Molestias Actuales</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="text-[11px] font-bold text-amber-300 block mb-1">Molestias o Dolores Actuales al Entrenar</label>
+                <textarea id="perfil-dolores-activos" rows="2" class="w-full bg-slate-950 border border-amber-500/30 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400" placeholder="ej: Molestia en rodilla derecha al bajar profundo en sentadilla, tensión lumbar..."></textarea>
+              </div>
+              <div>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">Cirugías previas, lesiones viejas o limitaciones</label>
+                <textarea id="perfil-cirugias-previas" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="ej: Operación de menisco en 2021, poca movilidad de tobillo izquierdo..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- BLOQUE 5: SUBIDA DE ESTUDIOS MÉDICOS, KINESIOLÓGICOS, ANTROPOMETRÍAS O PLANILLAS RM -->
+          <div class="space-y-4 pt-4 border-t border-slate-800">
+            <div>
+              <span class="text-xs uppercase font-extrabold text-blue-400 tracking-wider block">5. Adjuntar Estudios Médicos, Nutricionales o Planillas Anteriores</span>
+              <p class="text-[11px] text-slate-400 mt-0.5">Podés adjuntar resonancias, informes kinesiológicos, antropometrías ISAK o tus planillas viejas de RM (archivos o links de Drive).</p>
+            </div>
+
+            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div>
+                  <label class="text-[10px] text-slate-400 font-bold block mb-1">Tipo de Documento:</label>
+                  <select id="doc-tipo" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
+                    <option value="🩺 Estudio Médico / Resonancia">🩺 Estudio Médico / Resonancia</option>
+                    <option value="🩹 Informe Kinesiológico">🩹 Informe Kinesiológico / Rehab</option>
+                    <option value="🥗 Plan Nutricional / Antropometría">🥗 Plan Nutricional / Antropometría</option>
+                    <option value="📊 Planilla Vieja de RM / Rutina">📊 Planilla Vieja de RM / Rutina</option>
+                    <option value="📁 Otro Documento">📁 Otro Documento</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[10px] text-slate-400 font-bold block mb-1">Título / Descripción Breve:</label>
+                  <input type="text" id="doc-titulo" placeholder="ej: Resonancia Rodilla 2026" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
+                </div>
+                <div>
+                  <label class="text-[10px] text-slate-400 font-bold block mb-1">Link Directo (Drive / Dropbox) o Archivo:</label>
+                  <input type="text" id="doc-link" placeholder="https://drive.google.com/..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-slate-900">
+                <div class="flex items-center gap-2">
+                  <label class="text-[10px] text-emerald-400 font-bold cursor-pointer bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl hover:bg-slate-800 transition">
+                    📎 Seleccionar Archivo Local (PDF / Imagen)
+                    <input type="file" id="doc-archivo" accept="image/*,.pdf" onchange="procesarArchivoLocal(this)" class="hidden">
+                  </label>
+                  <span id="doc-archivo-nombre" class="text-[10px] text-slate-400 truncate max-w-xs"></span>
+                </div>
+                <button type="button" onclick="adjuntarDocumentoAlumno()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">
+                  ＋ Agregar Documento a mi Ficha
+                </button>
+              </div>
+            </div>
+
+            <!-- LISTADO DE DOCUMENTOS DEL ALUMNO -->
+            <div class="space-y-2">
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Tus Documentos Guardados:</span>
+              <div id="lista-documentos-alumno" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <p class="text-slate-500 text-xs col-span-2">No adjuntaste ningún documento todavía.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECCIÓN 5: CONTENEDOR HISTORIAL DE RUTINAS VIEJAS -->
       <div id="lista-historial" class="hidden space-y-4">
         <p class="text-slate-500 text-sm">Cargando historial de rutinas anteriores...</p>
       </div>
@@ -599,6 +919,7 @@
 
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // BIBLIOTECA PROPIA PF RAMIRO ABBATTISTA
     const BIBLIOTECA_DEFAULT = {
       calentamiento_dinamico: [
         "Inching Worm (Gusano de pies a manos con empuje)",
@@ -623,14 +944,14 @@
         "Apoyo Unilateral sobre Bosu o colchoneta con ojos cerrados",
         "Single Leg Romanian Deadlift con énfasis en estabilidad de arco plantar",
         "Lanzamientos de pelota medicinal contra pared en apoyo monopodal",
-        "Desplazamiento anteroposterior sobre tabla simulada / rodillo"
+        "Desplazamiento anteroposterior sobre superficie inestable / rodillo"
       ],
       recepciones_amortiguacion: [
         "Drop Landing desde cajón (30-40cm) con frenado bilateral reactivo",
         "Caída unilateral desde escalón con amortiguación suave y rodilla alineada",
-        "Salto vertical con recepción en posición baja Koena",
+        "Salto vertical con recepción en postura atlética baja",
         "Aterrizaje en 1 pierna tras salto lateral reactivo (Skater Jump to Stick)",
-        "Recepción con rotación de cadera simulando giro"
+        "Recepción con rotación de cadera simulando frenado reactivo"
       ],
       coordinacion_agilidad: [
         "Escalera de Coordinación: 2 pies adentro - 2 pies afuera (In & Out)",
@@ -749,6 +1070,300 @@
     let rutinasActivasAlumno = [];
     let todasLasRutinasAlumno = [];
     let entornoActivoAlumno = 'TODOS';
+    let chartRMInstance = null;
+    let modoAuthActual = 'login';
+    let archivoBase64Temporal = null;
+
+    function cambiarModoAuth(modo) {
+      modoAuthActual = modo;
+      const tabL = document.getElementById('tab-auth-login');
+      const tabR = document.getElementById('tab-auth-registro');
+      const campoWsp = document.getElementById('campo-whatsapp-registro');
+      const btnAccion = document.getElementById('btn-auth-accion');
+
+      if (modo === 'login') {
+        tabL.className = "w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950";
+        tabR.className = "w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white";
+        campoWsp.classList.add('hidden');
+        btnAccion.innerText = "Ingresar a mi Plan";
+      } else {
+        tabR.className = "w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950";
+        tabL.className = "w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white";
+        campoWsp.classList.remove('hidden');
+        btnAccion.innerText = "Crear Cuenta de Alumno";
+      }
+    }
+
+    function formatearTelefono(raw) {
+      if (!raw) return '';
+      let limpios = raw.replace(/\D/g, '');
+      if (limpios.startsWith('549')) return limpios;
+      if (limpios.startsWith('54')) return '549' + limpios.slice(2);
+      if (limpios.startsWith('15')) limpios = limpios.slice(2);
+      if (limpios.length === 10) return '549' + limpios;
+      return limpios;
+    }
+
+    // GESTIÓN DE FOTO DE PERFIL / AVATAR
+    function renderizarElementoAvatar(contenedor, valorAvatar) {
+      if (!contenedor) return;
+      if (valorAvatar && valorAvatar.startsWith('data:image')) {
+        contenedor.innerHTML = `<img src="${valorAvatar}" class="w-full h-full rounded-full object-cover">`;
+      } else {
+        contenedor.innerHTML = valorAvatar || '🏋️‍♂️';
+      }
+    }
+
+    function cargarFotoPerfilAlumno(input) {
+      const file = input.files[0];
+      if (!file || !usuarioActual) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64 = e.target.result;
+        guardarAvatarAlumno(base64);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function seleccionarEmojiAvatar(emoji) {
+      if (!usuarioActual) return;
+      guardarAvatarAlumno(emoji);
+    }
+
+    function guardarAvatarAlumno(valor) {
+      const email = usuarioActual.email;
+      localStorage.setItem(`avatar_alumno_${email}`, valor);
+      renderizarElementoAvatar(document.getElementById('avatar-alumno-display'), valor);
+      renderizarElementoAvatar(document.getElementById('preview-avatar-perfil'), valor);
+      alert("✅ ¡Foto / Icono de perfil actualizado!");
+    }
+
+    // GESTIÓN DE ARCHIVOS Y ESTUDIOS MÉDICOS / KINESIOLÓGICOS / RMs
+    function procesarArchivoLocal(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      document.getElementById('doc-archivo-nombre').innerText = `📄 ${file.name}`;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        archivoBase64Temporal = {
+          dataUrl: e.target.result,
+          name: file.name
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function adjuntarDocumentoAlumno() {
+      if (!usuarioActual) return;
+      const email = usuarioActual.email;
+      const tipo = document.getElementById('doc-tipo').value;
+      const titulo = document.getElementById('doc-titulo').value.trim() || 'Documento adjunto';
+      const link = document.getElementById('doc-link').value.trim();
+
+      if (!link && !archivoBase64Temporal) {
+        alert("Por favor ingresá un link de Drive/Dropbox o seleccioná un archivo local.");
+        return;
+      }
+
+      const nuevoDoc = {
+        id: Date.now(),
+        fecha: new Date().toLocaleDateString(),
+        tipo: tipo,
+        titulo: titulo,
+        url: link || archivoBase64Temporal.dataUrl,
+        nombreArchivo: archivoBase64Temporal ? archivoBase64Temporal.name : 'Enlace web'
+      };
+
+      const keyDocs = `documentos_atleta_${email}`;
+      const docs = JSON.parse(localStorage.getItem(keyDocs) || "[]");
+      docs.unshift(nuevoDoc);
+      localStorage.setItem(keyDocs, JSON.stringify(docs));
+
+      document.getElementById('doc-titulo').value = '';
+      document.getElementById('doc-link').value = '';
+      document.getElementById('doc-archivo').value = '';
+      document.getElementById('doc-archivo-nombre').innerText = '';
+      archivoBase64Temporal = null;
+
+      renderizarDocumentosAlumno(email);
+      alert("✅ ¡Documento adjuntado con éxito a tu ficha!");
+    }
+
+    function renderizarDocumentosAlumno(email) {
+      const cont = document.getElementById('lista-documentos-alumno');
+      const docs = JSON.parse(localStorage.getItem(`documentos_atleta_${email}`) || "[]");
+
+      if (docs.length === 0) {
+        cont.innerHTML = '<p class="text-slate-500 text-xs col-span-2">No adjuntaste ningún documento todavía.</p>';
+        return;
+      }
+
+      cont.innerHTML = docs.map((d, idx) => `
+        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between gap-2">
+          <div class="truncate">
+            <span class="text-[9px] text-blue-400 font-bold block uppercase">${d.tipo}</span>
+            <span class="text-white font-bold text-xs truncate block">${d.titulo}</span>
+            <span class="text-slate-500 text-[9px]">${d.fecha} • ${d.nombreArchivo}</span>
+          </div>
+          <div class="flex items-center gap-1.5 flex-shrink-0">
+            <a href="${d.url}" target="_blank" class="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 px-2.5 py-1 rounded-lg text-[10px] font-bold">
+              Ver
+            </a>
+            <button type="button" onclick="eliminarDocumentoAlumno('${email}', ${idx})" class="text-red-400 hover:text-red-300 px-1 py-1 text-xs">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function eliminarDocumentoAlumno(email, index) {
+      if (!confirm("¿Seguro que querés quitar este documento?")) return;
+      const keyDocs = `documentos_atleta_${email}`;
+      const docs = JSON.parse(localStorage.getItem(keyDocs) || "[]");
+      docs.splice(index, 1);
+      localStorage.setItem(keyDocs, JSON.stringify(docs));
+      renderizarDocumentosAlumno(email);
+    }
+
+    function cargarMiPerfilEnPantalla(email) {
+      const datos = JSON.parse(localStorage.getItem(`perfil_atleta_${email}`) || "{}");
+      document.getElementById('perfil-nombre').value = datos.nombre || email.split('@')[0];
+      document.getElementById('perfil-telefono').value = datos.telefono || localStorage.getItem(`telefono_alumno_${email}`) || '';
+      document.getElementById('perfil-peso').value = datos.peso || '';
+      document.getElementById('perfil-altura').value = datos.altura || '';
+      document.getElementById('perfil-edad').value = datos.edad || '';
+      document.getElementById('perfil-dias-semana').value = datos.diasSemana || '3 días semanales';
+      document.getElementById('perfil-tiempo-sesion').value = datos.tiempoSesion || '60 - 75 minutos';
+      document.getElementById('perfil-sede').value = datos.sede || 'Presencial Koena';
+
+      document.getElementById('perfil-exp-fuerza').value = datos.expFuerza || 'Intermedio (1 a 3 años)';
+      document.getElementById('perfil-exp-olimpico').value = datos.expOlimpico || 'Básica (Cargadas simples)';
+      document.getElementById('perfil-deportes').value = datos.deportes || '';
+
+      document.getElementById('perfil-objetivo').value = datos.objetivo || 'Fuerza Máxima & Rendimiento Atlético';
+      document.getElementById('perfil-equipamiento').value = datos.equipamiento || '';
+
+      document.getElementById('perfil-dolores-activos').value = datos.doloresActivos || '';
+      document.getElementById('perfil-cirugias-previas').value = datos.cirugiasPrevias || '';
+
+      const avatarGuardado = localStorage.getItem(`avatar_alumno_${email}`) || '🏋️‍♂️';
+      renderizarElementoAvatar(document.getElementById('avatar-alumno-display'), avatarGuardado);
+      renderizarElementoAvatar(document.getElementById('preview-avatar-perfil'), avatarGuardado);
+
+      const subtitulo = document.getElementById('dash-alumno-subtitulo');
+      if (subtitulo && datos.peso) {
+        subtitulo.innerText = `Atleta Activo • ${datos.peso} kg • ${datos.diasSemana || '3 días'} • ${datos.objetivo || ''}`;
+      }
+
+      renderizarDocumentosAlumno(email);
+    }
+
+    function guardarMiPerfilDeportivo() {
+      if (!usuarioActual) return;
+      const email = usuarioActual.email;
+      const perfil = {
+        nombre: document.getElementById('perfil-nombre').value.trim(),
+        telefono: formatearTelefono(document.getElementById('perfil-telefono').value.trim()),
+        peso: parseFloat(document.getElementById('perfil-peso').value) || null,
+        altura: parseInt(document.getElementById('perfil-altura').value) || null,
+        edad: parseInt(document.getElementById('perfil-edad').value) || null,
+        diasSemana: document.getElementById('perfil-dias-semana').value,
+        tiempoSesion: document.getElementById('perfil-tiempo-sesion').value,
+        sede: document.getElementById('perfil-sede').value,
+        expFuerza: document.getElementById('perfil-exp-fuerza').value,
+        expOlimpico: document.getElementById('perfil-exp-olimpico').value,
+        deportes: document.getElementById('perfil-deportes').value.trim(),
+        objetivo: document.getElementById('perfil-objetivo').value,
+        equipamiento: document.getElementById('perfil-equipamiento').value.trim(),
+        doloresActivos: document.getElementById('perfil-dolores-activos').value.trim(),
+        cirugiasPrevias: document.getElementById('perfil-cirugias-previas').value.trim()
+      };
+
+      localStorage.setItem(`perfil_atleta_${email}`, JSON.stringify(perfil));
+      if (perfil.telefono) {
+        localStorage.setItem(`telefono_alumno_${email}`, perfil.telefono);
+      }
+
+      alert("🎉 ¡Ficha deportiva guardada con éxito! Ramiro ya tiene tu información completa.");
+      cargarMiPerfilEnPantalla(email);
+    }
+
+    // VISUALIZADOR DE FICHA & ESTUDIOS PARA EL COACH CON AVATAR
+    function verFichaCompletaCoach(alumnoEmail) {
+      const p = JSON.parse(localStorage.getItem(`perfil_atleta_${alumnoEmail}`) || "{}");
+      const docs = JSON.parse(localStorage.getItem(`documentos_atleta_${alumnoEmail}`) || "[]");
+      const avatar = localStorage.getItem(`avatar_alumno_${alumnoEmail}`) || '🏋️‍♂️';
+      const cont = document.getElementById('contenido-ficha-coach');
+
+      const avatarHtml = (avatar && avatar.startsWith('data:image')) 
+        ? `<img src="${avatar}" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-400">`
+        : `<div class="avatar-circulo">${avatar}</div>`;
+
+      cont.innerHTML = `
+        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-3">
+              ${avatarHtml}
+              <div>
+                <h5 class="text-white font-bold text-sm">${p.nombre || alumnoEmail}</h5>
+                <span class="text-slate-500 text-[10px]">${alumnoEmail}</span>
+              </div>
+            </div>
+            <span class="bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded text-[10px]">${p.sede || 'Sin sede'}</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-[11px] pt-1">
+            <div><span class="text-slate-400">Peso actual:</span> <strong class="text-emerald-400 font-mono">${p.peso ? p.peso + ' kg' : 'S/D'}</strong></div>
+            <div><span class="text-slate-400">Altura:</span> <strong class="text-white font-mono">${p.altura ? p.altura + ' cm' : '-'}</strong></div>
+            <div><span class="text-slate-400">Edad:</span> <strong class="text-white">${p.edad ? p.edad + ' años' : '-'}</strong></div>
+            <div><span class="text-slate-400">Días x sem:</span> <strong class="text-white">${p.diasSemana || '3'}</strong></div>
+            <div><span class="text-slate-400">Duración:</span> <strong class="text-white">${p.tiempoSesion || '60m'}</strong></div>
+            <div><span class="text-slate-400">Deportes:</span> <strong class="text-white">${p.deportes || 'Ninguno'}</strong></div>
+          </div>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-1.5 text-[11px]">
+          <span class="text-emerald-400 font-bold uppercase tracking-wider block text-[10px]">Experiencia & Metas</span>
+          <div><span class="text-slate-400">Objetivo:</span> <strong class="text-white">${p.objetivo || 'No especificado'}</strong></div>
+          <div><span class="text-slate-400">Nivel fuerza:</span> <strong class="text-white">${p.expFuerza || '-'}</strong></div>
+          <div><span class="text-slate-400">L. Olímpico:</span> <strong class="text-white">${p.expOlimpico || '-'}</strong></div>
+          <div><span class="text-slate-400">Material disponible:</span> <strong class="text-white">${p.equipamiento || 'Completo'}</strong></div>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-2xl border border-amber-500/30 space-y-1.5 text-[11px]">
+          <span class="text-amber-400 font-bold uppercase tracking-wider block text-[10px]">⚠️ Dolores & Lesiones</span>
+          <div><span class="text-slate-400">Dolores activos:</span> <strong class="text-amber-300 block mt-0.5">${p.doloresActivos || 'Sin dolores reportados'}</strong></div>
+          <div><span class="text-slate-400">Cirugías / Viejas:</span> <strong class="text-slate-300 block mt-0.5">${p.cirugiasPrevias || 'Ninguna'}</strong></div>
+        </div>
+
+        <!-- MÓDULO DOCUMENTOS EN LA FICHA DEL COACH -->
+        <div class="bg-slate-950 p-3.5 rounded-2xl border border-blue-500/30 space-y-2 text-[11px]">
+          <span class="text-blue-400 font-bold uppercase tracking-wider block text-[10px]">📂 Estudios Médicos & Planillas (${docs.length})</span>
+          ${docs.length === 0 ? '<p class="text-slate-500 text-[10px]">El alumno no adjuntó estudios todavía.</p>' : `
+            <div class="space-y-1.5">
+              ${docs.map(d => `
+                <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 flex items-center justify-between">
+                  <div class="truncate pr-2">
+                    <span class="text-[9px] text-blue-300 font-bold block">${d.tipo}</span>
+                    <span class="text-white font-bold text-xs truncate block">${d.titulo}</span>
+                  </div>
+                  <a href="${d.url}" target="_blank" class="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 px-2.5 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap">
+                    Abrir Archivo
+                  </a>
+                </div>
+              `).join('')}
+            </div>
+          `}
+        </div>
+      `;
+
+      document.getElementById('modal-ficha-coach').classList.remove('hidden');
+    }
+
+    function cerrarModalFichaCoach() {
+      document.getElementById('modal-ficha-coach').classList.add('hidden');
+    }
 
     function calcularEpley(peso, reps) {
       const p = parseFloat(peso);
@@ -759,12 +1374,69 @@
       return Math.round(rm * 10) / 10;
     }
 
+    // CALCULADORA DE DISCOS EN BARRA OLÍMPICA
+    function abrirModalDiscos(kilos) {
+      const modal = document.getElementById('modal-discos');
+      const input = document.getElementById('inp-modal-kilos');
+      modal.classList.remove('hidden');
+      if (kilos && kilos > 0) {
+        input.value = kilos;
+        calcularDistribucionDiscos();
+      }
+    }
+
+    function cerrarModalDiscos() {
+      document.getElementById('modal-discos').classList.add('hidden');
+    }
+
+    function calcularDistribucionDiscos() {
+      const total = parseFloat(document.getElementById('inp-modal-kilos').value);
+      const resultado = document.getElementById('resultado-discos');
+
+      if (isNaN(total) || total < 20) {
+        resultado.innerHTML = '<span class="text-amber-400 font-bold">El peso mínimo en barra olímpica de 20 kg debe ser 20 kg.</span>';
+        return;
+      }
+
+      const pesoPorLado = (total - 20) / 2;
+      const discosDisponibles = [25, 20, 15, 10, 5, 2.5, 1.25];
+      let restante = pesoPorLado;
+      const discosUsados = [];
+
+      discosDisponibles.forEach(d => {
+        while (restante >= d) {
+          discosUsados.push(d);
+          restante = Math.round((restante - d) * 100) / 100;
+        }
+      });
+
+      if (discosUsados.length === 0) {
+        resultado.innerHTML = `
+          <div class="text-white font-bold">Barra Olímpica sola (20 kg)</div>
+          <span class="text-slate-400">Sin discos adicionales de los lados.</span>
+        `;
+        return;
+      }
+
+      resultado.innerHTML = `
+        <div class="text-emerald-400 font-black text-sm">🎯 Cargar por cada lado: ${pesoPorLado} kg</div>
+        <div class="flex flex-wrap gap-1.5 pt-1">
+          ${discosUsados.map(d => `
+            <span class="bg-slate-900 border border-emerald-500/40 text-emerald-300 font-mono font-black px-2.5 py-1 rounded-lg text-xs">
+              ${d} kg
+            </span>
+          `).join('')}
+        </div>
+        ${restante > 0 ? `<div class="text-[10px] text-amber-400 font-semibold pt-1">Diferencia no divisible exacta: ${restante * 2} kg</div>` : ''}
+      `;
+    }
+
     async function alternarWakeLock() {
       const txtStatus = document.getElementById('txt-wake-status');
       const btn = document.getElementById('btn-wake-lock');
 
       if (!('wakeLock' in navigator)) {
-        alert("Tu navegador no soporta el bloqueo de pantalla automático.");
+        alert("Tu dispositivo no soporta bloqueo de pantalla automático.");
         return;
       }
 
@@ -810,10 +1482,9 @@
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('btn-admin-access').addEventListener('click', solicitarClaveAdmin);
       document.getElementById('btn-link-coach').addEventListener('click', solicitarClaveAdmin);
-      document.getElementById('btn-login').addEventListener('click', iniciarSesion);
-      document.getElementById('btn-registro').addEventListener('click', registrarse);
       document.getElementById('btn-timer-toggle').addEventListener('click', pausarReanudarTimer);
       inicializarSelectores();
+      renderizarBibliotecaTecnica();
     });
 
     function cambiarSolapaCoach(vista) {
@@ -850,15 +1521,19 @@
     function cambiarSolapaAlumno(solapa) {
       const lActual = document.getElementById('lista-rutinas');
       const sRms = document.getElementById('seccion-rms-alumno');
+      const sBiblio = document.getElementById('seccion-biblioteca-alumno');
+      const sPerfil = document.getElementById('seccion-perfil-alumno');
       const lHistorial = document.getElementById('lista-historial');
       const tActual = document.getElementById('tab-a-actual');
       const tRms = document.getElementById('tab-a-rms');
+      const tBiblio = document.getElementById('tab-a-biblioteca');
+      const tPerfil = document.getElementById('tab-a-perfil');
       const tHistorial = document.getElementById('tab-a-historial');
       const tabsDias = document.getElementById('contenedor-tabs-dias');
 
-      [lActual, sRms, lHistorial].forEach(el => el.classList.add('hidden'));
-      [tActual, tRms, tHistorial].forEach(el => {
-        el.className = "text-xs px-3.5 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition";
+      [lActual, sRms, sBiblio, sPerfil, lHistorial].forEach(el => el.classList.add('hidden'));
+      [tActual, tRms, tBiblio, tPerfil, tHistorial].forEach(el => {
+        el.className = "text-xs px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition";
       });
 
       if (solapa === 'actual') {
@@ -870,6 +1545,16 @@
         tabsDias.classList.add('hidden');
         tRms.className = "text-xs px-4 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
         if (usuarioActual) cargarPlanillaRMsAlumno(usuarioActual.email);
+      } else if (solapa === 'biblioteca') {
+        sBiblio.classList.remove('hidden');
+        tabsDias.classList.add('hidden');
+        tBiblio.className = "text-xs px-4 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+        renderizarBibliotecaTecnica();
+      } else if (solapa === 'perfil') {
+        sPerfil.classList.remove('hidden');
+        tabsDias.classList.add('hidden');
+        tPerfil.className = "text-xs px-3 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+        if (usuarioActual) cargarMiPerfilEnPantalla(usuarioActual.email);
       } else {
         lHistorial.classList.remove('hidden');
         tabsDias.classList.add('hidden');
@@ -934,7 +1619,11 @@
     }
 
     function seleccionarAlumnoRapido(valor) {
-      if (valor) document.getElementById('admin-alumno').value = valor;
+      if (valor) {
+        document.getElementById('admin-alumno').value = valor;
+        const tel = localStorage.getItem(`telefono_alumno_${valor}`) || '';
+        document.getElementById('admin-alumno-tel').value = tel;
+      }
     }
 
     function filtrarPlanesPorEntornoYAlumno() {
@@ -959,6 +1648,19 @@
       renderizarPlanesAdmin(filtrados);
     }
 
+    function contactarAlumnoDirectoWhatsApp(alumnoEmail) {
+      let tel = localStorage.getItem(`telefono_alumno_${alumnoEmail}`);
+      if (!tel) {
+        const manual = prompt(`Ingresá el WhatsApp de ${alumnoEmail} para abrir el chat (ej: 11 2345-6789):`);
+        if (!manual) return;
+        tel = formatearTelefono(manual.trim());
+        localStorage.setItem(`telefono_alumno_${alumnoEmail}`, tel);
+      }
+
+      const mensaje = `Hola ${alumnoEmail.split('@')[0]}! Te escribo desde el equipo de Ramiro Abbattista. Vi que venís con buen ritmo y que te quedan días de plan pendientes esta semana. ¿Cómo venís con los tiempos para meter la sesión hoy o mañana y cuidar la racha? 💪`;
+      window.open(`https://wa.me/${tel}?text=${encodeURIComponent(mensaje)}`, '_blank');
+    }
+
     function renderizarPlanesAdmin(lista) {
       const cont = document.getElementById('contenedor-planes-admin');
       if (!lista || lista.length === 0) {
@@ -973,16 +1675,43 @@
         const wellness = localStorage.getItem(`wellness_${p.id}`) || '';
         const esKoena = (p.semana || '').toUpperCase().includes('KOENA');
 
+        const ultimaFecha = localStorage.getItem(`ultimo_entreno_fecha_${p.alumno_id}`);
+        let diasInactivo = 0;
+        if (ultimaFecha) {
+          diasInactivo = Math.floor((new Date() - new Date(ultimaFecha)) / (1000 * 60 * 60 * 24));
+        }
+
+        const perfil = JSON.parse(localStorage.getItem(`perfil_atleta_${p.alumno_id}`) || "{}");
+        const docs = JSON.parse(localStorage.getItem(`documentos_atleta_${p.alumno_id}`) || "[]");
+        const avatar = localStorage.getItem(`avatar_alumno_${p.alumno_id}`) || '🏋️‍♂️';
+
+        const miniAvatar = (avatar && avatar.startsWith('data:image'))
+          ? `<img src="${avatar}" class="w-6 h-6 rounded-full object-cover">`
+          : `<span>${avatar}</span>`;
+
         return `
-        <div class="bg-slate-950 p-4 rounded-2xl border ${esKoena ? 'border-cyan-500/40' : 'border-slate-800'} space-y-2 text-xs">
+        <div class="bg-slate-950 p-4 rounded-2xl border ${esKoena ? 'border-cyan-500/40' : 'border-slate-800'} space-y-2.5 text-xs">
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-1.5">
-              <span class="text-[10px] text-emerald-400 font-bold uppercase block">${p.alumno_id}</span>
+            <div class="flex items-center gap-2">
+              ${miniAvatar}
+              <span class="text-[10px] text-emerald-400 font-bold uppercase block">${perfil.nombre || p.alumno_id}</span>
               ${esKoena ? '<span class="bg-cyan-500/20 text-cyan-300 text-[9px] font-black px-1.5 py-0.5 rounded border border-cyan-500/30">KOENA</span>' : '<span class="bg-blue-500/20 text-blue-300 text-[9px] font-black px-1.5 py-0.5 rounded border border-blue-500/30">🌐 ONLINE</span>'}
             </div>
             <span class="text-[10px] bg-slate-900 border border-slate-700 px-2 py-0.5 rounded text-slate-300">
               🗓️ ${diaReal} ${fechaReal ? `(${fechaReal})` : ''}
             </span>
+          </div>
+
+          <!-- RESUMEN FICHA DEPORTIVA DEL ALUMNO PARA EL COACH -->
+          <div class="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 text-[11px] space-y-1">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300">⚖ Peso: <strong class="text-emerald-400 font-mono">${perfil.peso ? perfil.peso + ' kg' : 'S/D'}</strong> • ${perfil.diasSemana || '3 días'}</span>
+              <button type="button" onclick="verFichaCompletaCoach('${p.alumno_id}')" class="text-xs bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-bold">
+                📋 Ficha & Archivos (${docs.length})
+              </button>
+            </div>
+            ${perfil.doloresActivos ? `<span class="text-amber-300 block">⚠️ Dolor activo: <em>${perfil.doloresActivos}</em></span>` : ''}
+            ${perfil.objetivo ? `<span class="text-slate-400 block text-[10px]">🎯 Objetivo: ${perfil.objetivo}</span>` : ''}
           </div>
 
           <div>
@@ -991,11 +1720,21 @@
             ${wellness ? `<span class="text-[10px] text-blue-300 block mt-0.5">🩺 Wellness: ${wellness}</span>` : ''}
           </div>
 
-          <div class="flex items-center justify-between pt-2 border-t border-slate-800">
-            <span class="text-[11px] text-slate-500">${(p.ejercicios_detalle || []).length} ejercicios</span>
+          <div class="flex flex-wrap items-center justify-between pt-2 border-t border-slate-800 gap-2">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] text-slate-500">${(p.ejercicios_detalle || []).length} ejercicios</span>
+              <button type="button" onclick="contactarAlumnoDirectoWhatsApp('${p.alumno_id}')" class="bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                💬 WhatsApp
+              </button>
+              ${diasInactivo >= 6 ? `
+                <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-bold">
+                  ⚠ +${diasInactivo}d inactivo
+                </span>
+              ` : ''}
+            </div>
             <div class="flex gap-1.5">
               <button type="button" onclick='cargarRutinaAlEditor(${JSON.stringify(p.ejercicios_detalle || [])}, "${p.semana || ''}", "${p.dia || ''}", "${p.alumno_id || ''}")' class="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 px-3 py-1 rounded-lg font-bold">
-                Ajustar / Cargas
+                Ajustar
               </button>
               <button type="button" onclick="eliminarPlanAdmin('${p.id}')" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-2 py-1 rounded-lg font-bold">
                 ✕
@@ -1060,6 +1799,8 @@
     function cargarRutinaAlEditor(detalles, semana, dia, alumno = '') {
       sesionActual = JSON.parse(JSON.stringify(detalles || []));
       document.getElementById('admin-alumno').value = alumno || '';
+      const tel = localStorage.getItem(`telefono_alumno_${alumno}`) || '';
+      document.getElementById('admin-alumno-tel').value = tel;
       document.getElementById('admin-semana').value = semana || '';
       document.getElementById('admin-dia').value = dia ? dia + " (Copia)" : '';
       cambiarSolapaCoach('creador');
@@ -1157,6 +1898,7 @@
       biblioteca[cat].push(nombre.trim());
       localStorage.setItem('pf_biblioteca_v2', JSON.stringify(biblioteca));
       cargarEjerciciosPorCategoria();
+      renderizarBibliotecaTecnica();
       document.getElementById('sel-ejercicio').value = nombre.trim();
     }
 
@@ -1169,6 +1911,7 @@
         biblioteca[cat] = biblioteca[cat].filter(item => item !== ej);
         localStorage.setItem('pf_biblioteca_v2', JSON.stringify(biblioteca));
         cargarEjerciciosPorCategoria();
+        renderizarBibliotecaTecnica();
       }
     }
 
@@ -1243,6 +1986,7 @@
 
     async function guardarPlanificacionCompleta(comoPlantilla = false, modo = 'unir') {
       let alumno = document.getElementById('admin-alumno').value.trim();
+      const tel = document.getElementById('admin-alumno-tel').value.trim();
       const mes = document.getElementById('admin-mes').value.trim();
       const semana = document.getElementById('admin-semana').value.trim();
       let dia = document.getElementById('admin-dia').value.trim() || 'Lunes';
@@ -1253,6 +1997,10 @@
       if (!alumno || sesionActual.length === 0) {
         alert("Completá el alumno/título y agregá al menos un ejercicio a la sesión.");
         return;
+      }
+
+      if (tel) {
+        localStorage.setItem(`telefono_alumno_${alumno}`, formatearTelefono(tel));
       }
 
       const prefijoEntorno = entorno === 'KOENA' ? '[Koena] ' : '[Online] ';
@@ -1308,7 +2056,7 @@
       if (error) {
         alert("Error al guardar: " + error.message);
       } else {
-        alert(comoPlantilla ? "¡Plantilla inteligente guardada con éxito!" : `¡Planificación asignada con éxito al alumno para el día ${dia}!`);
+        alert(comoPlantilla ? "¡Plantilla maestra guardada con éxito!" : `¡Planificación asignada con éxito al alumno para el día ${dia}!`);
         sesionActual = [];
         renderTablaSesion();
         cargarPlanesAdmin();
@@ -1467,6 +2215,7 @@
       } else if (semanasRacha >= 4) {
         mBronce.classList.add('medalla-desbloqueada');
         mPlata.classList.add('medalla-desbloqueada');
+        mOro.classList.add('medalla-desbloqueada');
         lblRango.innerText = "Rango Activo: Hábito Consolidado (1-2 Meses) 🥈";
       } else if (semanasRacha >= 2) {
         mBronce.classList.add('medalla-desbloqueada');
@@ -1498,7 +2247,7 @@
       }
     }
 
-    // ====== PLANILLA DE RMs (EPLEY) ======
+    // ====== PLANILLA DE RMs (EPLEY) CON GRÁFICO ======
 
     function recalcularYGuardarRM(alumnoId, ejNombre, pesoInput, repsInput, notasInput) {
       const p = parseFloat(pesoInput.value) || 0;
@@ -1522,6 +2271,12 @@
       };
       localStorage.setItem(`rm_data_${alumnoId}_${ejNombre}`, JSON.stringify(dataObj));
 
+      const histKey = `rm_historial_${alumnoId}_${ejNombre}`;
+      let hist = JSON.parse(localStorage.getItem(histKey) || "[]");
+      hist.push({ fecha: new Date().toLocaleDateString(), rm: rm });
+      if (hist.length > 8) hist = hist.slice(-8);
+      localStorage.setItem(histKey, JSON.stringify(hist));
+
       sb.from('registros_rm').upsert({
         alumno_id: alumnoId,
         ejercicio: ejNombre,
@@ -1530,6 +2285,8 @@
         rm_calculado: rm,
         notas: dataObj.notas
       }, { onConflict: 'alumno_id,ejercicio' }).then();
+
+      actualizarGraficoEvolucionRM(alumnoId, ejNombre);
     }
 
     function extraerEjerciciosFuerzaPlanificacion(planificaciones) {
@@ -1563,9 +2320,14 @@
               <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">Fuerza & Rendimiento</span>
               <h4 class="text-base font-black text-white">${ejNombre}</h4>
             </div>
-            <div class="flex items-center gap-2 bg-slate-900 border border-emerald-500/30 px-3 py-1.5 rounded-xl self-start sm:self-auto">
-              <span class="text-xs text-slate-400 font-bold">1RM Estimado:</span>
-              <span id="rm-valor-${alumnoId}-${ejNombre}" class="text-base font-black text-emerald-400 font-mono">${rmActual} kg</span>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="abrirModalDiscos(${rmActual})" class="bg-slate-900 border border-slate-700 text-slate-300 hover:text-emerald-400 text-xs px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1 transition">
+                ⚖️ Discos
+              </button>
+              <div class="flex items-center gap-2 bg-slate-900 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
+                <span class="text-xs text-slate-400 font-bold">1RM:</span>
+                <span id="rm-valor-${alumnoId}-${ejNombre}" class="text-base font-black text-emerald-400 font-mono">${rmActual} kg</span>
+              </div>
             </div>
           </div>
 
@@ -1602,6 +2364,47 @@
       `;
     }
 
+    function actualizarGraficoEvolucionRM(alumnoId, ejNombre) {
+      const canvas = document.getElementById('chart-rm-evolucion');
+      if (!canvas) return;
+
+      const histKey = `rm_historial_${alumnoId}_${ejNombre}`;
+      const hist = JSON.parse(localStorage.getItem(histKey) || "[]");
+      
+      const labels = hist.length > 0 ? hist.map(h => h.fecha) : ['Mes 1', 'Mes 2', 'Mes 3'];
+      const dataPoints = hist.length > 0 ? hist.map(h => h.rm) : [70, 75, 80];
+
+      if (chartRMInstance) chartRMInstance.destroy();
+
+      chartRMInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: `1RM (kg) - ${ejNombre}`,
+            data: dataPoints,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.35,
+            fill: true,
+            pointBackgroundColor: '#10b981',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#cbd5e1', font: { size: 11, weight: 'bold' } } }
+          },
+          scales: {
+            x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(51, 65, 85, 0.3)' } },
+            y: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(51, 65, 85, 0.3)' } }
+          }
+        }
+      });
+    }
+
     async function cargarPlanillaRMsAlumno(email) {
       const cont = document.getElementById('lista-tabla-rms');
       
@@ -1619,6 +2422,9 @@
 
       const ejercicios = extraerEjerciciosFuerzaPlanificacion(rutinasActivasAlumno);
       cont.innerHTML = ejercicios.map(ej => renderizarTarjetaRM(email, ej, true)).join('');
+      if (ejercicios.length > 0) {
+        actualizarGraficoEvolucionRM(email, ejercicios[0]);
+      }
     }
 
     function agregarFilaRMDesdeDesplegable() {
@@ -1630,6 +2436,7 @@
       const cont = document.getElementById('lista-tabla-rms');
       
       cont.insertAdjacentHTML('afterbegin', renderizarTarjetaRM(email, ejNombre, true));
+      actualizarGraficoEvolucionRM(email, ejNombre);
       sel.value = "";
     }
 
@@ -1671,6 +2478,48 @@
       cont.insertAdjacentHTML('beforeend', renderizarTarjetaRM(alumnoEmail, nombre.trim(), true));
     }
 
+    // ====== BIBLIOTECA TÉCNICA LIBRE PF RAMIRO ABBATTISTA ======
+    function renderizarBibliotecaTecnica() {
+      const cont = document.getElementById('contenedor-grid-biblioteca');
+      if (!cont) return;
+
+      const filtroTexto = (document.getElementById('inp-buscar-biblio')?.value || '').toLowerCase();
+      const filtroCat = document.getElementById('sel-filtro-categoria-biblio')?.value || 'TODOS';
+
+      let items = [];
+      Object.keys(biblioteca).forEach(cat => {
+        if (filtroCat === 'TODOS' || filtroCat === cat) {
+          (biblioteca[cat] || []).forEach(ej => {
+            if (!filtroTexto || ej.toLowerCase().includes(filtroTexto)) {
+              items.push({ categoria: cat, nombre: ej });
+            }
+          });
+        }
+      });
+
+      if (items.length === 0) {
+        cont.innerHTML = '<p class="text-slate-500 text-xs col-span-2">No se encontraron ejercicios en la biblioteca con esos criterios.</p>';
+        return;
+      }
+
+      cont.innerHTML = items.map(item => `
+        <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80 flex items-center justify-between text-xs space-y-1">
+          <div>
+            <span class="text-[9px] text-emerald-400 font-bold uppercase tracking-wider block">${item.categoria.replace('_', ' ')}</span>
+            <span class="text-white font-bold text-sm block">${item.nombre}</span>
+          </div>
+          <button type="button" onclick="abrirModalDiscos(60)" class="bg-slate-900 border border-slate-700 text-slate-300 hover:text-emerald-400 px-2.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1">
+            ⚖
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function filtrarBibliotecaTecnica() {
+      renderizarBibliotecaTecnica();
+    }
+
+    // CAMBIO DE ENTORNO EN VISTA ALUMNO (KOENA VS ONLINE)
     function cambiarEntornoAlumno(entorno) {
       entornoActivoAlumno = entorno;
       const btnK = document.getElementById('btn-env-koena');
@@ -1736,7 +2585,10 @@
       const tot = parseInt(localStorage.getItem(`stats_total_${userEmail}`) || "0");
       const rac = parseInt(localStorage.getItem(`stats_racha_${userEmail}`) || "0");
       actualizarGamificacionUI(tot, rac, userEmail);
-      document.getElementById('dash-alumno-nombre').innerText = `Plan de ${userEmail.split('@')[0]}`;
+      
+      const perfil = JSON.parse(localStorage.getItem(`perfil_atleta_${userEmail}`) || "{}");
+      document.getElementById('dash-alumno-nombre').innerText = perfil.nombre ? `Plan de ${perfil.nombre}` : `Plan de ${userEmail.split('@')[0]}`;
+      cargarMiPerfilEnPantalla(userEmail);
 
       const { data, error } = await sb
         .from('planificaciones')
@@ -1876,6 +2728,7 @@
                       const segs = parseSegundos(item.descanso);
                       const cargaAnterior = localStorage.getItem(`last_weight_${item.ejercicio}`) || '';
                       const cargaAsignadaCoach = item.cargaCoach || '';
+                      const pesoNumerico = parseFloat(cargaAsignadaCoach) || parseFloat(cargaAnterior) || 0;
 
                       return `
                         <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl space-y-3">
@@ -1885,6 +2738,11 @@
                                 <h6 class="font-bold text-white text-base">${item.ejercicio}</h6>
                                 ${cargaAsignadaCoach ? `<span class="text-[11px] text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg font-bold">🎯 Carga Coach: ${cargaAsignadaCoach}</span>` : ''}
                                 ${cargaAnterior ? `<span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded font-mono">Última: ${cargaAnterior}</span>` : ''}
+                                ${pesoNumerico > 0 ? `
+                                  <button type="button" onclick="abrirModalDiscos(${pesoNumerico})" class="text-[10px] text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 px-2 py-0.5 rounded font-bold hover:bg-cyan-500/20">
+                                    ⚖️ Discos
+                                  </button>
+                                ` : ''}
                               </div>
                               <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300 mt-1.5">
                                 <span class="bg-slate-800 px-2.5 py-0.5 rounded font-medium">${item.series} series x ${item.reps}</span>
@@ -2000,6 +2858,14 @@
       p.className = esError ? "text-center text-xs text-red-400 font-semibold" : "text-center text-xs text-emerald-400 font-semibold";
     }
 
+    async function ejecutarAuth() {
+      if (modoAuthActual === 'login') {
+        await iniciarSesion();
+      } else {
+        await registrarse();
+      }
+    }
+
     async function iniciarSesion() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
@@ -2013,6 +2879,9 @@
     async function registrarse() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
+      const telInput = document.getElementById('reg-telefono').value.trim();
+      const nombreInput = document.getElementById('reg-nombre').value.trim();
+
       if (!email || !password) return mostrarMensaje("Ingresá correo y contraseña", true);
 
       esAdminVerificado = false;
@@ -2023,7 +2892,30 @@
       if (error) {
         mostrarMensaje("Error: " + error.message, true);
       } else {
-        mostrarMensaje("¡Cuenta de alumno creada con éxito! Ya podés ingresar.");
+        const perfilInicial = {
+          nombre: nombreInput || email.split('@')[0],
+          telefono: formatearTelefono(telInput),
+          peso: null,
+          altura: null,
+          edad: null,
+          diasSemana: '3 días semanales',
+          tiempoSesion: '60 - 75 minutos',
+          sede: 'Presencial Koena',
+          expFuerza: 'Intermedio (1 a 3 años)',
+          expOlimpico: 'Básica (Cargadas simples)',
+          deportes: '',
+          objetivo: 'Fuerza Máxima & Rendimiento Atlético',
+          equipamiento: '',
+          doloresActivos: '',
+          cirugiasPrevias: ''
+        };
+        localStorage.setItem(`perfil_atleta_${email}`, JSON.stringify(perfilInicial));
+        if (telInput) {
+          localStorage.setItem(`telefono_alumno_${email}`, formatearTelefono(telInput));
+        }
+
+        mostrarMensaje("¡Cuenta creada con éxito! Ya podés ingresar a tu plan.");
+        setTimeout(() => cambiarModoAuth('login'), 1200);
       }
     }
 
