@@ -12,7 +12,7 @@
   <meta name="theme-color" content="#020617">
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -163,7 +163,7 @@
   </header>
 
   <!-- PANTALLA INICIO / ACCESO -->
-  <main id="seccion-auth" class="max-w-md mx-auto mt-10 p-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl mx-4 md:mx-auto text-center space-y-6">
+  <main id="seccion-auth" class="max-w-md mx-auto mt-10 p-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl text-center space-y-6">
     <div class="flex flex-col items-center">
       <div class="flex items-center justify-center p-3 bg-slate-950 rounded-2xl border border-slate-800 shadow-inner mb-3">
         <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-24 w-24 object-contain">
@@ -721,7 +721,7 @@
 
               <!-- SELECTOR RÁPIDO DE ICONOS -->
               <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
-                <button type="button" onclick="seleccionarEmojiAvatar('🏋️‍♂️️')" class="hover:scale-125 transition text-base px-1">🏋️‍♂️</button>
+                <button type="button" onclick="seleccionarEmojiAvatar('🏋️‍♂️')" class="hover:scale-125 transition text-base px-1">🏋️‍♂️</button>
                 <button type="button" onclick="seleccionarEmojiAvatar('🏄‍♂️')" class="hover:scale-125 transition text-base px-1">🏄‍♂️</button>
                 <button type="button" onclick="seleccionarEmojiAvatar('⚡')" class="hover:scale-125 transition text-base px-1">⚡</button>
                 <button type="button" onclick="seleccionarEmojiAvatar('🥇')" class="hover:scale-125 transition text-base px-1">🥇</button>
@@ -908,31 +908,22 @@
     </div>
   </main>
 
-  <!-- LÓGICA JAVASCRIPT COMPLETA Y FUNCIONAL -->
+  <!-- SCRIPT DE CONTROL UNIFICADO -->
   <script>
-    // CORE EXTENDIDO DE ZONA MEDIA PARA ACTIVACIÓN
-    const BIBLIOTECA_CORE_AMPLIADA = [
-      "Deadbug isométrico empujando Fitball contra rodillas (Contralateral)",
-      "Bird-Dog con banda elástica y pausa isométrica de 2s",
-      "Press Pallof isométrico en polea o banda (Anti-rotación pura)",
-      "Press Pallof dinámico con elevación vertical sobre cabeza",
-      "Plancha Copenhagen (Aductores + Cadena lateral) sobre banco",
-      "Plancha lateral con abducción de cadera en estrella",
-      "Hollow Body Hold con balanceo o extensión progresiva",
-      "Bear Crawl Hold (Gateo isométrico con rodillas flotando a 2cm)",
-      "Rueda Abdominal (Ab Wheel Rollout) desde rodillas",
-      "Paseo del Granjero unilateral pesado (Suitcase Carry / Maleta)",
-      "Stir the Pot (Revolver la olla) con antebrazos sobre Fitball",
-      "Bicho muerto con talón al suelo y activación dorsal",
-      "Puente de Glúteos unilateral con marcha isométrica de talones",
-      "Side Plank con rotación torácica y alcance bajo el tronco",
-      "Roll-up con disco ligero y control segmentario de columna"
-    ];
+    // 1. INICIALIZACIÓN DE CONEXIÓN
+    sb.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        usuarioActual = session.user;
+        mostrarPanel(session.user);
+      } else {
+        usuarioActual = null;
+        if (!esAdminVerificado) {
+          mostrarLogin();
+        }
+      }
+    });
 
-    biblioteca.zona_media_koena = BIBLIOTECA_CORE_AMPLIADA;
-    localStorage.setItem('pf_biblioteca_v2', JSON.stringify(biblioteca));
-
-    // AUTENTICACIÓN
+    // 2. FUNCIONES DE AUTENTICACIÓN
     async function ejecutarAuth() {
       if (modoAuthActual === 'login') {
         await iniciarSesion();
@@ -947,8 +938,17 @@
       if (!email || !password) return mostrarMensaje("Ingresá correo y contraseña", true);
 
       mostrarMensaje("Conectando...");
-      const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) mostrarMensaje("Error: " + error.message, true);
+      try {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) {
+          mostrarMensaje("Error: " + error.message, true);
+        } else if (data?.user) {
+          usuarioActual = data.user;
+          mostrarPanel(data.user);
+        }
+      } catch (err) {
+        mostrarMensaje("Error de conexión: " + err.message, true);
+      }
     }
 
     async function registrarse() {
@@ -963,34 +963,38 @@
       document.getElementById('seccion-admin').classList.add('hidden');
 
       mostrarMensaje("Creando cuenta de alumno...");
-      const { data, error } = await sb.auth.signUp({ email, password });
-      if (error) {
-        mostrarMensaje("Error: " + error.message, true);
-      } else {
-        const perfilInicial = {
-          nombre: nombreInput || email.split('@')[0],
-          telefono: formatearTelefono(telInput),
-          peso: null,
-          altura: null,
-          edad: null,
-          diasSemana: '3 días semanales',
-          tiempoSesion: '60 - 75 minutos',
-          sede: 'Presencial Koena',
-          expFuerza: 'Intermedio (1 a 3 años)',
-          expOlimpico: 'Básica (Cargadas simples)',
-          deportes: '',
-          objetivo: 'Fuerza Máxima & Rendimiento Atlético',
-          equipamiento: '',
-          doloresActivos: '',
-          cirugiasPrevias: ''
-        };
-        localStorage.setItem(`perfil_atleta_${email}`, JSON.stringify(perfilInicial));
-        if (telInput) {
-          localStorage.setItem(`telefono_alumno_${email}`, formatearTelefono(telInput));
-        }
+      try {
+        const { data, error } = await sb.auth.signUp({ email, password });
+        if (error) {
+          mostrarMensaje("Error: " + error.message, true);
+        } else {
+          const perfilInicial = {
+            nombre: nombreInput || email.split('@')[0],
+            telefono: formatearTelefono(telInput),
+            peso: null,
+            altura: null,
+            edad: null,
+            diasSemana: '3 días semanales',
+            tiempoSesion: '60 - 75 minutos',
+            sede: 'Presencial Koena',
+            expFuerza: 'Intermedio (1 a 3 años)',
+            expOlimpico: 'Básica (Cargadas simples)',
+            deportes: '',
+            objetivo: 'Fuerza Máxima & Rendimiento Atlético',
+            equipamiento: '',
+            doloresActivos: '',
+            cirugiasPrevias: ''
+          };
+          localStorage.setItem(`perfil_atleta_${email}`, JSON.stringify(perfilInicial));
+          if (telInput) {
+            localStorage.setItem(`telefono_alumno_${email}`, formatearTelefono(telInput));
+          }
 
-        mostrarMensaje("¡Cuenta creada con éxito! Ya podés ingresar a tu plan.");
-        setTimeout(() => cambiarModoAuth('login'), 1200);
+          mostrarMensaje("¡Cuenta creada con éxito! Ya podés ingresar a tu plan.");
+          setTimeout(() => cambiarModoAuth('login'), 1200);
+        }
+      } catch (err) {
+        mostrarMensaje("Error al registrarse: " + err.message, true);
       }
     }
 
@@ -1029,18 +1033,6 @@
       p.innerText = txt;
       p.className = esError ? "text-center text-xs text-red-400 font-semibold" : "text-center text-xs text-emerald-400 font-semibold";
     }
-
-    sb.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        usuarioActual = session.user;
-        mostrarPanel(session.user);
-      } else {
-        usuarioActual = null;
-        if (!esAdminVerificado) {
-          mostrarLogin();
-        }
-      }
-    });
   </script>
 </body>
 </html>
