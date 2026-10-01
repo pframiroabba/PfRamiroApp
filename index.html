@@ -35,14 +35,17 @@
       box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.35);
     }
     .medalla-bloqueada {
-      opacity: 0.35;
+      opacity: 0.25;
       filter: grayscale(100%);
+      border-color: rgba(71, 85, 105, 0.3) !important;
+      transform: scale(0.97);
     }
     .medalla-desbloqueada {
       opacity: 1;
       filter: none;
       border-color: rgba(16, 185, 129, 0.8) !important;
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.3);
+      transform: scale(1);
     }
     @media print {
       header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container {
@@ -84,7 +87,7 @@
       <div class="flex items-center pl-2 border-l border-slate-800">
         <img src="logo-koena.webp" onerror="this.style.display='none'; document.getElementById('tag-koena-header').style.display='flex';" alt="Logo Koena" class="h-9 w-auto object-contain rounded">
         <div id="tag-koena-header" class="hidden items-center bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
-          🌊 Koena
+          Koena
         </div>
       </div>
 
@@ -115,15 +118,11 @@
   <!-- PANTALLA INICIO / ACCESO -->
   <main id="seccion-auth" class="max-w-md mx-auto mt-10 p-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl mx-4 md:mx-auto text-center space-y-6">
     <div class="flex flex-col items-center">
-      <div class="flex items-center justify-center gap-3 p-3 bg-slate-950 rounded-2xl border border-slate-800 shadow-inner mb-3">
-        <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-20 w-20 object-contain">
-        <img src="logo-koena.webp" onerror="this.style.display='none'; document.getElementById('tag-koena-auth').style.display='block';" alt="Logo Koena" class="h-16 w-auto object-contain">
-        <div id="tag-koena-auth" class="hidden bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-black px-2.5 py-1 rounded-lg uppercase tracking-wider">
-          🌊 Koena
-        </div>
+      <div class="flex items-center justify-center p-3 bg-slate-950 rounded-2xl border border-slate-800 shadow-inner mb-3">
+        <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-24 w-24 object-contain">
       </div>
       <h2 class="text-2xl font-black text-white tracking-wide">PF Ramiro Abbattista</h2>
-      <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Personalizados Online & Presenciales Koena</p>
+      <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma de Planificación y Rendimiento</p>
     </div>
 
     <div class="space-y-4 text-left">
@@ -155,10 +154,9 @@
   <!-- PANTALLA PRINCIPAL -->
   <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- DASHBOARD DEL ALUMNO CON MEDALLAS BRONCE, PLATA, ORO Y DIAMANTE -->
+    <!-- DASHBOARD DEL ALUMNO CON RACHA DINÁMICA E INSIGNIAS CONDICIONALES -->
     <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 p-5 md:p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-5">
       
-      <!-- IDENTIFICADOR DE MODALIDAD DEL ALUMNO (KOENA VS ONLINE) -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
         <div>
           <div class="flex items-center gap-2 mb-1">
@@ -171,70 +169,73 @@
         </div>
 
         <div class="flex items-center gap-3 self-start sm:self-auto">
-          <!-- CONMUTADOR DE VISTA DE ENTORNO SI EL ALUMNO PARTICIPA EN AMBOS -->
-          <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1">
-            <button type="button" onclick="cambiarEntornoAlumno('KOENA')" id="btn-env-koena" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition">🌊 Koena</button>
+          <!-- BOTÓN CLIQUEABLE CON LOGO DE KOENA PARA FILTRAR -->
+          <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1.5">
+            <button type="button" onclick="cambiarEntornoAlumno('KOENA')" id="btn-env-koena" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5">
+              <img src="logo-koena.webp" onerror="this.onerror=null; this.src='logo.jpg';" class="h-4 w-auto object-contain">
+              <span>Koena</span>
+            </button>
             <button type="button" onclick="cambiarEntornoAlumno('ONLINE')" id="btn-env-online" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition">🌐 Online</button>
           </div>
 
           <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
             <span class="text-base">🔥</span>
             <div>
-              <span class="text-[9px] text-slate-400 uppercase font-bold block">Racha</span>
-              <span id="stat-racha" class="text-xs font-black text-emerald-400">1</span>
+              <span class="text-[9px] text-slate-400 uppercase font-bold block">Racha Activa</span>
+              <span id="stat-racha" class="text-xs font-black text-emerald-400">0 sem</span>
             </div>
           </div>
           <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
             <span class="text-base">🏆</span>
             <div>
-              <span class="text-[9px] text-slate-400 uppercase font-bold block">Sesiones</span>
-              <span id="stat-totales" class="text-xs font-black text-white">0</span>
+              <span class="text-[9px] text-slate-400 uppercase font-bold block">Totales</span>
+              <span id="stat-totales" class="text-xs font-black text-white">0 sem</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- MEDALLAS PROGRESIVAS: BRONCE, PLATA, ORO, DIAMANTE -->
+      <!-- MEDALLAS QUE SE PIERDEN SI SE CORTA LA RACHA -->
       <div>
-        <div class="flex justify-between items-center mb-2.5">
-          <span class="text-[11px] text-slate-400 uppercase font-bold tracking-wider block">Nivel y Medallas de Rendimiento:</span>
-          <span id="lbl-rango-actual" class="text-xs font-black text-emerald-400">Rango Actual: Iniciado</span>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2.5">
+          <span class="text-[11px] text-slate-400 uppercase font-bold tracking-wider block">Insignias de Racha (¡Mantené tu ritmo semanal para no perderlas!):</span>
+          <span id="lbl-rango-actual" class="text-xs font-black text-emerald-400">Racha inicial</span>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <!-- BRONCE -->
-          <div id="medalla-bronce" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-amber-800/40 flex items-center gap-3 transition">
+          <!-- 2 A 3 SEMANAS -->
+          <div id="medalla-bronce" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-amber-800/40 flex items-center gap-3 transition-all duration-300">
             <span class="text-3xl">🥉</span>
             <div>
-              <h5 class="text-xs font-black text-amber-500 leading-tight">Bronce</h5>
-              <span class="text-[10px] text-slate-400 font-medium">1ª Sesión lista</span>
+              <h5 class="text-xs font-black text-amber-500 leading-tight">2-3 Semanas</h5>
+              <span class="text-[10px] text-slate-400 font-medium">Adaptación Base</span>
             </div>
           </div>
 
-          <!-- PLATA -->
-          <div id="medalla-plata" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-slate-400/40 flex items-center gap-3 transition">
+          <!-- 1 A 2 MESES -->
+          <div id="medalla-plata" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-slate-400/40 flex items-center gap-3 transition-all duration-300">
             <span class="text-3xl">🥈</span>
             <div>
-              <h5 class="text-xs font-black text-slate-300 leading-tight">Plata</h5>
-              <span class="text-[10px] text-slate-400 font-medium">5 Sesiones</span>
+              <h5 class="text-xs font-black text-slate-300 leading-tight">1-2 Meses</h5>
+              <span class="text-[10px] text-slate-400 font-medium">Consolidación</span>
             </div>
           </div>
 
-          <!-- ORO -->
-          <div id="medalla-oro" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-yellow-500/40 flex items-center gap-3 transition">
+          <!-- 3 A 6 MESES -->
+          <div id="medalla-oro" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-yellow-500/40 flex items-center gap-3 transition-all duration-300">
             <span class="text-3xl">🥇</span>
             <div>
-              <h5 class="text-xs font-black text-yellow-400 leading-tight">Oro</h5>
-              <span class="text-[10px] text-slate-400 font-medium">10 Sesiones</span>
+              <h5 class="text-xs font-black text-yellow-400 leading-tight">3-6 Meses</h5>
+              <span class="text-[10px] text-slate-400 font-medium">Fuerza & Potencia</span>
             </div>
           </div>
 
-          <!-- DIAMANTE -->
-          <div id="medalla-diamante" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-cyan-400/40 flex items-center gap-3 transition">
+          <!-- +1 AÑO -->
+          <div id="medalla-diamante" class="medalla-bloqueada bg-slate-950 p-3 rounded-2xl border border-cyan-400/40 flex items-center gap-3 transition-all duration-300">
             <span class="text-3xl">💎</span>
             <div>
-              <h5 class="text-xs font-black text-cyan-300 leading-tight">Diamante</h5>
-              <span class="text-[10px] text-slate-400 font-medium">20 Sesiones Élite</span>
+              <h5 class="text-xs font-black text-cyan-300 leading-tight">+1 Año Élite</h5>
+              <span class="text-[10px] text-slate-400 font-medium">Atleta de Alto Nivel</span>
             </div>
           </div>
         </div>
@@ -250,7 +251,7 @@
           <button type="button" onclick="cambiarSolapaCoach('alumnos')" id="tab-c-alumnos" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition">👥 Alumnos & Cargas</button>
           <button type="button" onclick="cambiarSolapaCoach('rms')" id="tab-c-rms" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📊 Planilla RMs Alumnos</button>
           <button type="button" onclick="cambiarSolapaCoach('plantillas')" id="tab-c-plantillas" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📑 Plantillas Inteligentes</button>
-          <button type="button" onclick="cambiarSolapaCoach('creador')" id="tab-c-creador" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">🛠️️ Creador Mensual</button>
+          <button type="button" onclick="cambiarSolapaCoach('creador')" id="tab-c-creador" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">🛠 Creador Mensual</button>
         </div>
         <button type="button" onclick="cerrarModoAdmin()" class="text-xs bg-red-500/20 text-red-300 px-3 py-2 rounded-xl font-bold">Cerrar Coach</button>
       </div>
@@ -266,8 +267,8 @@
           <div class="flex flex-wrap items-center gap-2">
             <select id="sel-filtro-entorno" onchange="filtrarPlanesPorEntornoYAlumno()" class="bg-slate-950 border border-slate-700 text-cyan-400 text-xs rounded-xl p-2.5 font-bold focus:outline-none focus:border-cyan-400">
               <option value="TODOS">🏢 Todos los Entornos</option>
-              <option value="KOENA">🌊 Solo Alumnos Koena</option>
-              <option value="ONLINE">🌐 Solo Personalizados Online</option>
+              <option value="KOENA">Koena (Presencial)</option>
+              <option value="ONLINE">🌐 Personalizado Online</option>
             </select>
 
             <select id="sel-filtro-alumnos" onchange="filtrarPlanesPorEntornoYAlumno()" class="bg-slate-950 border border-slate-700 text-emerald-400 text-xs rounded-xl p-2.5 font-bold focus:outline-none focus:border-blue-400">
@@ -329,7 +330,7 @@
                 🏢 Modalidad / Entorno de Entrenamiento:
               </label>
               <select id="admin-entorno" class="w-full bg-slate-900 border border-cyan-500/40 text-cyan-300 rounded-xl p-2.5 text-xs md:text-sm font-bold focus:outline-none focus:border-cyan-400">
-                <option value="KOENA">🌊 Presencial en Koena</option>
+                <option value="KOENA">Koena (Presencial)</option>
                 <option value="ONLINE">🌐 Personalizado Online</option>
               </select>
             </div>
@@ -513,7 +514,7 @@
         <button type="button" onclick="refrescarRutinas()" class="text-xs bg-slate-900 border border-slate-800 hover:bg-slate-800 px-3 py-2 rounded-xl text-slate-300 font-bold transition">Actualizar</button>
       </div>
 
-      <!-- SOLAPAS TIPO EXCEL POR DÍA (DENTRO DE RUTINA ACTUAL) -->
+      <!-- SOLAPAS TIPO EXCEL POR DÍA -->
       <div id="contenedor-tabs-dias" class="tabs-dias-container hidden mb-4 overflow-x-auto pb-1">
         <div class="flex items-center gap-2" id="barra-solapas-dias"></div>
       </div>
@@ -523,7 +524,7 @@
         <p class="text-slate-500 text-sm">Cargando tus entrenamientos...</p>
       </div>
 
-      <!-- SECCIÓN 2: PLANILLA DE RMs CON SELECTOR DESPLEGABLE DE EJERCICIOS -->
+      <!-- SECCIÓN 2: PLANILLA DE RMs CON SELECTOR DESPLEGABLE -->
       <div id="seccion-rms-alumno" class="hidden space-y-6">
         <div class="bg-slate-900 p-5 md:p-6 rounded-3xl border border-emerald-500/40 shadow-xl space-y-5">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
@@ -748,7 +749,6 @@
     let todasLasRutinasAlumno = [];
     let entornoActivoAlumno = 'TODOS';
 
-    // FÓRMULA DE EPLEY PURA
     function calcularEpley(peso, reps) {
       const p = parseFloat(peso);
       const r = parseInt(reps);
@@ -977,7 +977,7 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5">
               <span class="text-[10px] text-emerald-400 font-bold uppercase block">${p.alumno_id}</span>
-              ${esKoena ? '<span class="bg-cyan-500/20 text-cyan-300 text-[9px] font-black px-1.5 py-0.5 rounded border border-cyan-500/30">🌊 KOENA</span>' : '<span class="bg-blue-500/20 text-blue-300 text-[9px] font-black px-1.5 py-0.5 rounded border border-blue-500/30">🌐 ONLINE</span>'}
+              ${esKoena ? '<span class="bg-cyan-500/20 text-cyan-300 text-[9px] font-black px-1.5 py-0.5 rounded border border-cyan-500/30">KOENA</span>' : '<span class="bg-blue-500/20 text-blue-300 text-[9px] font-black px-1.5 py-0.5 rounded border border-blue-500/30">🌐 ONLINE</span>'}
             </div>
             <span class="text-[10px] bg-slate-900 border border-slate-700 px-2 py-0.5 rounded text-slate-300">
               🗓️ ${diaReal} ${fechaReal ? `(${fechaReal})` : ''}
@@ -1373,12 +1373,30 @@
 
       guardarDiaEjecucion(rutinaId, diaReal, fechaReal);
 
+      // CÁLCULO DE RACHA DINÁMICA: EVALUAR SI PERDIÓ LA RACHA POR MÁS DE 8 DÍAS
+      const hoy = new Date();
+      const ultimaFechaStr = localStorage.getItem(`ultimo_entreno_fecha_${email}`);
+      let racha = parseInt(localStorage.getItem(`stats_racha_${email}`) || "0");
       let totalSesiones = parseInt(localStorage.getItem(`stats_total_${email}`) || "0") + 1;
-      let racha = parseInt(localStorage.getItem(`stats_racha_${email}`) || "0") + 1;
+
+      if (ultimaFechaStr) {
+        const ultimaFecha = new Date(ultimaFechaStr);
+        const diasDiferencia = Math.floor((hoy - ultimaFecha) / (1000 * 60 * 60 * 24));
+        if (diasDiferencia > 8) {
+          // Perdió la racha por inactividad
+          racha = 1;
+        } else {
+          racha += 1;
+        }
+      } else {
+        racha = 1;
+      }
+
+      localStorage.setItem(`ultimo_entreno_fecha_${email}`, hoy.toISOString());
       localStorage.setItem(`stats_total_${email}`, totalSesiones.toString());
       localStorage.setItem(`stats_racha_${email}`, racha.toString());
 
-      actualizarGamificacionUI(totalSesiones, racha);
+      actualizarGamificacionUI(totalSesiones, racha, email);
 
       localStorage.setItem(`rpe_${rutinaId}`, rpeValor);
       if (comentario) localStorage.setItem(`comentario_${rutinaId}`, comentario);
@@ -1397,7 +1415,7 @@
         console.warn("Feedback guardado");
       }
 
-      alert("🎉 ¡Entrenamiento y Wellness registrados con éxito!");
+      alert("🎉 ¡Entrenamiento y Wellness registrados con éxito! Tu racha semanal se actualizó.");
 
       let textoMensaje = `Hola Ramiro, completé mi entrenamiento "${dia}" (${semana}).%0A%0A*Día ejecutado:* ${diaReal} ${fechaReal ? `(${fechaReal})` : ''}%0A*Wellness:* ${wellnessResumen}%0A*Esfuerzo Percibido (RPE):* ${rpeValor}/10%0A*Sensaciones:* ${comentario || 'Sesión completada en orden.'}`;
       if (videoUrl) {
@@ -1407,10 +1425,25 @@
       window.open(`https://wa.me/${WHATSAPP_COACH}?text=${textoMensaje}`, '_blank');
     }
 
-    // ACTUALIZACIÓN DE MEDALLAS BRONCE, PLATA, ORO Y DIAMANTE
-    function actualizarGamificacionUI(totales, racha) {
-      document.getElementById('stat-totales').innerText = totales;
-      document.getElementById('stat-racha').innerText = `${racha} ${racha === 1 ? 'Sesión' : 'Sesiones'}`;
+    // ACTUALIZACIÓN DE MEDALLAS: SI PIERDE LA RACHA VUELVEN A GRIS
+    function actualizarGamificacionUI(totales, racha, email) {
+      // Verificar si hubo inactividad mayor a 8 días para apagar las medallas
+      const ultimaFechaStr = email ? localStorage.getItem(`ultimo_entreno_fecha_${email}`) : null;
+      let rachaValida = racha;
+
+      if (ultimaFechaStr) {
+        const diasSinEntrenar = Math.floor((new Date() - new Date(ultimaFechaStr)) / (1000 * 60 * 60 * 24));
+        if (diasSinEntrenar > 8) {
+          rachaValida = 0;
+          if (email) localStorage.setItem(`stats_racha_${email}`, "0");
+        }
+      }
+
+      const semanasAprox = Math.floor(totales / 3);
+      const semanasRacha = Math.floor(rachaValida / 3);
+
+      document.getElementById('stat-totales').innerText = `${semanasAprox} sem`;
+      document.getElementById('stat-racha').innerText = `${semanasRacha} sem`;
 
       const mBronce = document.getElementById('medalla-bronce');
       const mPlata = document.getElementById('medalla-plata');
@@ -1418,32 +1451,34 @@
       const mDiamante = document.getElementById('medalla-diamante');
       const lblRango = document.getElementById('lbl-rango-actual');
 
-      // Reset
+      // Si la racha está rota, se apagan todas las medallas
       [mBronce, mPlata, mOro, mDiamante].forEach(m => {
         m.classList.remove('medalla-desbloqueada');
         m.classList.add('medalla-bloqueada');
       });
 
-      if (totales >= 20) {
+      if (semanasRacha >= 48) {
         mBronce.classList.add('medalla-desbloqueada');
         mPlata.classList.add('medalla-desbloqueada');
         mOro.classList.add('medalla-desbloqueada');
         mDiamante.classList.add('medalla-desbloqueada');
-        lblRango.innerText = "Rango Actual: Diamante Élite 💎";
-      } else if (totales >= 10) {
+        lblRango.innerText = "Rango Activo: Atleta Élite (+1 Año) 💎";
+      } else if (semanasRacha >= 12) {
         mBronce.classList.add('medalla-desbloqueada');
         mPlata.classList.add('medalla-desbloqueada');
         mOro.classList.add('medalla-desbloqueada');
-        lblRango.innerText = "Rango Actual: Oro Pro 🥇";
-      } else if (totales >= 5) {
+        lblRango.innerText = "Rango Activo: Progresión Semestral (3-6 Meses) 🥇";
+      } else if (semanasRacha >= 4) {
         mBronce.classList.add('medalla-desbloqueada');
         mPlata.classList.add('medalla-desbloqueada');
-        lblRango.innerText = "Rango Actual: Plata Constante 🥈";
-      } else if (totales >= 1) {
+        lblRango.innerText = "Rango Activo: Hábito Consolidado (1-2 Meses) 🥈";
+      } else if (semanasRacha >= 2) {
         mBronce.classList.add('medalla-desbloqueada');
-        lblRango.innerText = "Rango Actual: Bronce Iniciado 🥉";
+        lblRango.innerText = "Rango Activo: Base Completada (2-3 Semanas) 🥉";
+      } else if (rachaValida === 0 && totales > 0) {
+        lblRango.innerText = "⚠️ Racha pausada por inactividad (+8 días sin entrenar)";
       } else {
-        lblRango.innerText = "Rango Actual: Por comenzar";
+        lblRango.innerText = "Rango: Iniciando Planificación";
       }
     }
 
@@ -1640,18 +1675,17 @@
       cont.insertAdjacentHTML('beforeend', renderizarTarjetaRM(alumnoEmail, nombre.trim(), true));
     }
 
-    // CAMBIO DE ENTORNO EN VISTA ALUMNO (KOENA VS ONLINE)
     function cambiarEntornoAlumno(entorno) {
       entornoActivoAlumno = entorno;
       const btnK = document.getElementById('btn-env-koena');
       const btnO = document.getElementById('btn-env-online');
 
       if (entorno === 'KOENA') {
-        btnK.className = "px-2.5 py-1 rounded-lg text-[11px] font-black bg-cyan-500 text-slate-950 transition";
+        btnK.className = "px-2.5 py-1 rounded-lg text-[11px] font-black bg-cyan-500 text-slate-950 transition flex items-center gap-1.5 shadow-sm";
         btnO.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-400 hover:text-white transition";
       } else {
-        btnO.className = "px-2.5 py-1 rounded-lg text-[11px] font-black bg-blue-500 text-white transition";
-        btnK.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-400 hover:text-white transition";
+        btnO.className = "px-2.5 py-1 rounded-lg text-[11px] font-black bg-blue-500 text-white transition shadow-sm";
+        btnK.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-400 hover:text-white transition flex items-center gap-1.5";
       }
 
       aplicarFiltroEntornoRutinas();
@@ -1705,7 +1739,7 @@
     async function cargarRutinas(userEmail, userId) {
       const tot = parseInt(localStorage.getItem(`stats_total_${userEmail}`) || "0");
       const rac = parseInt(localStorage.getItem(`stats_racha_${userEmail}`) || "0");
-      actualizarGamificacionUI(tot, rac);
+      actualizarGamificacionUI(tot, rac, userEmail);
       document.getElementById('dash-alumno-nombre').innerText = `Plan de ${userEmail.split('@')[0]}`;
 
       const { data, error } = await sb
@@ -1723,12 +1757,11 @@
 
       todasLasRutinasAlumno = data;
 
-      // Detectar entorno por defecto según la última planificación
       const esKoena = (data[0].semana || '').toUpperCase().includes('KOENA');
       const badge = document.getElementById('badge-modalidad-alumno');
 
       if (esKoena) {
-        badge.innerText = "🌊 Sede Presencial Koena";
+        badge.innerText = "Sede Presencial Koena";
         badge.className = "text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border bg-cyan-500/15 text-cyan-300 border-cyan-500/30";
         cambiarEntornoAlumno('KOENA');
       } else {
@@ -1764,7 +1797,7 @@
                   <span class="text-xs uppercase font-extrabold tracking-wider ${esKoena ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'} px-3 py-1 rounded-full border">
                     ${r.semana || 'Planificación'}
                   </span>
-                  ${esKoena ? '<span class="text-[10px] font-black text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">🌊 Koena</span>' : '<span class="text-[10px] font-black text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">🌐 Online</span>'}
+                  ${esKoena ? '<span class="text-[10px] font-black text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">Koena</span>' : '<span class="text-[10px] font-black text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">🌐 Online</span>'}
                 </div>
                 <h4 class="text-2xl font-black text-white mt-1.5">${r.dia || 'Entrenamiento'}</h4>
               </div>
