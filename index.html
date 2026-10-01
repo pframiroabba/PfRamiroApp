@@ -12,7 +12,7 @@
   <meta name="theme-color" content="#020617">
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -908,22 +908,1944 @@
     </div>
   </main>
 
-  <!-- SCRIPT DE CONTROL UNIFICADO -->
+  <!-- LÓGICA JAVASCRIPT ÍNTEGRA Y DEFINITIVA -->
   <script>
-    // 1. INICIALIZACIÓN DE CONEXIÓN
-    sb.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        usuarioActual = session.user;
-        mostrarPanel(session.user);
+    const SUPABASE_URL = 'https://zuwqfzfncybtwvzwlqmw.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1d3FmemZuY3lidHd2endscW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2OTgzMTYsImV4cCI6MjEwNjI3NDMxNn0.B2NPB2q5Blni4KNcBoyvfp8yW70hC0KqOgm3O2q1gGI';
+
+    const CLAVE_ADMIN_MASTER = 'ramiro2026';
+    const WHATSAPP_COACH = '5491141906766';
+
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const BIBLIOTECA_DEFAULT = {
+      calentamiento_dinamico: [
+        "Inching Worm (Gusano de pies a manos con empuje)",
+        "Spiderman Lunge con apertura de pecho torácica",
+        "Trote suave con balanceos dinámicos de cadera",
+        "Apertura de aductores en carrera lateral baja",
+        "Skipping A & Skipping B con ritmo reactivo",
+        "Balanceo dinámico de piernas frontal y lateral contra apoyo"
+      ],
+      activacion_gluteos: [
+        "Monster Walk con banda elástica circular en rodillas/tobillos",
+        "Clamshell (Ostra) con miniband y pausa de 2 seg en contracción",
+        "Puente de Glúteos Unilateral con pierna extendida a 45 grados",
+        "Caminata lateral en semi-sentadilla con banda en tensión constante",
+        "Patada de Glúteo en cuadrupedia con talón al techo y pierna a 90°",
+        "Abducción de cadera de pie en polea baja o banda elástica",
+        "Hip Thrust monopodal sobre banco sin carga"
+      ],
+      propiocepcion_equilibrio: [
+        "Equilibrio Monopodal en suelo firme con pases de balón / Kettlebell",
+        "Alcances en Estrella (Y-Balance Test) a 1 pierna con flexión de rodilla",
+        "Apoyo Unilateral sobre Bosu o colchoneta con ojos cerrados",
+        "Single Leg Romanian Deadlift con énfasis en estabilidad de arco plantar",
+        "Lanzamientos de pelota medicinal contra pared en apoyo monopodal",
+        "Desplazamiento anteroposterior sobre superficie inestable / rodillo"
+      ],
+      recepciones_amortiguacion: [
+        "Drop Landing desde cajón (30-40cm) con frenado bilateral reactivo",
+        "Caída unilateral desde escalón con amortiguación suave y rodilla alineada",
+        "Salto vertical con recepción en postura atlética baja",
+        "Aterrizaje en 1 pierna tras salto lateral reactivo (Skater Jump to Stick)",
+        "Recepción con rotación de cadera simulando frenado reactivo"
+      ],
+      coordinacion_agilidad: [
+        "Escalera de Coordinación: 2 pies adentro - 2 pies afuera (In & Out)",
+        "Escalera de Coordinación: Patrón lateral Icky Shuffle a máxima velocidad",
+        "Drills de pies rápidos (Fast Feet) con salida en sprint de 5 metros",
+        "Cruce de pies lateral (Carioca / Paso cruzado) con rotación de pelvis",
+        "Zick-Zack con cambio de dirección a 45 grados y bajo centro de gravedad"
+      ],
+      olimpicos_variantes: [
+        "Power Clean (Cargada de potencia desde el suelo)",
+        "Hang Clean (Cargada desde colgante sobre rodillas)",
+        "Clean desde Bloques altos (foco en aceleración del segundo tirón)",
+        "Snatch (Arrancada olímpica completa)",
+        "Power Snatch (Arrancada de potencia desde colgante)",
+        "Clean Pull (Tirón alto de cargada con extensión triple)",
+        "Snatch Pull (Tirón de arrancada)",
+        "Split Jerk (Envión en tijera con pausa en recepción)",
+        "Push Jerk reactivo",
+        "Complejo Técnico: Hang Clean + Front Squat + Push Press"
+      ],
+      balisticos: [
+        "Saltos al Cajón (Box Jump) con recepción suave",
+        "Trap Bar Jump (Saltos balísticos con barra hexagonal)",
+        "Lanzamiento de Balón Medicinal contra el piso (Slam Ball)",
+        "Lanzamiento rotacional de Balón Medicinal contra pared",
+        "Kettlebell Swing estilo Ruso pesado",
+        "Saltos Pliométricos Unilaterales en vallas bajas"
+      ],
+      tracciones_vertical_horizontal: [
+        "Dominadas Pronas (Pull-ups) estrictas con pausa arriba",
+        "Dominadas Supinas (Chin-ups) lastradas",
+        "Remo Pendlay con Barra Olímpica desde el piso",
+        "Remo Seal con Mancuernas en banco horizontal (espalda aislada)",
+        "Remo Unilateral apoyado en banco con mancuerna pesada",
+        "Jalón al Pecho en Polea Alta con agarre neutro",
+        "Remo en suspensión TRX con pausa de 2 segundos en retracción",
+        "Remo Gironda en polea baja al abdomen con codos cerrados",
+        "Face Pull con cuerda en polea alta hacia la frente"
+      ],
+      superior_empuje: [
+        "Press de Banca Plano con Barra",
+        "Press Inclinado con Mancuernas",
+        "Press Militar Estricto de pie con Barra",
+        "Push Press con impulso de piernas",
+        "Fondos en Paralelas (Dips) con o sin lastre",
+        "Press de Hombros Sentado con Mancuernas",
+        "Aperturas o Cruces en Poleas"
+      ],
+      inferior_rodilla: [
+        "Sentadilla Trasera con Barra Olímpica",
+        "Sentadilla Frontal (Front Squat)",
+        "Sentadilla Búlgara con Mancuernas",
+        "Prensa a 45 Grados",
+        "Estocadas Caminando con Mancuernas",
+        "Goblet Squat con Kettlebell pesado",
+        "Sillón de Cuádriceps (Extensión de rodilla)"
+      ],
+      inferior_cadera: [
+        "Peso Muerto Convencional",
+        "Peso Muerto Rumano con Barra o Mancuernas",
+        "Hip Thrust con Barra Olímpica y almohadilla",
+        "Peso Muerto Sumo",
+        "Curl Femoral Tumbado o Sentado",
+        "Buenos Días con Barra en la espalda"
+      ],
+      zona_media_koena: [
+        "Deadbug isométrico empujando Fitball contra rodillas (Contralateral)",
+        "Bird-Dog con banda elástica y pausa isométrica de 2s",
+        "Press Pallof isométrico en polea o banda (Anti-rotación pura)",
+        "Press Pallof dinámico con elevación vertical sobre cabeza",
+        "Plancha Copenhagen (Aductores + Cadena lateral) sobre banco",
+        "Plancha lateral con abducción de cadera en estrella",
+        "Hollow Body Hold con balanceo o extensión progresiva",
+        "Bear Crawl Hold (Gateo isométrico con rodillas flotando a 2cm)",
+        "Rueda Abdominal (Ab Wheel Rollout) desde rodillas",
+        "Paseo del Granjero unilateral pesado (Suitcase Carry / Maleta)",
+        "Stir the Pot (Revolver la olla) con antebrazos sobre Fitball",
+        "Bicho muerto con talón al suelo y activación dorsal",
+        "Puente de Glúteos unilateral con marcha isométrica de talones",
+        "Side Plank con rotación torácica y alcance bajo el tronco",
+        "Roll-up con disco ligero y control segmentario de columna"
+      ],
+      mov_tobillo: [
+        "Dorsiflexión contra pared con rodilla adelantada",
+        "Movilidad de tobillo con banda elástica en tracción anterior",
+        "Círculos articulares lentos en apoyo monopodal",
+        "Descensos excéntricos de gemelos en escalón / cajón"
+      ],
+      mov_cadera: [
+        "90/90 Rotación interna y externa de cadera",
+        "Psoas Stretch dinámico con alcance torácico",
+        "World's Greatest Stretch (Movilidad Integral)",
+        "Frog Pose (Postura de la rana para aductores)",
+        "Deslizamiento lateral Cossack Squat dinámico",
+        "Círculos controlados de cadera en cuadrupedia (CARs)"
+      ],
+      mov_toracica: [
+        "Rotaciones torácicas en cuadrupedia con mano en nuca",
+        "Gato - Camello (Cat-Cow) controlado respiratorio",
+        "Thread the Needle (Pasar la aguja) torácico",
+        "Extensión torácica sobre Foam Roller con brazos en cruz",
+        "Rotación torácica con brazo en pared (Open Book)"
+      ],
+      mov_hombros: [
+        "Dislocaciones de hombro con pica / banda elástica",
+        "CARs articulares de hombro completos",
+        "Y-T-W en banco inclinado o suelo para escápulas",
+        "Wall Slides (Deslizamientos de brazos contra pared)",
+        "Rotación externa con codo pegado y banda elástica",
+        "Sleeper Stretch dinámico y suave"
+      ],
+      personalizados: []
+    };
+
+    let biblioteca = JSON.parse(localStorage.getItem('pf_biblioteca_v2')) || BIBLIOTECA_DEFAULT;
+    let sesionActual = [];
+    let usuarioActual = null;
+    let sortableInstance = null;
+    let esAdminVerificado = false;
+    let todasLasPlanificacionesAdmin = [];
+    let todasLasPlantillasAdmin = [];
+    let wakeLockSentinel = null;
+    let rutinasActivasAlumno = [];
+    let todasLasRutinasAlumno = [];
+    let entornoActivoAlumno = 'TODOS';
+    let chartRMInstance = null;
+    let modoAuthActual = 'login';
+    let archivoBase64Temporal = null;
+
+    // GESTIÓN DE PANTALLA AUTH
+    function cambiarModoAuth(modo) {
+      modoAuthActual = modo;
+      const tabL = document.getElementById('tab-auth-login');
+      const tabR = document.getElementById('tab-auth-registro');
+      const campoWsp = document.getElementById('campo-whatsapp-registro');
+      const btnAccion = document.getElementById('btn-auth-accion');
+
+      if (modo === 'login') {
+        tabL.className = "w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950";
+        tabR.className = "w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white";
+        campoWsp.classList.add('hidden');
+        btnAccion.innerText = "Ingresar a mi Plan";
       } else {
-        usuarioActual = null;
-        if (!esAdminVerificado) {
-          mostrarLogin();
+        tabR.className = "w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950";
+        tabL.className = "w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white";
+        campoWsp.classList.remove('hidden');
+        btnAccion.innerText = "Crear Cuenta de Alumno";
+      }
+    }
+
+    function formatearTelefono(raw) {
+      if (!raw) return '';
+      let limpios = raw.replace(/\D/g, '');
+      if (limpios.startsWith('549')) return limpios;
+      if (limpios.startsWith('54')) return '549' + limpios.slice(2);
+      if (limpios.startsWith('15')) limpios = limpios.slice(2);
+      if (limpios.length === 10) return '549' + limpios;
+      return limpios;
+    }
+
+    // GESTIÓN DE AVATAR / FOTO
+    function renderizarElementoAvatar(contenedor, valorAvatar) {
+      if (!contenedor) return;
+      if (valorAvatar && valorAvatar.startsWith('data:image')) {
+        contenedor.innerHTML = `<img src="${valorAvatar}" class="w-full h-full rounded-full object-cover">`;
+      } else {
+        contenedor.innerHTML = valorAvatar || '🏋️‍♂️';
+      }
+    }
+
+    function cargarFotoPerfilAlumno(input) {
+      const file = input.files[0];
+      if (!file || !usuarioActual) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        guardarAvatarAlumno(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function seleccionarEmojiAvatar(emoji) {
+      if (!usuarioActual) return;
+      guardarAvatarAlumno(emoji);
+    }
+
+    function guardarAvatarAlumno(valor) {
+      const email = usuarioActual.email;
+      localStorage.setItem(`avatar_alumno_${email}`, valor);
+      renderizarElementoAvatar(document.getElementById('avatar-alumno-display'), valor);
+      renderizarElementoAvatar(document.getElementById('preview-avatar-perfil'), valor);
+      alert("✅ ¡Foto / Icono de perfil actualizado!");
+    }
+
+    // GESTIÓN DE DOCUMENTOS
+    function procesarArchivoLocal(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      document.getElementById('doc-archivo-nombre').innerText = `📄 ${file.name}`;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        archivoBase64Temporal = {
+          dataUrl: e.target.result,
+          name: file.name
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function adjuntarDocumentoAlumno() {
+      if (!usuarioActual) return;
+      const email = usuarioActual.email;
+      const tipo = document.getElementById('doc-tipo').value;
+      const titulo = document.getElementById('doc-titulo').value.trim() || 'Documento adjunto';
+      const link = document.getElementById('doc-link').value.trim();
+
+      if (!link && !archivoBase64Temporal) {
+        alert("Por favor ingresá un link de Drive/Dropbox o seleccioná un archivo local.");
+        return;
+      }
+
+      const nuevoDoc = {
+        id: Date.now(),
+        fecha: new Date().toLocaleDateString(),
+        tipo: tipo,
+        titulo: titulo,
+        url: link || archivoBase64Temporal.dataUrl,
+        nombreArchivo: archivoBase64Temporal ? archivoBase64Temporal.name : 'Enlace web'
+      };
+
+      const keyDocs = `documentos_atleta_${email}`;
+      const docs = JSON.parse(localStorage.getItem(keyDocs) || "[]");
+      docs.unshift(nuevoDoc);
+      localStorage.setItem(keyDocs, JSON.stringify(docs));
+
+      document.getElementById('doc-titulo').value = '';
+      document.getElementById('doc-link').value = '';
+      document.getElementById('doc-archivo').value = '';
+      document.getElementById('doc-archivo-nombre').innerText = '';
+      archivoBase64Temporal = null;
+
+      renderizarDocumentosAlumno(email);
+      alert("✅ ¡Documento adjuntado con éxito a tu ficha!");
+    }
+
+    function renderizarDocumentosAlumno(email) {
+      const cont = document.getElementById('lista-documentos-alumno');
+      const docs = JSON.parse(localStorage.getItem(`documentos_atleta_${email}`) || "[]");
+
+      if (docs.length === 0) {
+        cont.innerHTML = '<p class="text-slate-500 text-xs col-span-2">No adjuntaste ningún documento todavía.</p>';
+        return;
+      }
+
+      cont.innerHTML = docs.map((d, idx) => `
+        <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl flex items-center justify-between gap-2">
+          <div class="truncate">
+            <span class="text-[9px] text-blue-400 font-bold block uppercase">${d.tipo}</span>
+            <span class="text-white font-bold text-xs truncate block">${d.titulo}</span>
+            <span class="text-slate-500 text-[9px]">${d.fecha} • ${d.nombreArchivo}</span>
+          </div>
+          <div class="flex items-center gap-1.5 flex-shrink-0">
+            <a href="${d.url}" target="_blank" class="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 px-2.5 py-1 rounded-lg text-[10px] font-bold">
+              Ver
+            </a>
+            <button type="button" onclick="eliminarDocumentoAlumno('${email}', ${idx})" class="text-red-400 hover:text-red-300 px-1 py-1 text-xs">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function eliminarDocumentoAlumno(email, index) {
+      if (!confirm("¿Seguro que querés quitar este documento?")) return;
+      const keyDocs = `documentos_atleta_${email}`;
+      const docs = JSON.parse(localStorage.getItem(keyDocs) || "[]");
+      docs.splice(index, 1);
+      localStorage.setItem(keyDocs, JSON.stringify(docs));
+      renderizarDocumentosAlumno(email);
+    }
+
+    function cargarMiPerfilEnPantalla(email) {
+      const datos = JSON.parse(localStorage.getItem(`perfil_atleta_${email}`) || "{}");
+      document.getElementById('perfil-nombre').value = datos.nombre || email.split('@')[0];
+      document.getElementById('perfil-telefono').value = datos.telefono || localStorage.getItem(`telefono_alumno_${email}`) || '';
+      document.getElementById('perfil-peso').value = datos.peso || '';
+      document.getElementById('perfil-altura').value = datos.altura || '';
+      document.getElementById('perfil-edad').value = datos.edad || '';
+      document.getElementById('perfil-dias-semana').value = datos.diasSemana || '3 días semanales';
+      document.getElementById('perfil-tiempo-sesion').value = datos.tiempoSesion || '60 - 75 minutos';
+      document.getElementById('perfil-sede').value = datos.sede || 'Presencial Koena';
+
+      document.getElementById('perfil-exp-fuerza').value = datos.expFuerza || 'Intermedio (1 a 3 años)';
+      document.getElementById('perfil-exp-olimpico').value = datos.expOlimpico || 'Básica (Cargadas simples)';
+      document.getElementById('perfil-deportes').value = datos.deportes || '';
+
+      document.getElementById('perfil-objetivo').value = datos.objetivo || 'Fuerza Máxima & Rendimiento Atlético';
+      document.getElementById('perfil-equipamiento').value = datos.equipamiento || '';
+
+      document.getElementById('perfil-dolores-activos').value = datos.doloresActivos || '';
+      document.getElementById('perfil-cirugias-previas').value = datos.cirugiasPrevias || '';
+
+      const avatarGuardado = localStorage.getItem(`avatar_alumno_${email}`) || '🏋️‍♂️';
+      renderizarElementoAvatar(document.getElementById('avatar-alumno-display'), avatarGuardado);
+      renderizarElementoAvatar(document.getElementById('preview-avatar-perfil'), avatarGuardado);
+
+      const subtitulo = document.getElementById('dash-alumno-subtitulo');
+      if (subtitulo && datos.peso) {
+        subtitulo.innerText = `Atleta Activo • ${datos.peso} kg • ${datos.diasSemana || '3 días'} • ${datos.objetivo || ''}`;
+      }
+
+      renderizarDocumentosAlumno(email);
+    }
+
+    function guardarMiPerfilDeportivo() {
+      if (!usuarioActual) return;
+      const email = usuarioActual.email;
+      const perfil = {
+        nombre: document.getElementById('perfil-nombre').value.trim(),
+        telefono: formatearTelefono(document.getElementById('perfil-telefono').value.trim()),
+        peso: parseFloat(document.getElementById('perfil-peso').value) || null,
+        altura: parseInt(document.getElementById('perfil-altura').value) || null,
+        edad: parseInt(document.getElementById('perfil-edad').value) || null,
+        diasSemana: document.getElementById('perfil-dias-semana').value,
+        tiempoSesion: document.getElementById('perfil-tiempo-sesion').value,
+        sede: document.getElementById('perfil-sede').value,
+        expFuerza: document.getElementById('perfil-exp-fuerza').value,
+        expOlimpico: document.getElementById('perfil-exp-olimpico').value,
+        deportes: document.getElementById('perfil-deportes').value.trim(),
+        objetivo: document.getElementById('perfil-objetivo').value,
+        equipamiento: document.getElementById('perfil-equipamiento').value.trim(),
+        doloresActivos: document.getElementById('perfil-dolores-activos').value.trim(),
+        cirugiasPrevias: document.getElementById('perfil-cirugias-previas').value.trim()
+      };
+
+      localStorage.setItem(`perfil_atleta_${email}`, JSON.stringify(perfil));
+      if (perfil.telefono) {
+        localStorage.setItem(`telefono_alumno_${email}`, perfil.telefono);
+      }
+
+      alert("🎉 ¡Ficha deportiva guardada con éxito! Ramiro ya tiene tu información completa.");
+      cargarMiPerfilEnPantalla(email);
+    }
+
+    // VISUALIZADOR DE FICHA & ESTUDIOS PARA EL COACH CON AVATAR
+    function verFichaCompletaCoach(alumnoEmail) {
+      const p = JSON.parse(localStorage.getItem(`perfil_atleta_${alumnoEmail}`) || "{}");
+      const docs = JSON.parse(localStorage.getItem(`documentos_atleta_${alumnoEmail}`) || "[]");
+      const avatar = localStorage.getItem(`avatar_alumno_${alumnoEmail}`) || '🏋️‍♂️';
+      const cont = document.getElementById('contenido-ficha-coach');
+
+      const avatarHtml = (avatar && avatar.startsWith('data:image')) 
+        ? `<img src="${avatar}" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-400">`
+        : `<div class="avatar-circulo">${avatar}</div>`;
+
+      cont.innerHTML = `
+        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-3">
+              ${avatarHtml}
+              <div>
+                <h5 class="text-white font-bold text-sm">${p.nombre || alumnoEmail}</h5>
+                <span class="text-slate-500 text-[10px]">${alumnoEmail}</span>
+              </div>
+            </div>
+            <span class="bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded text-[10px]">${p.sede || 'Sin sede'}</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-[11px] pt-1">
+            <div><span class="text-slate-400">Peso actual:</span> <strong class="text-emerald-400 font-mono">${p.peso ? p.peso + ' kg' : 'S/D'}</strong></div>
+            <div><span class="text-slate-400">Altura:</span> <strong class="text-white font-mono">${p.altura ? p.altura + ' cm' : '-'}</strong></div>
+            <div><span class="text-slate-400">Edad:</span> <strong class="text-white">${p.edad ? p.edad + ' años' : '-'}</strong></div>
+            <div><span class="text-slate-400">Días x sem:</span> <strong class="text-white">${p.diasSemana || '3'}</strong></div>
+            <div><span class="text-slate-400">Duración:</span> <strong class="text-white">${p.tiempoSesion || '60m'}</strong></div>
+            <div><span class="text-slate-400">Deportes:</span> <strong class="text-white">${p.deportes || 'Ninguno'}</strong></div>
+          </div>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-1.5 text-[11px]">
+          <span class="text-emerald-400 font-bold uppercase tracking-wider block text-[10px]">Experiencia & Metas</span>
+          <div><span class="text-slate-400">Objetivo:</span> <strong class="text-white">${p.objetivo || 'No especificado'}</strong></div>
+          <div><span class="text-slate-400">Nivel fuerza:</span> <strong class="text-white">${p.expFuerza || '-'}</strong></div>
+          <div><span class="text-slate-400">L. Olímpico:</span> <strong class="text-white">${p.expOlimpico || '-'}</strong></div>
+          <div><span class="text-slate-400">Material disponible:</span> <strong class="text-white">${p.equipamiento || 'Completo'}</strong></div>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-2xl border border-amber-500/30 space-y-1.5 text-[11px]">
+          <span class="text-amber-400 font-bold uppercase tracking-wider block text-[10px]">⚠️ Dolores & Lesiones</span>
+          <div><span class="text-slate-400">Dolores activos:</span> <strong class="text-amber-300 block mt-0.5">${p.doloresActivos || 'Sin dolores reportados'}</strong></div>
+          <div><span class="text-slate-400">Cirugías / Viejas:</span> <strong class="text-slate-300 block mt-0.5">${p.cirugiasPrevias || 'Ninguna'}</strong></div>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-2xl border border-blue-500/30 space-y-2 text-[11px]">
+          <span class="text-blue-400 font-bold uppercase tracking-wider block text-[10px]">📂 Estudios Médicos & Planillas (${docs.length})</span>
+          ${docs.length === 0 ? '<p class="text-slate-500 text-[10px]">El alumno no adjuntó estudios todavía.</p>' : `
+            <div class="space-y-1.5">
+              ${docs.map(d => `
+                <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 flex items-center justify-between">
+                  <div class="truncate pr-2">
+                    <span class="text-[9px] text-blue-300 font-bold block">${d.tipo}</span>
+                    <span class="text-white font-bold text-xs truncate block">${d.titulo}</span>
+                  </div>
+                  <a href="${d.url}" target="_blank" class="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 px-2.5 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap">
+                    Abrir Archivo
+                  </a>
+                </div>
+              `).join('')}
+            </div>
+          `}
+        </div>
+      `;
+
+      document.getElementById('modal-ficha-coach').classList.remove('hidden');
+    }
+
+    function cerrarModalFichaCoach() {
+      document.getElementById('modal-ficha-coach').classList.add('hidden');
+    }
+
+    // 1RM EPLEY
+    function calcularEpley(peso, reps) {
+      const p = parseFloat(peso);
+      const r = parseInt(reps);
+      if (isNaN(p) || p <= 0) return 0;
+      if (isNaN(r) || r <= 1) return p;
+      const rm = p * (1 + (r / 30));
+      return Math.round(rm * 10) / 10;
+    }
+
+    // CALCULADORA DISCOS
+    function abrirModalDiscos(kilos) {
+      const modal = document.getElementById('modal-discos');
+      const input = document.getElementById('inp-modal-kilos');
+      modal.classList.remove('hidden');
+      if (kilos && kilos > 0) {
+        input.value = kilos;
+        calcularDistribucionDiscos();
+      }
+    }
+
+    function cerrarModalDiscos() {
+      document.getElementById('modal-discos').classList.add('hidden');
+    }
+
+    function calcularDistribucionDiscos() {
+      const total = parseFloat(document.getElementById('inp-modal-kilos').value);
+      const resultado = document.getElementById('resultado-discos');
+
+      if (isNaN(total) || total < 20) {
+        resultado.innerHTML = '<span class="text-amber-400 font-bold">El peso mínimo en barra olímpica de 20 kg debe ser 20 kg.</span>';
+        return;
+      }
+
+      const pesoPorLado = (total - 20) / 2;
+      const discosDisponibles = [25, 20, 15, 10, 5, 2.5, 1.25];
+      let restante = pesoPorLado;
+      const discosUsados = [];
+
+      discosDisponibles.forEach(d => {
+        while (restante >= d) {
+          discosUsados.push(d);
+          restante = Math.round((restante - d) * 100) / 100;
+        }
+      });
+
+      if (discosUsados.length === 0) {
+        resultado.innerHTML = `
+          <div class="text-white font-bold">Barra Olímpica sola (20 kg)</div>
+          <span class="text-slate-400">Sin discos adicionales de los lados.</span>
+        `;
+        return;
+      }
+
+      resultado.innerHTML = `
+        <div class="text-emerald-400 font-black text-sm">🎯 Cargar por cada lado: ${pesoPorLado} kg</div>
+        <div class="flex flex-wrap gap-1.5 pt-1">
+          ${discosUsados.map(d => `
+            <span class="bg-slate-900 border border-emerald-500/40 text-emerald-300 font-mono font-black px-2.5 py-1 rounded-lg text-xs">
+              ${d} kg
+            </span>
+          `).join('')}
+        </div>
+        ${restante > 0 ? `<div class="text-[10px] text-amber-400 font-semibold pt-1">Diferencia no divisible exacta: ${restante * 2} kg</div>` : ''}
+      `;
+    }
+
+    // WAKE LOCK
+    async function alternarWakeLock() {
+      const txtStatus = document.getElementById('txt-wake-status');
+      const btn = document.getElementById('btn-wake-lock');
+
+      if (!('wakeLock' in navigator)) {
+        alert("Tu dispositivo no soporta bloqueo de pantalla automático.");
+        return;
+      }
+
+      if (wakeLockSentinel !== null) {
+        await wakeLockSentinel.release();
+        wakeLockSentinel = null;
+        txtStatus.innerText = "Off";
+        btn.className = "bg-slate-800 border border-slate-700 text-slate-400 text-xs px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1";
+      } else {
+        try {
+          wakeLockSentinel = await navigator.wakeLock.request('screen');
+          txtStatus.innerText = "On";
+          btn.className = "bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1";
+          wakeLockSentinel.addEventListener('release', () => {
+            txtStatus.innerText = "Off";
+            btn.className = "bg-slate-800 border border-slate-700 text-slate-400 text-xs px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1";
+            wakeLockSentinel = null;
+          });
+        } catch (err) {
+          console.warn("WakeLock error:", err);
         }
       }
+    }
+
+    function sonarBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.6);
+      } catch (e) {
+        console.warn("Audio no iniciado");
+      }
+    }
+
+    // EVENTOS AL CARGAR DOM
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('btn-admin-access').addEventListener('click', solicitarClaveAdmin);
+      document.getElementById('btn-link-coach').addEventListener('click', solicitarClaveAdmin);
+      document.getElementById('btn-timer-toggle').addEventListener('click', pausarReanudarTimer);
+      inicializarSelectores();
+      renderizarBibliotecaTecnica();
     });
 
-    // 2. FUNCIONES DE AUTENTICACIÓN
+    function cambiarSolapaCoach(vista) {
+      const vAlumnos = document.getElementById('vista-c-alumnos');
+      const vRms = document.getElementById('vista-c-rms');
+      const vPlantillas = document.getElementById('vista-c-plantillas');
+      const vCreador = document.getElementById('vista-c-creador');
+
+      const tAlumnos = document.getElementById('tab-c-alumnos');
+      const tRms = document.getElementById('tab-c-rms');
+      const tPlantillas = document.getElementById('tab-c-plantillas');
+      const tCreador = document.getElementById('tab-c-creador');
+
+      [vAlumnos, vRms, vPlantillas, vCreador].forEach(el => el.classList.add('hidden'));
+      [tAlumnos, tRms, tPlantillas, tCreador].forEach(el => {
+        el.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition";
+      });
+
+      if (vista === 'alumnos') {
+        vAlumnos.classList.remove('hidden');
+        tAlumnos.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition";
+      } else if (vista === 'rms') {
+        vRms.classList.remove('hidden');
+        tRms.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+      } else if (vista === 'plantillas') {
+        vPlantillas.classList.remove('hidden');
+        tPlantillas.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+      } else if (vista === 'creador') {
+        vCreador.classList.remove('hidden');
+        tCreador.className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+      }
+    }
+
+    function cambiarSolapaAlumno(solapa) {
+      const lActual = document.getElementById('lista-rutinas');
+      const sRms = document.getElementById('seccion-rms-alumno');
+      const sBiblio = document.getElementById('seccion-biblioteca-alumno');
+      const sPerfil = document.getElementById('seccion-perfil-alumno');
+      const lHistorial = document.getElementById('lista-historial');
+      const tActual = document.getElementById('tab-a-actual');
+      const tRms = document.getElementById('tab-a-rms');
+      const tBiblio = document.getElementById('tab-a-biblioteca');
+      const tPerfil = document.getElementById('tab-a-perfil');
+      const tHistorial = document.getElementById('tab-a-historial');
+      const tabsDias = document.getElementById('contenedor-tabs-dias');
+
+      [lActual, sRms, sBiblio, sPerfil, lHistorial].forEach(el => el.classList.add('hidden'));
+      [tActual, tRms, tBiblio, tPerfil, tHistorial].forEach(el => {
+        el.className = "text-xs px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition";
+      });
+
+      if (solapa === 'actual') {
+        lActual.classList.remove('hidden');
+        if (rutinasActivasAlumno.length > 1) tabsDias.classList.remove('hidden');
+        tActual.className = "text-xs px-4 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+      } else if (solapa === 'rms') {
+        sRms.classList.remove('hidden');
+        tabsDias.classList.add('hidden');
+        tRms.className = "text-xs px-4 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+        if (usuarioActual) cargarPlanillaRMsAlumno(usuarioActual.email);
+      } else if (solapa === 'biblioteca') {
+        sBiblio.classList.remove('hidden');
+        tabsDias.classList.add('hidden');
+        tBiblio.className = "text-xs px-4 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+        renderizarBibliotecaTecnica();
+      } else if (solapa === 'perfil') {
+        sPerfil.classList.remove('hidden');
+        tabsDias.classList.add('hidden');
+        tPerfil.className = "text-xs px-3 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+        if (usuarioActual) cargarMiPerfilEnPantalla(usuarioActual.email);
+      } else {
+        lHistorial.classList.remove('hidden');
+        tabsDias.classList.add('hidden');
+        tHistorial.className = "text-xs px-4 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+      }
+    }
+
+    function solicitarClaveAdmin() {
+      const clave = prompt("Ingresá la Clave de Administrador / Coach:");
+      if (!clave) return;
+
+      if (clave.trim() === CLAVE_ADMIN_MASTER) {
+        esAdminVerificado = true;
+        document.getElementById('seccion-admin').classList.remove('hidden');
+        document.getElementById('seccion-auth').classList.add('hidden');
+        document.getElementById('seccion-panel').classList.remove('hidden');
+        cambiarSolapaCoach('alumnos');
+        cargarPlanesAdmin();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert("Clave incorrecta.");
+      }
+    }
+
+    function cerrarModoAdmin() {
+      esAdminVerificado = false;
+      document.getElementById('seccion-admin').classList.add('hidden');
+    }
+
+    async function cargarPlanesAdmin() {
+      const { data, error } = await sb
+        .from('planificaciones')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) return;
+
+      const todos = data || [];
+      todasLasPlanificacionesAdmin = todos.filter(p => !p.es_plantilla && p.alumno_id !== 'PLANTILLA_MAESTRA');
+      todasLasPlantillasAdmin = todos.filter(p => p.es_plantilla || p.alumno_id === 'PLANTILLA_MAESTRA');
+
+      const alumnosSet = new Set();
+      todasLasPlanificacionesAdmin.forEach(p => {
+        if (p.alumno_id) alumnosSet.add(p.alumno_id);
+      });
+      const listaAlumnos = Array.from(alumnosSet).sort();
+
+      const selFiltro = document.getElementById('sel-filtro-alumnos');
+      selFiltro.innerHTML = '<option value="TODOS">👤 Todos los Alumnos</option>';
+      listaAlumnos.forEach(a => selFiltro.innerHTML += `<option value="${a}">${a}</option>`);
+
+      const selRapido = document.getElementById('sel-alumno-rapido');
+      selRapido.innerHTML = '<option value="">▼ Elegir de la lista de alumnos...</option>';
+      listaAlumnos.forEach(a => selRapido.innerHTML += `<option value="${a}">${a}</option>`);
+
+      const selRmCoach = document.getElementById('sel-filtro-rm-alumno');
+      selRmCoach.innerHTML = '<option value="">▼ Elegir Alumno...</option>';
+      listaAlumnos.forEach(a => selRmCoach.innerHTML += `<option value="${a}">👤 ${a}</option>`);
+
+      renderizarPlanesAdmin(todasLasPlanificacionesAdmin);
+      renderizarPlantillasAdmin(todasLasPlantillasAdmin);
+    }
+
+    function seleccionarAlumnoRapido(valor) {
+      if (valor) {
+        document.getElementById('admin-alumno').value = valor;
+        const tel = localStorage.getItem(`telefono_alumno_${valor}`) || '';
+        document.getElementById('admin-alumno-tel').value = tel;
+      }
+    }
+
+    function filtrarPlanesPorEntornoYAlumno() {
+      const entorno = document.getElementById('sel-filtro-entorno').value;
+      const alumno = document.getElementById('sel-filtro-alumnos').value;
+
+      let filtrados = todasLasPlanificacionesAdmin;
+
+      if (entorno !== 'TODOS') {
+        filtrados = filtrados.filter(p => {
+          const sem = (p.semana || '').toUpperCase();
+          if (entorno === 'KOENA') return sem.includes('KOENA') || sem.includes('PRESENCIAL');
+          if (entorno === 'ONLINE') return sem.includes('ONLINE') || !sem.includes('KOENA');
+          return true;
+        });
+      }
+
+      if (alumno !== 'TODOS') {
+        filtrados = filtrados.filter(p => p.alumno_id === alumno);
+      }
+
+      renderizarPlanesAdmin(filtrados);
+    }
+
+    function contactarAlumnoDirectoWhatsApp(alumnoEmail) {
+      let tel = localStorage.getItem(`telefono_alumno_${alumnoEmail}`);
+      if (!tel) {
+        const manual = prompt(`Ingresá el WhatsApp de ${alumnoEmail} para abrir el chat (ej: 11 2345-6789):`);
+        if (!manual) return;
+        tel = formatearTelefono(manual.trim());
+        localStorage.setItem(`telefono_alumno_${alumnoEmail}`, tel);
+      }
+
+      const mensaje = `Hola ${alumnoEmail.split('@')[0]}! Te escribo desde el equipo de Ramiro Abbattista. Vi que venís con buen ritmo y que te quedan días de plan pendientes esta semana. ¿Cómo venís con los tiempos para meter la sesión hoy o mañana y cuidar la racha? 💪`;
+      window.open(`https://wa.me/${tel}?text=${encodeURIComponent(mensaje)}`, '_blank');
+    }
+
+    function renderizarPlanesAdmin(lista) {
+      const cont = document.getElementById('contenedor-planes-admin');
+      if (!lista || lista.length === 0) {
+        cont.innerHTML = '<p class="text-slate-500 text-xs col-span-2">No se encontraron planificaciones con esos filtros.</p>';
+        return;
+      }
+
+      cont.innerHTML = lista.map(p => {
+        const diaReal = localStorage.getItem(`dia_ejecucion_${p.id}`) || 'No registrado aún';
+        const fechaReal = localStorage.getItem(`fecha_ejecucion_${p.id}`) || '';
+        const rpe = localStorage.getItem(`rpe_${p.id}`) || '-';
+        const wellness = localStorage.getItem(`wellness_${p.id}`) || '';
+        const esKoena = (p.semana || '').toUpperCase().includes('KOENA');
+
+        const ultimaFecha = localStorage.getItem(`ultimo_entreno_fecha_${p.alumno_id}`);
+        let diasInactivo = 0;
+        if (ultimaFecha) {
+          diasInactivo = Math.floor((new Date() - new Date(ultimaFecha)) / (1000 * 60 * 60 * 24));
+        }
+
+        const perfil = JSON.parse(localStorage.getItem(`perfil_atleta_${p.alumno_id}`) || "{}");
+        const docs = JSON.parse(localStorage.getItem(`documentos_atleta_${p.alumno_id}`) || "[]");
+        const avatar = localStorage.getItem(`avatar_alumno_${p.alumno_id}`) || '🏋️‍♂️';
+
+        const miniAvatar = (avatar && avatar.startsWith('data:image'))
+          ? `<img src="${avatar}" class="w-6 h-6 rounded-full object-cover">`
+          : `<span>${avatar}</span>`;
+
+        return `
+        <div class="bg-slate-950 p-4 rounded-2xl border ${esKoena ? 'border-cyan-500/40' : 'border-slate-800'} space-y-2.5 text-xs">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              ${miniAvatar}
+              <span class="text-[10px] text-emerald-400 font-bold uppercase block">${perfil.nombre || p.alumno_id}</span>
+              ${esKoena ? '<span class="bg-cyan-500/20 text-cyan-300 text-[9px] font-black px-1.5 py-0.5 rounded border border-cyan-500/30">KOENA</span>' : '<span class="bg-blue-500/20 text-blue-300 text-[9px] font-black px-1.5 py-0.5 rounded border border-blue-500/30">🌐 ONLINE</span>'}
+            </div>
+            <span class="text-[10px] bg-slate-900 border border-slate-700 px-2 py-0.5 rounded text-slate-300">
+              🗓️ ${diaReal} ${fechaReal ? `(${fechaReal})` : ''}
+            </span>
+          </div>
+
+          <div class="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 text-[11px] space-y-1">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300">⚖ Peso: <strong class="text-emerald-400 font-mono">${perfil.peso ? perfil.peso + ' kg' : 'S/D'}</strong> • ${perfil.diasSemana || '3 días'}</span>
+              <button type="button" onclick="verFichaCompletaCoach('${p.alumno_id}')" class="text-xs bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-bold">
+                📋 Ficha & Archivos (${docs.length})
+              </button>
+            </div>
+            ${perfil.doloresActivos ? `<span class="text-amber-300 block">⚠️ Dolor activo: <em>${perfil.doloresActivos}</em></span>` : ''}
+            ${perfil.objetivo ? `<span class="text-slate-400 block text-[10px]">🎯 Objetivo: ${perfil.objetivo}</span>` : ''}
+          </div>
+
+          <div>
+            <span class="font-bold text-white text-sm block">${p.dia || 'Sesión'}</span>
+            <span class="text-slate-400 text-[11px]">${p.semana || 'Plan'} • RPE: <strong class="text-emerald-400">${rpe}/10</strong></span>
+            ${wellness ? `<span class="text-[10px] text-blue-300 block mt-0.5">🩺 Wellness: ${wellness}</span>` : ''}
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between pt-2 border-t border-slate-800 gap-2">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] text-slate-500">${(p.ejercicios_detalle || []).length} ejercicios</span>
+              <button type="button" onclick="contactarAlumnoDirectoWhatsApp('${p.alumno_id}')" class="bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                💬 WhatsApp
+              </button>
+              ${diasInactivo >= 6 ? `
+                <span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-bold">
+                  ⚠ +${diasInactivo}d inactivo
+                </span>
+              ` : ''}
+            </div>
+            <div class="flex gap-1.5">
+              <button type="button" onclick='cargarRutinaAlEditor(${JSON.stringify(p.ejercicios_detalle || [])}, "${p.semana || ''}", "${p.dia || ''}", "${p.alumno_id || ''}")' class="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 px-3 py-1 rounded-lg font-bold">
+                Ajustar
+              </button>
+              <button type="button" onclick="eliminarPlanAdmin('${p.id}')" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-2 py-1 rounded-lg font-bold">
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      }).join('');
+    }
+
+    function renderizarPlantillasAdmin(lista) {
+      const cont = document.getElementById('contenedor-plantillas-coach');
+      const count = document.getElementById('contador-plantillas');
+      count.innerText = `${lista.length} Plantillas`;
+
+      if (!lista || lista.length === 0) {
+        cont.innerHTML = '<p class="text-slate-500 text-xs col-span-2">Todavía no guardaste plantillas inteligentes.</p>';
+        return;
+      }
+
+      cont.innerHTML = lista.map(p => `
+        <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between text-xs">
+          <div>
+            <span class="text-[10px] text-blue-400 font-bold uppercase block">Plantilla Maestra</span>
+            <span class="font-bold text-white text-sm block">${p.dia || 'Sesión'}</span>
+            <span class="text-slate-400 text-[11px]">${p.semana || 'Bloque'} • ${(p.ejercicios_detalle || []).length} Ejercicios</span>
+          </div>
+          <div class="flex gap-1.5">
+            <button type="button" onclick='cargarPlantillaAlCreador(${JSON.stringify(p.ejercicios_detalle || [])}, "${p.semana || ''}", "${p.dia || ''}")' class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 px-3 py-1.5 rounded-lg font-black transition">
+              Usar esta Plantilla
+            </button>
+            <button type="button" onclick="eliminarPlanAdmin('${p.id}')" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-2 py-1 rounded-lg font-bold">
+              ✕
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function cargarPlantillaAlCreador(detalles, semana, dia) {
+      sesionActual = JSON.parse(JSON.stringify(detalles || []));
+      document.getElementById('admin-alumno').value = '';
+      document.getElementById('admin-semana').value = semana || '';
+      document.getElementById('admin-dia').value = dia || '';
+      cambiarSolapaCoach('creador');
+      renderTablaSesion();
+      window.scrollTo({ top: document.getElementById('admin-alumno').offsetTop - 80, behavior: 'smooth' });
+    }
+
+    async function eliminarPlanAdmin(id) {
+      if (!confirm("¿Seguro que querés eliminar este registro?")) return;
+      const { error } = await sb.from('planificaciones').delete().eq('id', id);
+      if (error) {
+        alert("Error al borrar: " + error.message);
+      } else {
+        cargarPlanesAdmin();
+        refrescarRutinas();
+      }
+    }
+
+    function cargarRutinaAlEditor(detalles, semana, dia, alumno = '') {
+      sesionActual = JSON.parse(JSON.stringify(detalles || []));
+      document.getElementById('admin-alumno').value = alumno || '';
+      const tel = localStorage.getItem(`telefono_alumno_${alumno}`) || '';
+      document.getElementById('admin-alumno-tel').value = tel;
+      document.getElementById('admin-semana').value = semana || '';
+      document.getElementById('admin-dia').value = dia ? dia + " (Copia)" : '';
+      cambiarSolapaCoach('creador');
+      renderTablaSesion();
+      window.scrollTo({ top: document.getElementById('admin-alumno').offsetTop - 80, behavior: 'smooth' });
+    }
+
+    let timerInterval = null;
+    let tiempoRestante = 90;
+    let timerEnPausa = false;
+
+    function iniciarTimerDescanso(segundos) {
+      if (timerInterval) clearInterval(timerInterval);
+      tiempoRestante = segundos;
+      timerEnPausa = false;
+
+      document.getElementById('timer-box').classList.remove('hidden');
+      document.getElementById('btn-timer-toggle').innerText = "Pausa";
+      actualizarDisplayTimer();
+
+      timerInterval = setInterval(() => {
+        if (!timerEnPausa) {
+          tiempoRestante--;
+          actualizarDisplayTimer();
+          if (tiempoRestante <= 0) {
+            clearInterval(timerInterval);
+            sonarBeep();
+            navigator.vibrate?.([200, 100, 200]);
+            document.getElementById('timer-display').innerText = "¡TIEMPO!";
+          }
+        }
+      }, 1000);
+    }
+
+    function actualizarDisplayTimer() {
+      const min = Math.floor(tiempoRestante / 60);
+      const seg = tiempoRestante % 60;
+      document.getElementById('timer-display').innerText = 
+        `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
+    }
+
+    function pausarReanudarTimer() {
+      timerEnPausa = !timerEnPausa;
+      document.getElementById('btn-timer-toggle').innerText = timerEnPausa ? "Reanudar" : "Pausa";
+    }
+
+    function cerrarTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      document.getElementById('timer-box').classList.add('hidden');
+    }
+
+    function parseSegundos(texto) {
+      if (!texto) return 90;
+      const num = parseInt(texto.replace(/\D/g, ''));
+      return isNaN(num) ? 90 : num;
+    }
+
+    function inicializarSelectores() {
+      const selReps = document.getElementById('inp-reps');
+      if (selReps && selReps.options.length === 0) {
+        for (let i = 100; i >= 1; i--) selReps.innerHTML += `<option value="${i}">${i} reps</option>`;
+        selReps.value = "10";
+      }
+
+      const selRir = document.getElementById('inp-rir');
+      if (selRir && selRir.options.length === 0) {
+        for (let r = 10; r >= 1; r--) selRir.innerHTML += `<option value="RIR ${r}">RIR ${r}</option>`;
+        selRir.innerHTML += `<option value="RPE 10 / Al Fallo">Al Fallo (RIR 0)</option>`;
+        selRir.innerHTML += `<option value="Movilidad">Movilidad / Fluido</option>`;
+        selRir.value = "RIR 2";
+      }
+
+      cargarEjerciciosPorCategoria();
+      inicializarDragAndDrop();
+    }
+
+    function cargarEjerciciosPorCategoria() {
+      const cat = document.getElementById('sel-categoria').value;
+      const selEj = document.getElementById('sel-ejercicio');
+      selEj.innerHTML = '';
+
+      const lista = biblioteca[cat] || [];
+      if (lista.length === 0) {
+        selEj.innerHTML = '<option value="">(No hay ejercicios en esta categoría)</option>';
+        return;
+      }
+      lista.forEach(ej => selEj.innerHTML += `<option value="${ej}">${ej}</option>`);
+    }
+
+    function crearNuevoEjercicio() {
+      const nombre = prompt("Nombre del nuevo ejercicio:");
+      if (!nombre || !nombre.trim()) return;
+      const cat = document.getElementById('sel-categoria').value;
+      if (!biblioteca[cat]) biblioteca[cat] = [];
+      biblioteca[cat].push(nombre.trim());
+      localStorage.setItem('pf_biblioteca_v2', JSON.stringify(biblioteca));
+      cargarEjerciciosPorCategoria();
+      renderizarBibliotecaTecnica();
+      document.getElementById('sel-ejercicio').value = nombre.trim();
+    }
+
+    function eliminarEjercicioSeleccionado() {
+      const cat = document.getElementById('sel-categoria').value;
+      const ej = document.getElementById('sel-ejercicio').value;
+      if (!ej) return;
+
+      if (confirm(`¿Eliminar "${ej}" de la biblioteca?`)) {
+        biblioteca[cat] = biblioteca[cat].filter(item => item !== ej);
+        localStorage.setItem('pf_biblioteca_v2', JSON.stringify(biblioteca));
+        cargarEjerciciosPorCategoria();
+        renderizarBibliotecaTecnica();
+      }
+    }
+
+    function agregarFilaRutina() {
+      const ejercicio = document.getElementById('sel-ejercicio').value;
+      if (!ejercicio) return alert("Seleccioná un ejercicio válido.");
+
+      const item = {
+        bloque: document.getElementById('inp-bloque').value,
+        ejercicio: ejercicio,
+        series: parseInt(document.getElementById('inp-series').value) || 3,
+        reps: document.getElementById('inp-reps').value,
+        cargaCoach: document.getElementById('inp-carga-coach').value.trim() || 'A elección',
+        rir: document.getElementById('inp-rir').value,
+        descanso: document.getElementById('inp-descanso').value,
+        video: document.getElementById('inp-video').value.trim()
+      };
+
+      sesionActual.push(item);
+      renderTablaSesion();
+      document.getElementById('inp-video').value = '';
+      document.getElementById('inp-carga-coach').value = '';
+    }
+
+    function eliminarFila(index) {
+      sesionActual.splice(index, 1);
+      renderTablaSesion();
+    }
+
+    function inicializarDragAndDrop() {
+      const el = document.getElementById('tabla-ejercicios-body');
+      if (!el) return;
+      if (sortableInstance) sortableInstance.destroy();
+
+      sortableInstance = new Sortable(el, {
+        handle: '.handle-drag',
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: function (evt) {
+          const itemMovido = sesionActual.splice(evt.oldIndex, 1)[0];
+          sesionActual.splice(evt.newIndex, 0, itemMovido);
+          renderTablaSesion();
+        }
+      });
+    }
+
+    function renderTablaSesion() {
+      const tbody = document.getElementById('tabla-ejercicios-body');
+      const contador = document.getElementById('contador-ejercicios-sesion');
+      contador.innerText = `${sesionActual.length} ejercicios listos`;
+
+      if (sesionActual.length === 0) {
+        tbody.innerHTML = '<tr id="fila-vacia"><td colspan="10" class="p-4 text-center text-slate-500">Todavía no agregaste ejercicios a la sesión.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = sesionActual.map((f, i) => `
+        <tr class="hover:bg-slate-900 transition select-none">
+          <td class="p-3 text-center text-slate-400 font-bold handle-drag cursor-grab">☰</td>
+          <td class="p-3 font-bold text-emerald-400 text-xs">${f.bloque}</td>
+          <td class="p-3 text-white font-medium">${f.ejercicio}</td>
+          <td class="p-3 text-slate-300">${f.series}</td>
+          <td class="p-3 text-slate-300">${f.reps}</td>
+          <td class="p-3 font-bold text-emerald-300">${f.cargaCoach || 'Libre'}</td>
+          <td class="p-3 text-emerald-300 font-semibold">${f.rir}</td>
+          <td class="p-3 text-slate-300">${f.descanso}</td>
+          <td class="p-3">${f.video ? `<a href="${f.video}" target="_blank" class="text-emerald-400 hover:underline font-bold">Ver</a>` : '-'}</td>
+          <td class="p-3 text-center"><button type="button" onclick="eliminarFila(${i})" class="text-red-400 hover:text-red-300 font-bold px-2 py-1">✕</button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function guardarPlanificacionCompleta(comoPlantilla = false, modo = 'unir') {
+      let alumno = document.getElementById('admin-alumno').value.trim();
+      const tel = document.getElementById('admin-alumno-tel').value.trim();
+      const mes = document.getElementById('admin-mes').value.trim();
+      const semana = document.getElementById('admin-semana').value.trim();
+      let dia = document.getElementById('admin-dia').value.trim() || 'Lunes';
+      const entorno = document.getElementById('admin-entorno').value;
+
+      if (comoPlantilla) alumno = "PLANTILLA_MAESTRA";
+
+      if (!alumno || sesionActual.length === 0) {
+        alert("Completá el alumno/título y agregá al menos un ejercicio a la sesión.");
+        return;
+      }
+
+      if (tel) {
+        localStorage.setItem(`telefono_alumno_${alumno}`, formatearTelefono(tel));
+      }
+
+      const prefijoEntorno = entorno === 'KOENA' ? '[Koena] ' : '[Online] ';
+      const encabezadoCiclo = `${prefijoEntorno}${mes ? `${mes} • ${semana || 'Semana 1'}` : (semana || 'Plan')}`;
+      const resumenTexto = sesionActual.map(e => `[${e.bloque}] ${e.ejercicio} | ${e.series} x ${e.reps} (${e.rir}) - Carga: ${e.cargaCoach || 'Libre'} - Descanso: ${e.descanso}`).join('\n');
+
+      if (modo === 'unir' && !comoPlantilla) {
+        const { data: existente } = await sb
+          .from('planificaciones')
+          .select('*')
+          .eq('alumno_id', alumno)
+          .eq('semana', encabezadoCiclo)
+          .eq('dia', dia)
+          .maybeSingle();
+
+        if (existente) {
+          const detallesPrevios = existente.ejercicios_detalle || [];
+          const detallesCombinados = [...detallesPrevios, ...sesionActual];
+          const textoCombinado = detallesCombinados.map(e => `[${e.bloque}] ${e.ejercicio} | ${e.series} x ${e.reps} (${e.rir}) - Carga: ${e.cargaCoach || 'Libre'}`).join('\n');
+
+          const { error: errUpdate } = await sb
+            .from('planificaciones')
+            .update({
+              ejercicios: textoCombinado,
+              ejercicios_detalle: detallesCombinados
+            })
+            .eq('id', existente.id);
+
+          if (!errUpdate) {
+            alert(`¡Se anexaron los ejercicios al ${dia} existente del alumno! Todo en el mismo día.`);
+            sesionActual = [];
+            renderTablaSesion();
+            cargarPlanesAdmin();
+            refrescarRutinas();
+            return;
+          }
+        }
+      }
+
+      if (modo === 'separado') {
+        dia = `${dia} (Bloque ${new Date().toLocaleTimeString().slice(0, 5)})`;
+      }
+
+      const { error } = await sb.from('planificaciones').insert([{
+        alumno_id: alumno,
+        semana: encabezadoCiclo,
+        dia: dia,
+        ejercicios: resumenTexto,
+        ejercicios_detalle: sesionActual,
+        es_plantilla: comoPlantilla
+      }]);
+
+      if (error) {
+        alert("Error al guardar: " + error.message);
+      } else {
+        alert(comoPlantilla ? "¡Plantilla maestra guardada con éxito!" : `¡Planificación asignada con éxito al alumno para el día ${dia}!`);
+        sesionActual = [];
+        renderTablaSesion();
+        cargarPlanesAdmin();
+        refrescarRutinas();
+      }
+    }
+
+    async function guardarCargaNube(rutinaId, ejNombre, serieIdx, valor) {
+      const email = usuarioActual ? usuarioActual.email : 'anonimo';
+      localStorage.setItem(`carga_${rutinaId}_${ejNombre}_${serieIdx}`, valor);
+      localStorage.setItem(`last_weight_${ejNombre}`, valor);
+
+      try {
+        await sb.from('registros_cargas').insert([{
+          planificacion_id: String(rutinaId),
+          alumno_id: email,
+          ejercicio: ejNombre,
+          serie_numero: serieIdx + 1,
+          carga: valor
+        }]);
+      } catch (e) {
+        console.warn("Aviso:", e);
+      }
+    }
+
+    function toggleSerieCompletada(btn, rutinaId, ejNombre, serieIndex) {
+      btn.classList.toggle('serie-done');
+      const key = `done_${rutinaId}_${ejNombre}_${serieIndex}`;
+      const estadoActual = localStorage.getItem(key) === 'true';
+      localStorage.setItem(key, (!estadoActual).toString());
+    }
+
+    function toggleBloqueAlumno(idBloque) {
+      const el = document.getElementById(idBloque);
+      if (el) el.classList.toggle('hidden');
+    }
+
+    function guardarDiaEjecucion(rutinaId, dia, fecha) {
+      localStorage.setItem(`dia_ejecucion_${rutinaId}`, dia);
+      localStorage.setItem(`fecha_ejecucion_${rutinaId}`, fecha);
+    }
+
+    async function guardarFeedbackSesion(rutinaId, dia, semana) {
+      const selRpe = document.getElementById(`sel-rpe-${rutinaId}`);
+      const txtComentario = document.getElementById(`txt-feedback-${rutinaId}`);
+      const txtVideoAlumno = document.getElementById(`txt-video-alumno-${rutinaId}`);
+      const selDiaReal = document.getElementById(`sel-dia-real-${rutinaId}`);
+      const txtFechaReal = document.getElementById(`txt-fecha-real-${rutinaId}`);
+
+      const sueno = document.getElementById(`check-sueno-${rutinaId}`)?.value || '4';
+      const energia = document.getElementById(`check-energia-${rutinaId}`)?.value || '4';
+      const dolor = document.getElementById(`check-dolor-${rutinaId}`)?.value || '1';
+
+      const wellnessResumen = `Sueño: ${sueno}/5 | Energía: ${energia}/5 | Agujetas: ${dolor}/5`;
+      localStorage.setItem(`wellness_${rutinaId}`, wellnessResumen);
+
+      const rpeValor = selRpe ? selRpe.value : "Sin RPE";
+      const comentario = txtComentario ? txtComentario.value.trim() : "";
+      const videoUrl = txtVideoAlumno ? txtVideoAlumno.value.trim() : "";
+      const diaReal = selDiaReal ? selDiaReal.value : "Hoy";
+      const fechaReal = txtFechaReal ? txtFechaReal.value : "";
+      const email = usuarioActual ? usuarioActual.email : 'alumno';
+
+      guardarDiaEjecucion(rutinaId, diaReal, fechaReal);
+
+      const hoy = new Date();
+      const ultimaFechaStr = localStorage.getItem(`ultimo_entreno_fecha_${email}`);
+      let racha = parseInt(localStorage.getItem(`stats_racha_${email}`) || "0");
+      let totalSesiones = parseInt(localStorage.getItem(`stats_total_${email}`) || "0") + 1;
+
+      if (ultimaFechaStr) {
+        const ultimaFecha = new Date(ultimaFechaStr);
+        const diasDiferencia = Math.floor((hoy - ultimaFecha) / (1000 * 60 * 60 * 24));
+        if (diasDiferencia > 8) {
+          racha = 1;
+        } else {
+          racha += 1;
+        }
+      } else {
+        racha = 1;
+      }
+
+      localStorage.setItem(`ultimo_entreno_fecha_${email}`, hoy.toISOString());
+      localStorage.setItem(`stats_total_${email}`, totalSesiones.toString());
+      localStorage.setItem(`stats_racha_${email}`, racha.toString());
+
+      actualizarGamificacionUI(totalSesiones, racha, email);
+
+      localStorage.setItem(`rpe_${rutinaId}`, rpeValor);
+      if (comentario) localStorage.setItem(`comentario_${rutinaId}`, comentario);
+      if (videoUrl) localStorage.setItem(`video_alumno_${rutinaId}`, videoUrl);
+
+      try {
+        await sb.from('feedback_sesiones').insert([{
+          planificacion_id: String(rutinaId),
+          alumno_id: email,
+          semana: semana,
+          dia: `${dia} (Hecho: ${diaReal} ${fechaReal})`,
+          rpe: parseInt(rpeValor) || null,
+          comentario: `[${wellnessResumen}] ` + comentario + (videoUrl ? ` | Video Técnica: ${videoUrl}` : '')
+        }]);
+      } catch (e) {
+        console.warn("Feedback guardado");
+      }
+
+      alert("🎉 ¡Entrenamiento y Wellness registrados con éxito! Tu racha semanal se actualizó.");
+
+      let textoMensaje = `Hola Ramiro, completé mi entrenamiento "${dia}" (${semana}).%0A%0A*Día ejecutado:* ${diaReal} ${fechaReal ? `(${fechaReal})` : ''}%0A*Wellness:* ${wellnessResumen}%0A*Esfuerzo Percibido (RPE):* ${rpeValor}/10%0A*Sensaciones:* ${comentario || 'Sesión completada en orden.'}`;
+      if (videoUrl) {
+        textoMensaje += `%0A%0A*📹 Video técnica:* ${encodeURIComponent(videoUrl)}`;
+      }
+
+      window.open(`https://wa.me/${WHATSAPP_COACH}?text=${textoMensaje}`, '_blank');
+    }
+
+    function actualizarGamificacionUI(totales, racha, email) {
+      const ultimaFechaStr = email ? localStorage.getItem(`ultimo_entreno_fecha_${email}`) : null;
+      let rachaValida = racha;
+
+      if (ultimaFechaStr) {
+        const diasSinEntrenar = Math.floor((new Date() - new Date(ultimaFechaStr)) / (1000 * 60 * 60 * 24));
+        if (diasSinEntrenar > 8) {
+          rachaValida = 0;
+          if (email) localStorage.setItem(`stats_racha_${email}`, "0");
+        }
+      }
+
+      const semanasAprox = Math.floor(totales / 3);
+      const semanasRacha = Math.floor(rachaValida / 3);
+
+      document.getElementById('stat-totales').innerText = `${semanasAprox} sem`;
+      document.getElementById('stat-racha').innerText = `${semanasRacha} sem`;
+
+      const mBronce = document.getElementById('medalla-bronce');
+      const mPlata = document.getElementById('medalla-plata');
+      const mOro = document.getElementById('medalla-oro');
+      const mDiamante = document.getElementById('medalla-diamante');
+      const lblRango = document.getElementById('lbl-rango-actual');
+
+      [mBronce, mPlata, mOro, mDiamante].forEach(m => {
+        m.classList.remove('medalla-desbloqueada');
+        m.classList.add('medalla-bloqueada');
+      });
+
+      if (semanasRacha >= 48) {
+        mBronce.classList.add('medalla-desbloqueada');
+        mPlata.classList.add('medalla-desbloqueada');
+        mOro.classList.add('medalla-desbloqueada');
+        mDiamante.classList.add('medalla-desbloqueada');
+        lblRango.innerText = "Rango Activo: Atleta Élite (+1 Año) 💎";
+      } else if (semanasRacha >= 12) {
+        mBronce.classList.add('medalla-desbloqueada');
+        mPlata.classList.add('medalla-desbloqueada');
+        mOro.classList.add('medalla-desbloqueada');
+        lblRango.innerText = "Rango Activo: Progresión Semestral (3-6 Meses) 🥇";
+      } else if (semanasRacha >= 4) {
+        mBronce.classList.add('medalla-desbloqueada');
+        mPlata.classList.add('medalla-desbloqueada');
+        mOro.classList.add('medalla-desbloqueada');
+        lblRango.innerText = "Rango Activo: Hábito Consolidado (1-2 Meses) 🥈";
+      } else if (semanasRacha >= 2) {
+        mBronce.classList.add('medalla-desbloqueada');
+        lblRango.innerText = "Rango Activo: Base Completada (2-3 Semanas) 🥉";
+      } else if (rachaValida === 0 && totales > 0) {
+        lblRango.innerText = "⚠️ Racha pausada por inactividad (+8 días sin entrenar)";
+      } else {
+        lblRango.innerText = "Rango: Iniciando Planificación";
+      }
+    }
+
+    function activarSolapaDia(rutinaId) {
+      rutinasActivasAlumno.forEach(r => {
+        const tarjeta = document.getElementById(`tarjeta-rutina-${r.id}`);
+        const botonTab = document.getElementById(`btn-tab-dia-${r.id}`);
+        if (tarjeta) tarjeta.classList.add('hidden');
+        if (botonTab) {
+          botonTab.classList.remove('tab-dia-active');
+          botonTab.classList.add('bg-slate-900', 'text-slate-300', 'border-slate-800');
+        }
+      });
+
+      const tarjetaActiva = document.getElementById(`tarjeta-rutina-${rutinaId}`);
+      const botonActivo = document.getElementById(`btn-tab-dia-${rutinaId}`);
+      if (tarjetaActiva) tarjetaActiva.classList.remove('hidden');
+      if (botonActivo) {
+        botonActivo.classList.remove('bg-slate-900', 'text-slate-300', 'border-slate-800');
+        botonActivo.classList.add('tab-dia-active');
+      }
+    }
+
+    // RMs & PORCENTAJES
+    function recalcularYGuardarRM(alumnoId, ejNombre, pesoInput, repsInput, notasInput) {
+      const p = parseFloat(pesoInput.value) || 0;
+      const r = parseInt(repsInput.value) || 1;
+      const rm = calcularEpley(p, r);
+
+      const labelRM = document.getElementById(`rm-valor-${alumnoId}-${ejNombre}`);
+      if (labelRM) labelRM.innerText = `${rm} kg`;
+
+      const porcentajes = [95, 90, 85, 80, 75, 70, 65, 60];
+      porcentajes.forEach(pct => {
+        const cell = document.getElementById(`pct-${alumnoId}-${ejNombre}-${pct}`);
+        if (cell) cell.innerText = `${Math.round(rm * (pct / 100) * 10) / 10} kg`;
+      });
+
+      const dataObj = {
+        peso: p,
+        reps: r,
+        rm: rm,
+        notas: notasInput ? notasInput.value : ''
+      };
+      localStorage.setItem(`rm_data_${alumnoId}_${ejNombre}`, JSON.stringify(dataObj));
+
+      const histKey = `rm_historial_${alumnoId}_${ejNombre}`;
+      let hist = JSON.parse(localStorage.getItem(histKey) || "[]");
+      hist.push({ fecha: new Date().toLocaleDateString(), rm: rm });
+      if (hist.length > 8) hist = hist.slice(-8);
+      localStorage.setItem(histKey, JSON.stringify(hist));
+
+      sb.from('registros_rm').upsert({
+        alumno_id: alumnoId,
+        ejercicio: ejNombre,
+        peso: p,
+        reps: r,
+        rm_calculado: rm,
+        notas: dataObj.notas
+      }, { onConflict: 'alumno_id,ejercicio' }).then();
+
+      actualizarGraficoEvolucionRM(alumnoId, ejNombre);
+    }
+
+    function extraerEjerciciosFuerzaPlanificacion(planificaciones) {
+      const setEjercicios = new Set();
+      planificaciones.forEach(p => {
+        (p.ejercicios_detalle || []).forEach(e => {
+          const blk = (e.bloque || '').toUpperCase();
+          if (blk.includes('FUERZA') || blk.includes('OLÍMPICO') || blk.includes('OLIMPICO') || blk.includes('POTENCIA') || blk.includes('TRACCIONES')) {
+            setEjercicios.add(e.ejercicio);
+          }
+        });
+      });
+      if (setEjercicios.size === 0) {
+        setEjercicios.add("Sentadilla Trasera con Barra Olímpica");
+        setEjercicios.add("Press de Banca Plano con Barra");
+        setEjercicios.add("Peso Muerto Convencional");
+        setEjercicios.add("Power Clean (Cargada de potencia)");
+      }
+      return Array.from(setEjercicios);
+    }
+
+    function renderizarTarjetaRM(alumnoId, ejNombre, editable = true) {
+      const guardado = JSON.parse(localStorage.getItem(`rm_data_${alumnoId}_${ejNombre}`)) || { peso: '', reps: '', rm: 0, notas: '' };
+      const rmActual = guardado.rm || 0;
+      const porcentajes = [95, 90, 85, 80, 75, 70, 65, 60];
+
+      return `
+        <div class="bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 space-y-4 shadow-lg">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            <div>
+              <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">Fuerza & Rendimiento</span>
+              <h4 class="text-base font-black text-white">${ejNombre}</h4>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="abrirModalDiscos(${rmActual})" class="bg-slate-900 border border-slate-700 text-slate-300 hover:text-emerald-400 text-xs px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1 transition">
+                ⚖️ Discos
+              </button>
+              <div class="flex items-center gap-2 bg-slate-900 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
+                <span class="text-xs text-slate-400 font-bold">1RM:</span>
+                <span id="rm-valor-${alumnoId}-${ejNombre}" class="text-base font-black text-emerald-400 font-mono">${rmActual} kg</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Carga Levantada (kg):</label>
+              <input type="number" id="rm-p-${alumnoId}-${ejNombre}" value="${guardado.peso}" placeholder="ej: 80" ${!editable ? 'disabled' : ''} oninput="recalcularYGuardarRM('${alumnoId}', '${ejNombre}', this, document.getElementById('rm-r-${alumnoId}-${ejNombre}'), document.getElementById('rm-n-${alumnoId}-${ejNombre}'))" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Repeticiones Logradas:</label>
+              <input type="number" id="rm-r-${alumnoId}-${ejNombre}" value="${guardado.reps}" placeholder="ej: 5" ${!editable ? 'disabled' : ''} oninput="recalcularYGuardarRM('${alumnoId}', '${ejNombre}', document.getElementById('rm-p-${alumnoId}-${ejNombre}'), this, document.getElementById('rm-n-${alumnoId}-${ejNombre}'))" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">Anotaciones / Sensaciones:</label>
+              <input type="text" id="rm-n-${alumnoId}-${ejNombre}" value="${guardado.notas}" placeholder="ej: Buen control" ${!editable ? 'disabled' : ''} onchange="recalcularYGuardarRM('${alumnoId}', '${ejNombre}', document.getElementById('rm-p-${alumnoId}-${ejNombre}'), document.getElementById('rm-r-${alumnoId}-${ejNombre}'), this)" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tabla de Porcentajes de Carga:</span>
+            <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 text-center">
+              ${porcentajes.map(pct => {
+                const kgPct = rmActual ? Math.round(rmActual * (pct / 100) * 10) / 10 : 0;
+                return `
+                  <div class="bg-slate-900/90 border border-slate-800 p-1.5 rounded-lg">
+                    <span class="text-[9px] text-slate-400 font-bold block">${pct}%</span>
+                    <span id="pct-${alumnoId}-${ejNombre}-${pct}" class="text-xs font-black text-emerald-300 font-mono">${kgPct} kg</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function actualizarGraficoEvolucionRM(alumnoId, ejNombre) {
+      const canvas = document.getElementById('chart-rm-evolucion');
+      if (!canvas) return;
+
+      const histKey = `rm_historial_${alumnoId}_${ejNombre}`;
+      const hist = JSON.parse(localStorage.getItem(histKey) || "[]");
+      
+      const labels = hist.length > 0 ? hist.map(h => h.fecha) : ['Mes 1', 'Mes 2', 'Mes 3'];
+      const dataPoints = hist.length > 0 ? hist.map(h => h.rm) : [70, 75, 80];
+
+      if (chartRMInstance) chartRMInstance.destroy();
+
+      chartRMInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: `1RM (kg) - ${ejNombre}`,
+            data: dataPoints,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.35,
+            fill: true,
+            pointBackgroundColor: '#10b981',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#cbd5e1', font: { size: 11, weight: 'bold' } } }
+          },
+          scales: {
+            x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(51, 65, 85, 0.3)' } },
+            y: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(51, 65, 85, 0.3)' } }
+          }
+        }
+      });
+    }
+
+    async function cargarPlanillaRMsAlumno(email) {
+      const cont = document.getElementById('lista-tabla-rms');
+      
+      const { data: rmsNube } = await sb.from('registros_rm').select('*').eq('alumno_id', email);
+      if (rmsNube && rmsNube.length > 0) {
+        rmsNube.forEach(r => {
+          localStorage.setItem(`rm_data_${email}_${r.ejercicio}`, JSON.stringify({
+            peso: r.peso,
+            reps: r.reps,
+            rm: r.rm_calculado,
+            notas: r.notas || ''
+          }));
+        });
+      }
+
+      const ejercicios = extraerEjerciciosFuerzaPlanificacion(rutinasActivasAlumno);
+      cont.innerHTML = ejercicios.map(ej => renderizarTarjetaRM(email, ej, true)).join('');
+      if (ejercicios.length > 0) {
+        actualizarGraficoEvolucionRM(email, ejercicios[0]);
+      }
+    }
+
+    function agregarFilaRMDesdeDesplegable() {
+      const sel = document.getElementById('sel-ejercicio-rm-desplegable');
+      const ejNombre = sel.value;
+      if (!ejNombre) return alert("Seleccioná un ejercicio de la lista desplegable.");
+
+      const email = usuarioActual ? usuarioActual.email : 'alumno';
+      const cont = document.getElementById('lista-tabla-rms');
+      
+      cont.insertAdjacentHTML('afterbegin', renderizarTarjetaRM(email, ejNombre, true));
+      actualizarGraficoEvolucionRM(email, ejNombre);
+      sel.value = "";
+    }
+
+    async function cargarRMsAdminParaAlumno(alumnoEmail) {
+      const cont = document.getElementById('contenedor-rms-admin');
+      if (!alumnoEmail) {
+        cont.innerHTML = '<p class="text-slate-500 text-xs">Seleccioná un alumno arriba para ver su planilla de 1RM.</p>';
+        return;
+      }
+
+      const { data: planes } = await sb.from('planificaciones').select('*').eq('alumno_id', alumnoEmail).order('created_at', { ascending: false });
+      const { data: rmsNube } = await sb.from('registros_rm').select('*').eq('alumno_id', alumnoEmail);
+
+      if (rmsNube && rmsNube.length > 0) {
+        rmsNube.forEach(r => {
+          localStorage.setItem(`rm_data_${alumnoEmail}_${r.ejercicio}`, JSON.stringify({
+            peso: r.peso,
+            reps: r.reps,
+            rm: r.rm_calculado,
+            notas: r.notas || ''
+          }));
+        });
+      }
+
+      const ejercicios = extraerEjerciciosFuerzaPlanificacion(planes || []);
+      cont.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-xs font-bold text-white">Planilla de 1RM de <strong class="text-emerald-400">${alumnoEmail}</strong></span>
+          <button type="button" onclick="agregarFilaRMCoach('${alumnoEmail}')" class="text-xs bg-slate-800 hover:bg-slate-700 text-emerald-300 px-3 py-1 rounded-lg font-bold border border-emerald-500/20">＋ Agregar Ejercicio</button>
+        </div>
+        ${ejercicios.map(ej => renderizarTarjetaRM(alumnoEmail, ej, true)).join('')}
+      `;
+    }
+
+    function agregarFilaRMCoach(alumnoEmail) {
+      const nombre = prompt(`Nombre del ejercicio para calcular el 1RM de ${alumnoEmail}:`);
+      if (!nombre || !nombre.trim()) return;
+      const cont = document.getElementById('contenedor-rms-admin');
+      cont.insertAdjacentHTML('beforeend', renderizarTarjetaRM(alumnoEmail, nombre.trim(), true));
+    }
+
+    // BIBLIOTECA TÉCNICA LIBRE
+    function renderizarBibliotecaTecnica() {
+      const cont = document.getElementById('contenedor-grid-biblioteca');
+      if (!cont) return;
+
+      const filtroTexto = (document.getElementById('inp-buscar-biblio')?.value || '').toLowerCase();
+      const filtroCat = document.getElementById('sel-filtro-categoria-biblio')?.value || 'TODOS';
+
+      let items = [];
+      Object.keys(biblioteca).forEach(cat => {
+        if (filtroCat === 'TODOS' || filtroCat === cat) {
+          (biblioteca[cat] || []).forEach(ej => {
+            if (!filtroTexto || ej.toLowerCase().includes(filtroTexto)) {
+              items.push({ categoria: cat, nombre: ej });
+            }
+          });
+        }
+      });
+
+      if (items.length === 0) {
+        cont.innerHTML = '<p class="text-slate-500 text-xs col-span-2">No se encontraron ejercicios en la biblioteca con esos criterios.</p>';
+        return;
+      }
+
+      cont.innerHTML = items.map(item => `
+        <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80 flex items-center justify-between text-xs space-y-1">
+          <div>
+            <span class="text-[9px] text-emerald-400 font-bold uppercase tracking-wider block">${item.categoria.replace('_', ' ')}</span>
+            <span class="text-white font-bold text-sm block">${item.nombre}</span>
+          </div>
+          <button type="button" onclick="abrirModalDiscos(60)" class="bg-slate-900 border border-slate-700 text-slate-300 hover:text-emerald-400 px-2.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1">
+            ⚖
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function filtrarBibliotecaTecnica() {
+      renderizarBibliotecaTecnica();
+    }
+
+    // CONMUTADOR KOENA VS ONLINE
+    function cambiarEntornoAlumno(entorno) {
+      entornoActivoAlumno = entorno;
+      const btnK = document.getElementById('btn-env-koena');
+      const btnO = document.getElementById('btn-env-online');
+
+      if (entorno === 'KOENA') {
+        btnK.className = "px-2.5 py-1 rounded-lg text-[11px] font-black bg-cyan-500 text-slate-950 transition flex items-center gap-1.5 shadow-sm";
+        btnO.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-400 hover:text-white transition";
+      } else {
+        btnO.className = "px-2.5 py-1 rounded-lg text-[11px] font-black bg-blue-500 text-white transition shadow-sm";
+        btnK.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-400 hover:text-white transition flex items-center gap-1.5";
+      }
+
+      aplicarFiltroEntornoRutinas();
+    }
+
+    function aplicarFiltroEntornoRutinas() {
+      let filtradas = todasLasRutinasAlumno;
+      if (entornoActivoAlumno !== 'TODOS') {
+        filtradas = todasLasRutinasAlumno.filter(r => {
+          const sem = (r.semana || '').toUpperCase();
+          if (entornoActivoAlumno === 'KOENA') return sem.includes('KOENA') || sem.includes('PRESENCIAL');
+          if (entornoActivoAlumno === 'ONLINE') return sem.includes('ONLINE') || !sem.includes('KOENA');
+          return true;
+        });
+      }
+
+      const contActual = document.getElementById('lista-rutinas');
+      const contHistorial = document.getElementById('lista-historial');
+      const contTabsDias = document.getElementById('contenedor-tabs-dias');
+      const barraSolapas = document.getElementById('barra-solapas-dias');
+
+      if (filtradas.length === 0) {
+        contActual.innerHTML = '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-400">No hay planificaciones en esta sede o modalidad.</div>';
+        contTabsDias.classList.add('hidden');
+        return;
+      }
+
+      const ultimaSemana = filtradas[0].semana;
+      rutinasActivasAlumno = filtradas.filter(d => d.semana === ultimaSemana);
+      const rutinasViejas = filtradas.filter(d => d.semana !== ultimaSemana);
+
+      if (rutinasActivasAlumno.length > 1) {
+        contTabsDias.classList.remove('hidden');
+        barraSolapas.innerHTML = rutinasActivasAlumno.map((r, idx) => `
+          <button type="button" id="btn-tab-dia-${r.id}" onclick="activarSolapaDia('${r.id}')" class="px-4 py-2 rounded-xl text-xs font-bold border transition whitespace-nowrap ${idx === 0 ? 'tab-dia-active' : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'}">
+            📑 ${r.dia || `Día ${idx + 1}`}
+          </button>
+        `).join('');
+      } else {
+        contTabsDias.classList.add('hidden');
+      }
+
+      contActual.innerHTML = renderizarListaTarjetas(rutinasActivasAlumno, false);
+      contHistorial.innerHTML = rutinasViejas.length > 0 ? renderizarListaTarjetas(rutinasViejas, true) : '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-500">Sin rutinas archivadas en este entorno.</div>';
+
+      if (rutinasActivasAlumno.length > 0) {
+        activarSolapaDia(rutinasActivasAlumno[0].id);
+      }
+    }
+
+    async function cargarRutinas(userEmail, userId) {
+      const tot = parseInt(localStorage.getItem(`stats_total_${userEmail}`) || "0");
+      const rac = parseInt(localStorage.getItem(`stats_racha_${userEmail}`) || "0");
+      actualizarGamificacionUI(tot, rac, userEmail);
+      
+      const perfil = JSON.parse(localStorage.getItem(`perfil_atleta_${userEmail}`) || "{}");
+      document.getElementById('dash-alumno-nombre').innerText = perfil.nombre ? `Plan de ${perfil.nombre}` : `Plan de ${userEmail.split('@')[0]}`;
+      cargarMiPerfilEnPantalla(userEmail);
+
+      const { data, error } = await sb
+        .from('planificaciones')
+        .select('*')
+        .or(`alumno_id.eq.${userEmail},alumno_id.eq.${userId}`)
+        .order('created_at', { ascending: false });
+
+      if (error || !data || data.length === 0) {
+        document.getElementById('lista-rutinas').innerHTML = '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-400">Todavía no tenés planificaciones cargadas para tu cuenta. Tu entrenador te la asignará a la brevedad.</div>';
+        document.getElementById('lista-historial').innerHTML = '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-500">Sin rutinas en el historial.</div>';
+        document.getElementById('contenedor-tabs-dias').classList.add('hidden');
+        return;
+      }
+
+      todasLasRutinasAlumno = data;
+
+      const esKoena = (data[0].semana || '').toUpperCase().includes('KOENA');
+      const badge = document.getElementById('badge-modalidad-alumno');
+
+      if (esKoena) {
+        badge.innerText = "Sede Presencial Koena";
+        badge.className = "text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border bg-cyan-500/15 text-cyan-300 border-cyan-500/30";
+        cambiarEntornoAlumno('KOENA');
+      } else {
+        badge.innerText = "🌐 Personalizado Online";
+        badge.className = "text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border bg-blue-500/15 text-blue-300 border-blue-500/30";
+        cambiarEntornoAlumno('ONLINE');
+      }
+    }
+
+    function renderizarListaTarjetas(lista, esHistorial = false) {
+      return lista.map((r, rIdx) => {
+        const detalles = r.ejercicios_detalle || [];
+        const bloques = {};
+        detalles.forEach((ej, idx) => {
+          const bloqueNombre = ej.bloque || "BLOQUE GENERAL";
+          if (!bloques[bloqueNombre]) bloques[bloqueNombre] = [];
+          bloques[bloqueNombre].push({ ...ej, originalIndex: idx });
+        });
+
+        const rpeGuardado = localStorage.getItem(`rpe_${r.id}`) || "7";
+        const comentarioGuardado = localStorage.getItem(`comentario_${r.id}`) || "";
+        const videoGuardado = localStorage.getItem(`video_alumno_${r.id}`) || "";
+        const diaRealGuardado = localStorage.getItem(`dia_ejecucion_${r.id}`) || "Lunes";
+        const fechaRealGuardada = localStorage.getItem(`fecha_ejecucion_${r.id}`) || new Date().toISOString().split('T')[0];
+        const esKoena = (r.semana || '').toUpperCase().includes('KOENA');
+
+        return `
+          <div id="tarjeta-rutina-${r.id}" class="${!esHistorial && rIdx > 0 ? 'hidden' : ''} bg-slate-900 border ${esKoena ? 'border-cyan-500/30' : (esHistorial ? 'border-slate-800/80 opacity-90' : 'border-slate-800')} p-5 md:p-6 rounded-3xl shadow-xl space-y-6 print-clean">
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-xs uppercase font-extrabold tracking-wider ${esKoena ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'} px-3 py-1 rounded-full border">
+                    ${r.semana || 'Planificación'}
+                  </span>
+                  ${esKoena ? '<span class="text-[10px] font-black text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">Koena</span>' : '<span class="text-[10px] font-black text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">🌐 Online</span>'}
+                </div>
+                <h4 class="text-2xl font-black text-white mt-1.5">${r.dia || 'Entrenamiento'}</h4>
+              </div>
+
+              <div class="flex items-center gap-2 self-start md:self-auto">
+                <button type="button" onclick="window.print()" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-3 py-2 rounded-xl font-bold transition flex items-center gap-1.5">
+                  📄 <span class="hidden sm:inline">Exportar</span> PDF
+                </button>
+                <div class="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+                  <select id="sel-dia-real-${r.id}" onchange="guardarDiaEjecucion('${r.id}', this.value, document.getElementById('txt-fecha-real-${r.id}').value)" class="bg-slate-900 text-xs font-bold text-emerald-400 rounded p-1 border border-slate-800">
+                    <option value="Lunes" ${diaRealGuardado === 'Lunes' ? 'selected' : ''}>Lunes</option>
+                    <option value="Martes" ${diaRealGuardado === 'Martes' ? 'selected' : ''}>Martes</option>
+                    <option value="Miércoles" ${diaRealGuardado === 'Miércoles' ? 'selected' : ''}>Miércoles</option>
+                    <option value="Jueves" ${diaRealGuardado === 'Jueves' ? 'selected' : ''}>Jueves</option>
+                    <option value="Viernes" ${diaRealGuardado === 'Viernes' ? 'selected' : ''}>Viernes</option>
+                    <option value="Sábado" ${diaRealGuardado === 'Sábado' ? 'selected' : ''}>Sábado</option>
+                    <option value="Domingo" ${diaRealGuardado === 'Domingo' ? 'selected' : ''}>Domingo</option>
+                  </select>
+                  <input type="date" id="txt-fecha-real-${r.id}" value="${fechaRealGuardada}" onchange="guardarDiaEjecucion('${r.id}', document.getElementById('sel-dia-real-${r.id}').value, this.value)" class="bg-slate-900 text-xs font-bold text-white rounded p-1 border border-slate-800">
+                </div>
+              </div>
+            </div>
+
+            <!-- CHECK-IN BIENESTAR -->
+            <div class="bg-slate-950/90 border border-blue-500/30 p-4 rounded-2xl space-y-2 no-print">
+              <span class="text-[11px] font-bold text-blue-400 uppercase tracking-wider block">🩺 Check-in Diario de Bienestar (Previo al entreno)</span>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                <div>
+                  <label class="text-[10px] text-slate-400 font-semibold block mb-1">Calidad del Sueño:</label>
+                  <select id="check-sueno-${r.id}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white font-bold">
+                    <option value="5">😴 5/5 - Excelente descanso</option>
+                    <option value="4" selected>😊 4/5 - Buen sueño</option>
+                    <option value="3">😐 3/5 - Regular / Cortado</option>
+                    <option value="2">🥱 2/5 - Mal descanso</option>
+                    <option value="1">😫 1/5 - Insomnio / Pésimo</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[10px] text-slate-400 font-semibold block mb-1">Nivel de Energía:</label>
+                  <select id="check-energia-${r.id}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white font-bold">
+                    <option value="5">⚡ 5/5 - Con ganas de romperla</option>
+                    <option value="4" selected>💪 4/5 - Buena energía</option>
+                    <option value="3">🆗 3/5 - Normal</option>
+                    <option value="2">📉 2/5 - Cansado</option>
+                    <option value="1">🪫 1/5 - Sin energía / Fatiga</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[10px] text-slate-400 font-semibold block mb-1">Dolor Muscular / Agujetas:</label>
+                  <select id="check-dolor-${r.id}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white font-bold">
+                    <option value="1" selected>🟢 1/5 - Cero molestias</option>
+                    <option value="2">🟡 2/5 - Leve tensión</option>
+                    <option value="3">🟠 3/5 - Agujetas normales</option>
+                    <option value="4">🔴 4/5 - Dolor muscular alto</option>
+                    <option value="5">🚨 5/5 - Dolor agudo</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECCIONES DE BLOQUES -->
+            <div class="space-y-6">
+              ${Object.keys(bloques).map((nombreBloque, bIdx) => {
+                const bloqueId = `bloque_c_${r.id}_${bIdx}`;
+                return `
+                <div class="bg-slate-950 p-4 md:p-5 rounded-2xl border border-slate-800 shadow-md space-y-4">
+                  <div onclick="toggleBloqueAlumno('${bloqueId}')" class="flex items-center justify-between border-b border-slate-800/80 pb-3 cursor-pointer select-none">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-3 h-3 rounded-full bg-emerald-400 inline-block shadow-sm shadow-emerald-400/50"></span>
+                      <h5 class="text-sm md:text-base font-black uppercase tracking-wider text-emerald-300">${nombreBloque}</h5>
+                    </div>
+                    <span class="text-[10px] text-slate-500 hover:text-slate-300 font-bold bg-slate-900 border border-slate-800 px-2 py-1 rounded-lg no-print">
+                      ▼ Plegar
+                    </span>
+                  </div>
+
+                  <div id="${bloqueId}" class="space-y-3.5">
+                    ${bloques[nombreBloque].map(item => {
+                      const cantSeries = parseInt(item.series) || 1;
+                      const segs = parseSegundos(item.descanso);
+                      const cargaAnterior = localStorage.getItem(`last_weight_${item.ejercicio}`) || '';
+                      const cargaAsignadaCoach = item.cargaCoach || '';
+                      const pesoNumerico = parseFloat(cargaAsignadaCoach) || parseFloat(cargaAnterior) || 0;
+
+                      return `
+                        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl space-y-3">
+                          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                            <div>
+                              <div class="flex flex-wrap items-center gap-2">
+                                <h6 class="font-bold text-white text-base">${item.ejercicio}</h6>
+                                ${cargaAsignadaCoach ? `<span class="text-[11px] text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg font-bold">🎯 Carga Coach: ${cargaAsignadaCoach}</span>` : ''}
+                                ${cargaAnterior ? `<span class="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded font-mono">Última: ${cargaAnterior}</span>` : ''}
+                                ${pesoNumerico > 0 ? `
+                                  <button type="button" onclick="abrirModalDiscos(${pesoNumerico})" class="text-[10px] text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 px-2 py-0.5 rounded font-bold hover:bg-cyan-500/20">
+                                    ⚖️ Discos
+                                  </button>
+                                ` : ''}
+                              </div>
+                              <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300 mt-1.5">
+                                <span class="bg-slate-800 px-2.5 py-0.5 rounded font-medium">${item.series} series x ${item.reps}</span>
+                                <span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded font-bold">${item.rir}</span>
+                                <button type="button" onclick="iniciarTimerDescanso(${segs})" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-0.5 rounded text-slate-200 font-medium flex items-center gap-1 active:scale-95 transition no-print">
+                                  ⏱️ Pausa: ${item.descanso}
+                                </button>
+                              </div>
+                            </div>
+                            
+                            ${item.video ? `
+                              <a href="${item.video}" target="_blank" rel="noopener noreferrer" class="text-xs bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-500/30 px-3.5 py-2 rounded-xl font-bold flex items-center gap-1.5 self-start md:self-auto transition no-print shadow-sm">
+                                ▶ Ver Video Demostrativo
+                              </a>
+                            ` : ''}
+                          </div>
+
+                          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-slate-800">
+                            ${Array.from({ length: cantSeries }).map((_, sIdx) => {
+                              const doneKey = `done_${r.id}_${item.ejercicio}_${sIdx}`;
+                              const isDone = localStorage.getItem(doneKey) === 'true';
+                              const cargaKey = `carga_${r.id}_${item.ejercicio}_${sIdx}`;
+                              const cargaGuardada = localStorage.getItem(cargaKey) || '';
+
+                              return `
+                                <div class="flex items-center gap-2 bg-slate-950 p-2 rounded-lg border border-slate-800 ${isDone ? 'serie-done' : ''}">
+                                  <button type="button" onclick="toggleSerieCompletada(this.parentElement, '${r.id}', '${item.ejercicio}',${sIdx})" class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 flex items-center justify-center text-xs font-black transition no-print">
+                                    ✓
+                                  </button>
+                                  <span class="text-[11px] text-slate-400 font-bold">S${sIdx + 1}:</span>
+                                  <input type="text" placeholder="${cargaAsignadaCoach || cargaAnterior || 'Kg / RPE'}" value="${cargaGuardada}" onchange="guardarCargaNube('${r.id}', '${item.ejercicio}',${sIdx}, this.value)" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
+                                </div>
+                              `;
+                            }).join('')}
+                          </div>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+              `;
+              }).join('')}
+            </div>
+
+            <!-- FEEDBACK Y VIDEO -->
+            <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-2xl space-y-3 no-print">
+              <div class="flex items-center justify-between">
+                <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider flex items-center gap-1.5">
+                  📊 Retroalimentación & Corrección Técnica
+                </span>
+                <span class="text-[10px] text-slate-400">Escala RPE 1-10</span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
+                <div>
+                  <label class="text-[11px] text-slate-400 font-semibold block mb-1">Esfuerzo General (RPE):</label>
+                  <select id="sel-rpe-${r.id}" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white font-bold focus:outline-none focus:border-emerald-500">
+                    <option value="1" ${rpeGuardado === "1" ? "selected" : ""}>1 - Regenerativo / Muy suave</option>
+                    <option value="2" ${rpeGuardado === "2" ? "selected" : ""}>2 - Muy suave</option>
+                    <option value="3" ${rpeGuardado === "3" ? "selected" : ""}>3 - Suave</option>
+                    <option value="4" ${rpeGuardado === "4" ? "selected" : ""}>4 - Moderado</option>
+                    <option value="5" ${rpeGuardado === "5" ? "selected" : ""}>5 - Algo duro</option>
+                    <option value="6" ${rpeGuardado === "6" ? "selected" : ""}>6 - Duro</option>
+                    <option value="7" ${rpeGuardado === "7" ? "selected" : ""}>7 - Muy duro (Óptimo)</option>
+                    <option value="8" ${rpeGuardado === "8" ? "selected" : ""}>8 - Extremadamente duro</option>
+                    <option value="9" ${rpeGuardado === "9" ? "selected" : ""}>9 - Casi al fallo</option>
+                    <option value="10" ${rpeGuardado === "10" ? "selected" : ""}>10 - Fallo técnico / Agotador</option>
+                  </select>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label class="text-[11px] text-slate-400 font-semibold block mb-1">Sensaciones / Molestias:</label>
+                  <input type="text" id="txt-feedback-${r.id}" value="${comentarioGuardado}" placeholder="ej: Me sentí con buena potencia en las cargadas" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                </div>
+              </div>
+
+              <div>
+                <label class="text-[11px] text-emerald-400 font-semibold block mb-1">📹 Video de tu técnica (Link Drive, YouTube o subida):</label>
+                <input type="text" id="txt-video-alumno-${r.id}" value="${videoGuardado}" placeholder="Pegá acá el link de tu video para que Ramiro lo evalúe" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+              </div>
+
+              <div class="pt-2 flex justify-end">
+                <button type="button" onclick="guardarFeedbackSesion('${r.id}', '${r.dia || 'Entrenamiento'}', '${r.semana || ''}')" class="text-xs bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 py-2.5 rounded-xl transition shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-1.5">
+                  ✅ Enviar Feedback y Video al Coach
+                </button>
+              </div>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    function refrescarRutinas() {
+      if (usuarioActual) cargarRutinas(usuarioActual.email, usuarioActual.id);
+    }
+
+    // AUTENTICACIÓN
     async function ejecutarAuth() {
       if (modoAuthActual === 'login') {
         await iniciarSesion();
@@ -1033,6 +2955,18 @@
       p.innerText = txt;
       p.className = esError ? "text-center text-xs text-red-400 font-semibold" : "text-center text-xs text-emerald-400 font-semibold";
     }
+
+    sb.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        usuarioActual = session.user;
+        mostrarPanel(session.user);
+      } else {
+        usuarioActual = null;
+        if (!esAdminVerificado) {
+          mostrarLogin();
+        }
+      }
+    });
   </script>
 </body>
 </html>
