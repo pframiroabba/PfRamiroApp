@@ -84,8 +84,9 @@
     <div class="flex items-center gap-3">
       <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-10 w-10 md:h-11 md:w-11 object-contain rounded-lg border border-slate-700">
       
+      <!-- LOGO KOENA ENCABEZADO -->
       <div class="flex items-center pl-2 border-l border-slate-800">
-        <img src="logo-koena.webp" onerror="this.style.display='none'; document.getElementById('tag-koena-header').style.display='flex';" alt="Logo Koena" class="h-9 w-auto object-contain rounded">
+        <img src="logo-koena.webp" onerror="this.onerror=null; this.src='logo-koena.png'; this.onerror=()=>{this.style.display='none'; document.getElementById('tag-koena-header').style.display='flex';};" alt="Logo Koena" class="h-9 w-auto object-contain rounded">
         <div id="tag-koena-header" class="hidden items-center bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
           Koena
         </div>
@@ -172,7 +173,7 @@
           <!-- BOTÓN CLIQUEABLE CON LOGO DE KOENA PARA FILTRAR -->
           <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1.5">
             <button type="button" onclick="cambiarEntornoAlumno('KOENA')" id="btn-env-koena" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5">
-              <img src="logo-koena.webp" onerror="this.onerror=null; this.src='logo.jpg';" class="h-4 w-auto object-contain">
+              <img src="logo-koena.webp" onerror="this.onerror=null; this.src='logo-koena.png'; this.onerror=()=>{this.style.display='none';};" class="h-4 w-auto object-contain">
               <span>Koena</span>
             </button>
             <button type="button" onclick="cambiarEntornoAlumno('ONLINE')" id="btn-env-online" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition">🌐 Online</button>
@@ -1373,7 +1374,6 @@
 
       guardarDiaEjecucion(rutinaId, diaReal, fechaReal);
 
-      // CÁLCULO DE RACHA DINÁMICA: EVALUAR SI PERDIÓ LA RACHA POR MÁS DE 8 DÍAS
       const hoy = new Date();
       const ultimaFechaStr = localStorage.getItem(`ultimo_entreno_fecha_${email}`);
       let racha = parseInt(localStorage.getItem(`stats_racha_${email}`) || "0");
@@ -1383,7 +1383,6 @@
         const ultimaFecha = new Date(ultimaFechaStr);
         const diasDiferencia = Math.floor((hoy - ultimaFecha) / (1000 * 60 * 60 * 24));
         if (diasDiferencia > 8) {
-          // Perdió la racha por inactividad
           racha = 1;
         } else {
           racha += 1;
@@ -1425,9 +1424,7 @@
       window.open(`https://wa.me/${WHATSAPP_COACH}?text=${textoMensaje}`, '_blank');
     }
 
-    // ACTUALIZACIÓN DE MEDALLAS: SI PIERDE LA RACHA VUELVEN A GRIS
     function actualizarGamificacionUI(totales, racha, email) {
-      // Verificar si hubo inactividad mayor a 8 días para apagar las medallas
       const ultimaFechaStr = email ? localStorage.getItem(`ultimo_entreno_fecha_${email}`) : null;
       let rachaValida = racha;
 
@@ -1451,7 +1448,6 @@
       const mDiamante = document.getElementById('medalla-diamante');
       const lblRango = document.getElementById('lbl-rango-actual');
 
-      // Si la racha está rota, se apagan todas las medallas
       [mBronce, mPlata, mOro, mDiamante].forEach(m => {
         m.classList.remove('medalla-desbloqueada');
         m.classList.add('medalla-bloqueada');
