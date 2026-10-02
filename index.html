@@ -67,6 +67,11 @@
       border: 2px solid #10b981;
       flex-shrink: 0;
     }
+    .btn-tipo-barra-active {
+      background-color: #10b981 !important;
+      color: #020617 !important;
+      font-weight: 900 !important;
+    }
     @media print {
       header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container, #modal-discos, #modal-ficha-coach {
         display: none !important;
@@ -87,6 +92,55 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-32 antialiased select-none">
 
+  <!-- MODAL CALCULADORA VISUAL DE DISCOS CON SELECCIÓN DE BARRA -->
+  <div id="modal-discos" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h4 class="font-black text-white text-base flex items-center gap-2">⚖️ Calculadora de Discos</h4>
+        <button type="button" onclick="cerrarModalDiscos()" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
+      </div>
+
+      <!-- SELECTOR DE TIPO DE BARRA / PESO PROPIO -->
+      <div class="space-y-1.5">
+        <span class="text-[11px] text-slate-400 font-bold block uppercase tracking-wider">Tipo o Peso de Barra:</span>
+        <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+          <button type="button" onclick="establecerPesoBarra(20, this)" class="btn-tipo-barra btn-tipo-barra-active bg-slate-950 border border-slate-700 p-1.5 rounded-xl text-slate-300 font-bold transition">
+            20 kg (Olímpica)
+          </button>
+          <button type="button" onclick="establecerPesoBarra(15, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-1.5 rounded-xl text-slate-300 font-bold transition">
+            15 kg (Mujer)
+          </button>
+          <button type="button" onclick="establecerPesoBarra(10, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-1.5 rounded-xl text-slate-300 font-bold transition">
+            10 kg (Junior)
+          </button>
+          <button type="button" onclick="establecerPesoBarra(25, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-1.5 rounded-xl text-slate-300 font-bold transition">
+            25 kg (Hexag.)
+          </button>
+          <button type="button" onclick="establecerPesoBarra(0, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-1.5 rounded-xl text-slate-300 font-bold transition">
+            0 kg (Sin barra)
+          </button>
+          <div class="relative">
+            <input type="number" id="inp-peso-barra-custom" step="0.5" oninput="cambiarPesoBarraCustom(this.value)" placeholder="Otro kg" class="w-full h-full bg-slate-950 border border-slate-700 text-center rounded-xl p-1 text-[11px] font-mono text-emerald-400 font-bold focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+      </div>
+
+      <!-- PESO OBJETIVO TOTAL -->
+      <div>
+        <span class="text-xs text-slate-400 block mb-1">Peso total objetivo a levantar:</span>
+        <div class="flex items-center gap-2">
+          <input type="number" id="inp-modal-kilos" step="0.5" class="bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-mono font-bold text-lg w-full" placeholder="ej: 82.5">
+          <button type="button" onclick="calcularDistribucionDiscos()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs">Calcular</button>
+        </div>
+      </div>
+
+      <!-- RESULTADO VISUAL -->
+      <div id="resultado-discos" class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs space-y-2">
+        <span class="text-slate-500">Ingresá el peso para ver qué discos cargar de cada lado.</span>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL FICHA ANAMNESIS & ARCHIVOS PARA EL COACH -->
   <div id="modal-ficha-coach" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 max-w-xl w-full rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
@@ -95,26 +149,6 @@
         <button type="button" onclick="cerrarModalFichaCoach()" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
       </div>
       <div id="contenido-ficha-coach" class="space-y-3 text-xs"></div>
-    </div>
-  </div>
-
-  <!-- MODAL CALCULADORA VISUAL DE DISCOS -->
-  <div id="modal-discos" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl p-5 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h4 class="font-black text-white text-base flex items-center gap-2">⚖️ Carga en Barra Olímpica</h4>
-        <button type="button" onclick="cerrarModalDiscos()" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
-      </div>
-      <div>
-        <span class="text-xs text-slate-400 block mb-1">Peso total objetivo:</span>
-        <div class="flex items-center gap-2">
-          <input type="number" id="inp-modal-kilos" step="0.5" class="bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-mono font-bold text-lg w-full" placeholder="ej: 82.5">
-          <button type="button" onclick="calcularDistribucionDiscos()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs">Calcular</button>
-        </div>
-      </div>
-      <div id="resultado-discos" class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs space-y-2">
-        <span class="text-slate-500">Ingresá el peso para ver qué discos cargar de cada lado.</span>
-      </div>
     </div>
   </div>
 
@@ -135,7 +169,6 @@
     <div class="flex items-center gap-3">
       <img src="logo-icono.webp" onerror="this.onerror=null; this.src='logo.jpg';" alt="Logo PF Ramiro" class="h-10 w-10 md:h-11 md:w-11 object-contain rounded-lg border border-slate-700">
       
-      <!-- LOGO KOENA -->
       <div class="flex items-center pl-2 border-l border-slate-800">
         <img src="logo-koena.webp" onerror="this.onerror=null; this.src='logo-koena.png'; this.onerror=()=>{this.style.display='none';};" alt="Logo Koena" class="h-9 w-auto object-contain rounded">
         <div id="tag-koena-header" class="hidden items-center bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
@@ -447,7 +480,7 @@
             <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio por Bloque</span>
             <div class="flex flex-wrap items-center gap-2">
               <button type="button" onclick="aplicarPresetProgresionRamiro()" class="text-xs bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 px-3 py-1 rounded-lg font-black transition">
-                ⚡ Cargar Progresión S1-S5 Ramiro
+                ⚡ Cargar Progresión Progresiva (Tope 4 Series)
               </button>
               <button type="button" onclick="crearNuevoEjercicio()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg text-emerald-300 font-bold">+ Crear</button>
               <button type="button" onclick="eliminarEjercicioSeleccionado()" class="text-xs bg-red-900/30 hover:bg-red-900/50 text-red-300 px-3 py-1 rounded-lg font-bold">Eliminar</button>
@@ -500,10 +533,10 @@
             </div>
           </div>
 
-          <!-- MATRIZ SEMANAL PROGRESIVA (SEMANAS 1 A 5) -->
+          <!-- MATRIZ SEMANAL PROGRESIVA (SEMANAS 1 A 5 - MÁXIMO 4 SERIES) -->
           <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 space-y-2.5">
             <div class="flex justify-between items-center">
-              <span class="text-[11px] font-black text-emerald-400 uppercase tracking-wider">🎯 Progresión Ondulada Semanal (% / Carga / Reps):</span>
+              <span class="text-[11px] font-black text-emerald-400 uppercase tracking-wider">🎯 Progresión Ondulada Semanal (% / Carga / Reps - Tope 4 Series):</span>
               <span class="text-[10px] text-slate-400">Podés poner % (ej: 75%) o kilos fijos (ej: 80kg)</span>
             </div>
             
@@ -520,18 +553,18 @@
               </div>
               <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
                 <span class="text-[10px] font-bold text-slate-400 block mb-1">Semana 3 (Intensif.):</span>
-                <input type="text" id="prog-s3-reps" value="2x8 + 2x6 reps" placeholder="Reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+                <input type="text" id="prog-s3-reps" value="4x6 reps" placeholder="Reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
                 <input type="text" id="prog-s3-carga" value="80%" placeholder="% o Kg" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
               </div>
               <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
                 <span class="text-[10px] font-bold text-slate-400 block mb-1">Semana 4 (Pesada):</span>
-                <input type="text" id="prog-s4-reps" value="2x6 + 2x4 reps" placeholder="Reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+                <input type="text" id="prog-s4-reps" value="4x4 reps" placeholder="Reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
                 <input type="text" id="prog-s4-carga" value="85%" placeholder="% o Kg" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
               </div>
               <div class="bg-slate-950 p-2 rounded-lg border border-emerald-500/50">
                 <span class="text-[10px] font-bold text-emerald-400 block mb-1">Semana 5 (Testeo RIR 0):</span>
-                <input type="text" id="prog-s5-reps" value="12-8-6-4 + Fallo" placeholder="Reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-                <input type="text" id="prog-s5-carga" value="87.5% - 90%" placeholder="% o Kg" class="w-full bg-slate-900 border border-emerald-500 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+                <input type="text" id="prog-s5-reps" value="12-8-6-4 + 1xFallo" placeholder="Reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+                <input type="text" id="prog-s5-carga" value="90%+" placeholder="% o Kg" class="w-full bg-slate-900 border border-emerald-500 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
               </div>
             </div>
           </div>
@@ -539,7 +572,7 @@
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             <div>
               <label class="text-[11px] text-slate-400 font-semibold">Series Base</label>
-              <input type="number" id="inp-series" value="3" min="1" max="20" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
+              <input type="number" id="inp-series" value="3" min="1" max="4" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
             </div>
             <div>
               <label class="text-[11px] text-slate-400 font-semibold">RIR / Esfuerzo</label>
@@ -845,7 +878,7 @@
                 <label class="text-[11px] font-bold text-slate-400 block mb-1">Levantamiento Olímpico</label>
                 <select id="perfil-exp-olimpico" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
                   <option value="Cero experiencia / Nunca hice">Cero experiencia / Nunca hice</option>
-                  <option value="Básica (Cargadas de potencia simples)" selected>Básica (Cargadas simples)</option>
+                  <option value="Básica (Cargadas simples)" selected>Básica (Cargadas simples)</option>
                   <option value="Dominio técnico completo (Clean & Snatch)">Dominio técnico completo</option>
                 </select>
               </div>
@@ -1125,8 +1158,9 @@
     let chartRMInstance = null;
     let modoAuthActual = 'login';
     let archivoBase64Temporal = null;
+    let pesoBarraSeleccionada = 20;
 
-    // APLICAR PRESET DE PROGRESIÓN ONDULADA
+    // PRESET METODOLÓGICO RAMIRO ABBATTISTA: TOPE 4 SERIES & SOBRECARGA PROGRESIVA
     function aplicarPresetProgresionRamiro() {
       document.getElementById('prog-s1-reps').value = "3x8 reps";
       document.getElementById('prog-s1-carga').value = "70%";
@@ -1134,18 +1168,18 @@
       document.getElementById('prog-s2-reps').value = "4x8 reps";
       document.getElementById('prog-s2-carga').value = "75%";
 
-      document.getElementById('prog-s3-reps').value = "2x8 + 2x6 reps";
+      document.getElementById('prog-s3-reps').value = "4x6 reps";
       document.getElementById('prog-s3-carga').value = "80%";
 
-      document.getElementById('prog-s4-reps').value = "2x6 + 2x4 reps";
+      document.getElementById('prog-s4-reps').value = "4x4 reps";
       document.getElementById('prog-s4-carga').value = "85%";
 
-      document.getElementById('prog-s5-reps').value = "12-8-6-4 + Fallo";
-      document.getElementById('prog-s5-carga').value = "90%";
+      document.getElementById('prog-s5-reps').value = "12-8-6-4 + 1xFallo";
+      document.getElementById('prog-s5-carga').value = "90%+";
 
       document.getElementById('inp-series').value = "4";
       document.getElementById('inp-rir').value = "RIR 2";
-      alert("✅ Progresión metodológica de Ramiro Abbattista cargada en el ejercicio.");
+      alert("✅ Progresión progresiva de 4 series máximas aplicada.");
     }
 
     // FORMATEO DE TELÉFONO
@@ -1511,7 +1545,7 @@
         </div>
 
         <div class="bg-slate-950 p-3.5 rounded-2xl border border-amber-500/30 space-y-1.5 text-[11px]">
-          <span class="text-amber-400 font-bold uppercase tracking-wider block text-[10px]">⚠️ Dolores & Lesiones</span>
+          <span class="text-amber-400 font-bold uppercase tracking-wider block text-[10px]">⚠️️ Dolores & Lesiones</span>
           <div><span class="text-slate-400">Dolores activos:</span> <strong class="text-amber-300 block mt-0.5">${p.doloresActivos || 'Sin dolores reportados'}</strong></div>
           <div><span class="text-slate-400">Cirugías / Viejas:</span> <strong class="text-slate-300 block mt-0.5">${p.cirugiasPrevias || 'Ninguna'}</strong></div>
         </div>
@@ -1610,15 +1644,32 @@
       refrescarRutinas();
     }
 
-    // CALCULADORA DISCOS
+    // CALCULADORA DISCOS CON SOPORTE COMPLETO DE BARRAS
+    function establecerPesoBarra(peso, boton) {
+      pesoBarraSeleccionada = parseFloat(peso);
+      document.querySelectorAll('.btn-tipo-barra').forEach(b => b.classList.remove('btn-tipo-barra-active'));
+      if (boton) boton.classList.add('btn-tipo-barra-active');
+      document.getElementById('inp-peso-barra-custom').value = '';
+      calcularDistribucionDiscos();
+    }
+
+    function cambiarPesoBarraCustom(val) {
+      const p = parseFloat(val);
+      if (!isNaN(p) && p >= 0) {
+        pesoBarraSeleccionada = p;
+        document.querySelectorAll('.btn-tipo-barra').forEach(b => b.classList.remove('btn-tipo-barra-active'));
+        calcularDistribucionDiscos();
+      }
+    }
+
     function abrirModalDiscos(kilos) {
       const modal = document.getElementById('modal-discos');
       const input = document.getElementById('inp-modal-kilos');
       modal.classList.remove('hidden');
       if (kilos && kilos > 0) {
         input.value = kilos;
-        calcularDistribucionDiscos();
       }
+      calcularDistribucionDiscos();
     }
 
     function cerrarModalDiscos() {
@@ -1628,13 +1679,29 @@
     function calcularDistribucionDiscos() {
       const total = parseFloat(document.getElementById('inp-modal-kilos').value);
       const resultado = document.getElementById('resultado-discos');
+      const pesoBarra = pesoBarraSeleccionada;
 
-      if (isNaN(total) || total < 20) {
-        resultado.innerHTML = '<span class="text-amber-400 font-bold">El peso mínimo en barra olímpica de 20 kg debe ser 20 kg.</span>';
+      if (isNaN(total) || total <= 0) {
+        resultado.innerHTML = '<span class="text-slate-500">Ingresá el peso objetivo para ver qué discos cargar de cada lado.</span>';
         return;
       }
 
-      const pesoPorLado = (total - 20) / 2;
+      if (total < pesoBarra) {
+        resultado.innerHTML = `<span class="text-amber-400 font-bold">El peso objetivo (${total} kg) no puede ser menor al peso de la barra seleccionada (${pesoBarra} kg).</span>`;
+        return;
+      }
+
+      const pesoEnDiscosTotal = total - pesoBarra;
+      const pesoPorLado = pesoEnDiscosTotal / 2;
+
+      if (pesoPorLado === 0) {
+        resultado.innerHTML = `
+          <div class="text-emerald-400 font-bold text-sm">Barra sola (${pesoBarra} kg)</div>
+          <span class="text-slate-400">Sin discos adicionales a los lados.</span>
+        `;
+        return;
+      }
+
       const discosDisponibles = [25, 20, 15, 10, 5, 2.5, 1.25];
       let restante = pesoPorLado;
       const discosUsados = [];
@@ -1646,24 +1713,22 @@
         }
       });
 
-      if (discosUsados.length === 0) {
-        resultado.innerHTML = `
-          <div class="text-white font-bold">Barra Olímpica sola (20 kg)</div>
-          <span class="text-slate-400">Sin discos adicionales de los lados.</span>
-        `;
-        return;
-      }
-
       resultado.innerHTML = `
-        <div class="text-emerald-400 font-black text-sm">🎯 Cargar por cada lado: ${pesoPorLado} kg</div>
-        <div class="flex flex-wrap gap-1.5 pt-1">
-          ${discosUsados.map(d => `
-            <span class="bg-slate-900 border border-emerald-500/40 text-emerald-300 font-mono font-black px-2.5 py-1 rounded-lg text-xs">
-              ${d} kg
-            </span>
-          `).join('')}
+        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+          <span class="text-slate-400">Barra: <strong class="text-white">${pesoBarra} kg</strong></span>
+          <span class="text-emerald-400 font-black text-sm">🎯 Por lado: ${pesoPorLado} kg</span>
         </div>
-        ${restante > 0 ? `<div class="text-[10px] text-amber-400 font-semibold pt-1">Diferencia no divisible exacta: ${restante * 2} kg</div>` : ''}
+        <div class="space-y-1 pt-1">
+          <span class="text-[10px] text-slate-400 block font-bold uppercase">Cargar de cada lado:</span>
+          <div class="flex flex-wrap gap-1.5">
+            ${discosUsados.map(d => `
+              <span class="bg-slate-900 border border-emerald-500/40 text-emerald-300 font-mono font-black px-2.5 py-1 rounded-lg text-xs">
+                ${d} kg
+              </span>
+            `).join('')}
+          </div>
+          ${restante > 0 ? `<div class="text-[10px] text-amber-400 font-semibold pt-1">Diferencia no divisible exacta: ${restante * 2} kg</div>` : ''}
+        </div>
       `;
     }
 
@@ -2149,7 +2214,6 @@
                                 ` : ''}
                               </div>
                               
-                              <!-- CABEZAL VISUAL DE PRESCRIPCIÓN COACH -->
                               <div class="mt-1.5 bg-slate-950 p-2.5 rounded-xl border border-emerald-500/30 text-xs flex flex-wrap items-center gap-2">
                                 <span class="text-emerald-400 font-black">🎯 Semana ${semanaActivaAlumno}:</span>
                                 <span class="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-black">${resolucion.valorTexto}</span>
@@ -2168,7 +2232,6 @@
                             ` : ''}
                           </div>
 
-                          <!-- CASO ESPECIAL: SEMANA 5 - RAMPA DE APROXIMACIÓN + FALLO RIR 0 -->
                           ${esSemanaTesteoFallo ? `
                             <div class="bg-slate-950 border border-amber-500/40 p-3.5 rounded-xl space-y-3">
                               <span class="text-[11px] font-black text-amber-400 uppercase tracking-wider block">🔥 Protocolo de Rampa & Testeo de Fuerza (Semana Final):</span>
@@ -2207,9 +2270,8 @@
                               </div>
                             </div>
                           ` : `
-                            <!-- SERIES NORMALES SEMANALES -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-slate-800">
-                              ${Array.from({ length: parseInt(item.series) || 3 }).map((_, sIdx) => {
+                              ${Array.from({ length: Math.min(parseInt(item.series) || 3, 4) }).map((_, sIdx) => {
                                 const doneKey = `done_${r.id}_${item.ejercicio}_sem${semanaActivaAlumno}_s${sIdx}`;
                                 const isDone = localStorage.getItem(doneKey) === 'true';
                                 const cargaKey = `carga_${r.id}_${item.ejercicio}_sem${semanaActivaAlumno}_s${sIdx}`;
