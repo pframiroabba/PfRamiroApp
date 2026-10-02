@@ -92,7 +92,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-32 antialiased select-none">
 
-  <!-- MODAL CALCULADORA VISUAL DE DISCOS CON SELECCIÓN DE BARRA -->
+  <!-- MODAL CALCULADORA VISUAL DE DISCOS -->
   <div id="modal-discos" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -100,7 +100,6 @@
         <button type="button" onclick="cerrarModalDiscos()" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
       </div>
 
-      <!-- SELECTOR DE TIPO DE BARRA / PESO PROPIO -->
       <div class="space-y-1.5">
         <span class="text-[11px] text-slate-400 font-bold block uppercase tracking-wider">Tipo o Peso de Barra:</span>
         <div class="grid grid-cols-3 gap-1.5 text-[11px]">
@@ -125,7 +124,6 @@
         </div>
       </div>
 
-      <!-- PESO OBJETIVO TOTAL -->
       <div>
         <span class="text-xs text-slate-400 block mb-1">Peso total objetivo a levantar:</span>
         <div class="flex items-center gap-2">
@@ -134,7 +132,6 @@
         </div>
       </div>
 
-      <!-- RESULTADO VISUAL -->
       <div id="resultado-discos" class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs space-y-2">
         <span class="text-slate-500">Ingresá el peso para ver qué discos cargar de cada lado.</span>
       </div>
@@ -1160,7 +1157,6 @@
     let archivoBase64Temporal = null;
     let pesoBarraSeleccionada = 20;
 
-    // PRESET METODOLÓGICO RAMIRO ABBATTISTA: TOPE 4 SERIES & SOBRECARGA PROGRESIVA
     function aplicarPresetProgresionRamiro() {
       document.getElementById('prog-s1-reps').value = "3x8 reps";
       document.getElementById('prog-s1-carga').value = "70%";
@@ -1182,7 +1178,6 @@
       alert("✅ Progresión progresiva de 4 series máximas aplicada.");
     }
 
-    // FORMATEO DE TELÉFONO
     function formatearTelefono(raw) {
       if (!raw) return '';
       let limpios = raw.replace(/\D/g, '');
@@ -1193,7 +1188,6 @@
       return limpios;
     }
 
-    // AUTH
     function cambiarModoAuth(modo) {
       modoAuthActual = modo;
       const tabL = document.getElementById('tab-auth-login');
@@ -1324,13 +1318,12 @@
       p.className = esError ? "text-center text-xs text-red-400 font-semibold" : "text-center text-xs text-emerald-400 font-semibold";
     }
 
-    // AVATAR
     function renderizarElementoAvatar(contenedor, valorAvatar) {
       if (!contenedor) return;
       if (valorAvatar && valorAvatar.startsWith('data:image')) {
         contenedor.innerHTML = `<img src="${valorAvatar}" class="w-full h-full rounded-full object-cover">`;
       } else {
-        contenedor.innerHTML = valorAvatar || '🏋️‍♂️';
+        contenedor.innerHTML = valorAvatar || '🏋️‍♂️️';
       }
     }
 
@@ -1355,7 +1348,6 @@
       alert("✅ ¡Foto / Icono de perfil actualizado!");
     }
 
-    // DOCUMENTOS
     function procesarArchivoLocal(input) {
       const file = input.files[0];
       if (!file) return;
@@ -1438,7 +1430,6 @@
       renderizarDocumentosAlumno(email);
     }
 
-    // PERFIL ALUMNO
     function cargarMiPerfilEnPantalla(email) {
       const datos = JSON.parse(localStorage.getItem(`perfil_atleta_${email}`) || "{}");
       document.getElementById('perfil-nombre').value = datos.nombre || email.split('@')[0];
@@ -1502,7 +1493,6 @@
       cargarMiPerfilEnPantalla(email);
     }
 
-    // VER FICHA COACH
     function verFichaCompletaCoach(alumnoEmail) {
       const p = JSON.parse(localStorage.getItem(`perfil_atleta_${alumnoEmail}`) || "{}");
       const docs = JSON.parse(localStorage.getItem(`documentos_atleta_${alumnoEmail}`) || "[]");
@@ -1545,7 +1535,7 @@
         </div>
 
         <div class="bg-slate-950 p-3.5 rounded-2xl border border-amber-500/30 space-y-1.5 text-[11px]">
-          <span class="text-amber-400 font-bold uppercase tracking-wider block text-[10px]">⚠️️ Dolores & Lesiones</span>
+          <span class="text-amber-400 font-bold uppercase tracking-wider block text-[10px]">⚠️ Dolores & Lesiones</span>
           <div><span class="text-slate-400">Dolores activos:</span> <strong class="text-amber-300 block mt-0.5">${p.doloresActivos || 'Sin dolores reportados'}</strong></div>
           <div><span class="text-slate-400">Cirugías / Viejas:</span> <strong class="text-slate-300 block mt-0.5">${p.cirugiasPrevias || 'Ninguna'}</strong></div>
         </div>
@@ -1577,7 +1567,6 @@
       document.getElementById('modal-ficha-coach').classList.add('hidden');
     }
 
-    // 1RM EPLEY & MATEMÁTICA
     function calcularEpley(peso, reps) {
       const p = parseFloat(peso);
       const r = parseInt(reps);
@@ -1611,7 +1600,6 @@
       };
     }
 
-    // ACTUALIZAR 1RM DESDE SERIE AL FALLO (SEMANA 5)
     function actualizarRMDesdeFallo(ejercicioNombre, inputKilosId, inputRepsId) {
       const email = usuarioActual ? usuarioActual.email : 'alumno';
       const peso = parseFloat(document.getElementById(inputKilosId).value);
@@ -1644,7 +1632,6 @@
       refrescarRutinas();
     }
 
-    // CALCULADORA DISCOS CON SOPORTE COMPLETO DE BARRAS
     function establecerPesoBarra(peso, boton) {
       pesoBarraSeleccionada = parseFloat(peso);
       document.querySelectorAll('.btn-tipo-barra').forEach(b => b.classList.remove('btn-tipo-barra-active'));
@@ -1732,7 +1719,6 @@
       `;
     }
 
-    // WAKE LOCK & TIMER
     async function alternarWakeLock() {
       const txtStatus = document.getElementById('txt-wake-status');
       const btn = document.getElementById('btn-wake-lock');
@@ -1831,7 +1817,6 @@
       return isNaN(num) ? 90 : num;
     }
 
-    // INICIALIZACIÓN
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('btn-admin-access').addEventListener('click', solicitarClaveAdmin);
       document.getElementById('btn-link-coach').addEventListener('click', solicitarClaveAdmin);
@@ -1897,7 +1882,7 @@
       const item = {
         bloque: document.getElementById('inp-bloque').value,
         ejercicio: ejercicio,
-        series: parseInt(document.getElementById('inp-series').value) || 3,
+        series: Math.min(parseInt(document.getElementById('inp-series').value) || 3, 4),
         rir: document.getElementById('inp-rir').value,
         descanso: document.getElementById('inp-descanso').value,
         video: document.getElementById('inp-video').value.trim(),
@@ -2102,7 +2087,6 @@
       }
     }
 
-    // FEEDBACK
     async function guardarFeedbackSesion(rutinaId, dia, semana) {
       const selRpe = document.getElementById(`sel-rpe-${rutinaId}`);
       const txtComentario = document.getElementById(`txt-feedback-${rutinaId}`);
@@ -2330,6 +2314,72 @@
       }).join('');
     }
 
+    function cambiarEntornoAlumno(entorno) {
+      entornoActivoAlumno = entorno;
+      const btnK = document.getElementById('btn-env-koena');
+      const btnO = document.getElementById('btn-env-online');
+
+      if (btnK && btnO) {
+        if (entorno === 'KOENA') {
+          btnK.className = "px-2.5 py-1 rounded-lg text-[11px] font-black bg-cyan-500 text-slate-950 transition flex items-center gap-1.5 shadow-sm";
+          btnO.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-400 hover:text-white transition";
+        } else if (entorno === 'ONLINE') {
+          btnO.className = "px-2.5 py-1 rounded-lg text-[11px] font-black bg-blue-500 text-white transition shadow-sm";
+          btnK.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-400 hover:text-white transition flex items-center gap-1.5";
+        } else {
+          btnK.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-400 hover:text-white transition flex items-center gap-1.5";
+          btnO.className = "px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-400 hover:text-white transition";
+        }
+      }
+
+      aplicarFiltroEntornoRutinas();
+    }
+
+    function aplicarFiltroEntornoRutinas() {
+      let filtradas = todasLasRutinasAlumno;
+      if (entornoActivoAlumno !== 'TODOS') {
+        filtradas = todasLasRutinasAlumno.filter(r => {
+          const sem = (r.semana || '').toUpperCase();
+          if (entornoActivoAlumno === 'KOENA') return sem.includes('KOENA') || sem.includes('PRESENCIAL');
+          if (entornoActivoAlumno === 'ONLINE') return sem.includes('ONLINE') || !sem.includes('KOENA');
+          return true;
+        });
+      }
+
+      const contActual = document.getElementById('lista-rutinas');
+      const contHistorial = document.getElementById('lista-historial');
+      const contTabsDias = document.getElementById('contenedor-tabs-dias');
+      const barraSolapas = document.getElementById('barra-solapas-dias');
+
+      if (!filtradas || filtradas.length === 0) {
+        contActual.innerHTML = '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-400">No hay entrenamientos cargados en esta vista.</div>';
+        contTabsDias.classList.add('hidden');
+        return;
+      }
+
+      const ultimaSemana = filtradas[0].semana;
+      rutinasActivasAlumno = filtradas.filter(d => d.semana === ultimaSemana);
+      const rutinasViejas = filtradas.filter(d => d.semana !== ultimaSemana);
+
+      if (rutinasActivasAlumno.length > 1) {
+        contTabsDias.classList.remove('hidden');
+        barraSolapas.innerHTML = rutinasActivasAlumno.map((r, idx) => `
+          <button type="button" id="btn-tab-dia-${r.id}" onclick="activarSolapaDia('${r.id}')" class="px-4 py-2 rounded-xl text-xs font-bold border transition whitespace-nowrap ${idx === 0 ? 'tab-dia-active' : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'}">
+            📑 ${r.dia || `Día ${idx + 1}`}
+          </button>
+        `).join('');
+      } else {
+        contTabsDias.classList.add('hidden');
+      }
+
+      contActual.innerHTML = renderizarListaTarjetas(rutinasActivasAlumno, false);
+      contHistorial.innerHTML = rutinasViejas.length > 0 ? renderizarListaTarjetas(rutinasViejas, true) : '<div class="p-8 bg-slate-900 rounded-2xl border border-slate-800 text-center text-slate-500">Sin rutinas archivadas.</div>';
+
+      if (rutinasActivasAlumno.length > 0) {
+        activarSolapaDia(rutinasActivasAlumno[0].id);
+      }
+    }
+
     async function cargarRutinas(userEmail, userId) {
       const { data, error } = await sb
         .from('planificaciones')
@@ -2369,7 +2419,6 @@
       if (usuarioActual) cargarRutinas(usuarioActual.email, usuarioActual.id);
     }
 
-    // LISTAR RMs ALUMNO
     async function cargarPlanillaRMsAlumno(email) {
       const cont = document.getElementById('lista-tabla-rms');
       const { data: rmsNube } = await sb.from('registros_rm').select('*').eq('alumno_id', email);
@@ -2506,7 +2555,6 @@
       sel.value = "";
     }
 
-    // COACH TABS & ACTIONS
     function cambiarSolapaCoach(vista) {
       ['vista-c-alumnos', 'vista-c-rms', 'vista-c-plantillas', 'vista-c-creador'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
@@ -2721,7 +2769,46 @@
       `;
     }
 
-    // LISTENER AUTH ESTABLE
+    function renderizarBibliotecaTecnica() {
+      const cont = document.getElementById('contenedor-grid-biblioteca');
+      if (!cont) return;
+
+      const filtroTexto = (document.getElementById('inp-buscar-biblio')?.value || '').toLowerCase();
+      const filtroCat = document.getElementById('sel-filtro-categoria-biblio')?.value || 'TODOS';
+
+      let items = [];
+      Object.keys(biblioteca).forEach(cat => {
+        if (filtroCat === 'TODOS' || filtroCat === cat) {
+          (biblioteca[cat] || []).forEach(ej => {
+            if (!filtroTexto || ej.toLowerCase().includes(filtroTexto)) {
+              items.push({ categoria: cat, nombre: ej });
+            }
+          });
+        }
+      });
+
+      if (items.length === 0) {
+        cont.innerHTML = '<p class="text-slate-500 text-xs col-span-2">No se encontraron ejercicios en la biblioteca.</p>';
+        return;
+      }
+
+      cont.innerHTML = items.map(item => `
+        <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80 flex items-center justify-between text-xs space-y-1">
+          <div>
+            <span class="text-[9px] text-emerald-400 font-bold uppercase tracking-wider block">${item.categoria.replace('_', ' ')}</span>
+            <span class="text-white font-bold text-sm block">${item.nombre}</span>
+          </div>
+          <button type="button" onclick="abrirModalDiscos(60)" class="bg-slate-900 border border-slate-700 text-slate-300 hover:text-emerald-400 px-2.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1">
+            ⚖
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function filtrarBibliotecaTecnica() {
+      renderizarBibliotecaTecnica();
+    }
+
     sb.auth.onAuthStateChange((event, session) => {
       if (session) {
         usuarioActual = session.user;
