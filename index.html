@@ -803,7 +803,7 @@
 
               <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
                 <button type="button" onclick="seleccionarEmojiAvatar('🏋️‍♂️')" class="hover:scale-125 transition text-base px-1">🏋️‍♂️</button>
-                <button type="button" onclick="seleccionarEmojiAvatar('🏄‍♂️')" class="hover:scale-125 transition text-base px-1">🏄‍♂️️</button>
+                <button type="button" onclick="seleccionarEmojiAvatar('🏄‍♂️')" class="hover:scale-125 transition text-base px-1">🏄‍♂️</button>
                 <button type="button" onclick="seleccionarEmojiAvatar('⚡')" class="hover:scale-125 transition text-base px-1">⚡</button>
                 <button type="button" onclick="seleccionarEmojiAvatar('🥇')" class="hover:scale-125 transition text-base px-1">🥇</button>
                 <button type="button" onclick="seleccionarEmojiAvatar('🥊')" class="hover:scale-125 transition text-base px-1">🥊</button>
@@ -1204,6 +1204,27 @@
       return limpios;
     }
 
+    // REGISTRO GLOBAL DE ALUMNO EN LA NUBE Y EN STORAGE COMPARTIDO
+    async function sincronizarAlumnoEnNube(email, nombre, tel) {
+      if (!email) return;
+      try {
+        const listaGlobal = JSON.parse(localStorage.getItem('alumnos_globales_registrados') || "[]");
+        if (!listaGlobal.includes(email)) {
+          listaGlobal.push(email);
+          localStorage.setItem('alumnos_globales_registrados', JSON.stringify(listaGlobal));
+        }
+
+        await sb.from('perfiles_alumnos').upsert({
+          email: email,
+          nombre: nombre || email.split('@')[0],
+          telefono: tel || '',
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'email' });
+      } catch (e) {
+        console.warn("Aviso al registrar alumno en nube:", e);
+      }
+    }
+
     function cambiarModoAuth(modo) {
       modoAuthActual = modo;
       const tabL = document.getElementById('tab-auth-login');
@@ -1244,6 +1265,7 @@
           mostrarMensaje("Error: " + error.message, true);
         } else if (data?.user) {
           usuarioActual = data.user;
+          await sincronizarAlumnoEnNube(data.user.email);
           mostrarPanel(data.user);
         }
       } catch (err) {
@@ -1268,9 +1290,11 @@
         if (error) {
           mostrarMensaje("Error: " + error.message, true);
         } else {
+          const telF = formatearTelefono(telInput);
+          const nom = nombreInput || email.split('@')[0];
           const perfilInicial = {
-            nombre: nombreInput || email.split('@')[0],
-            telefono: formatearTelefono(telInput),
+            nombre: nom,
+            telefono: telF,
             peso: null,
             altura: null,
             edad: null,
@@ -1286,9 +1310,11 @@
             cirugiasPrevias: ''
           };
           localStorage.setItem(`perfil_atleta_${email}`, JSON.stringify(perfilInicial));
-          if (telInput) {
-            localStorage.setItem(`telefono_alumno_${email}`, formatearTelefono(telInput));
+          if (telF) {
+            localStorage.setItem(`telefono_alumno_${email}`, telF);
           }
+
+          await sincronizarAlumnoEnNube(email, nom, telF);
 
           mostrarMensaje("¡Cuenta creada con éxito! Ya podés ingresar a tu plan.");
           setTimeout(() => cambiarModoAuth('login'), 1200);
@@ -1504,6 +1530,8 @@
       if (perfil.telefono) {
         localStorage.setItem(`telefono_alumno_${email}`, perfil.telefono);
       }
+
+      sincronizarAlumnoEnNube(email, perfil.nombre, perfil.telefono);
 
       alert("🎉 ¡Ficha deportiva guardada con éxito! Ramiro ya tiene tu información completa.");
       cargarMiPerfilEnPantalla(email);
@@ -1966,6 +1994,32 @@
       }).join('');
     }
 
+    function seleccionarAlumnoCreador(valor) {
+      const inputAlumno = document.getElementById('admin-alumno');
+      const inputTel = document.getElementById('admin-alumno-tel');
+
+      if (valor === 'OTRO_MANUAL') {
+        const manual = prompt("Ingresá el correo electrónico o nombre del nuevo alumno:");
+        if (manual && manual.trim()) {
+          inputAlumno.value = manual.trim();
+          inputTel.value = localStorage.getItem(`telefono_alumno_${manual.trim()}`) || '';
+        } else {
+          document.getElementById('sel-alumno-creador').value = '';
+          inputAlumno.value = '';
+          inputTel.value = '';
+        }
+        return;
+      }
+
+      if (valor) {
+        inputAlumno.value = valor;
+        inputTel.value = localStorage.getItem(`telefono_alumno_${valor}`) || '';
+      } else {
+        inputAlumno.value = '';
+        inputTel.value = '';
+      }
+    }
+
     async function guardarPlanificacionCompleta(comoPlantilla = false, modo = 'unir') {
       let alumno = document.getElementById('admin-alumno').value.trim();
       const tel = document.getElementById('admin-alumno-tel').value.trim();
@@ -1977,7 +2031,7 @@
       if (comoPlantilla) alumno = "PLANTILLA_MAESTRA";
 
       if (!alumno || sesionActual.length === 0) {
-        alert("Completá el alumno/título y agregá al menos un ejercicio a la sesión.");
+        alert("Elegí un alumno de la lista y agregá al menos un ejercicio a la sesión.");
         return;
       }
 
@@ -2663,6 +2717,166 @@
       document.getElementById('seccion-admin').classList.add('hidden');
     }
 
+    async function cargarPlanesAdmin() {
+      const { data } = await sb.from('planificaciones').select('*').order('created_at', { ascending: false });
+      const todos = data || [];
+      todasLasPlanificacionesAdmin = todos.filter(p => !p.es_plantilla && p.alumno_id !== 'PLANTILLA_MAESTRA');
+      todasLasPlantillasAdmin = todos.filter(p => p.es_plantilla || p.alumno_id === 'PLANTILLA_MAESTRA');
+
+      const alumnosSet = new Set();
+      todasLasPlanificacionesAdmin.forEach(p => { if (p.alumno_id) alumnosSet.add(p.alumno_id); });
+      
+      // Buscar alumnos desde perfiles en Supabase
+      try {
+        const { data: perfilesNube } = await sb.from('perfiles_alumnos').select('*');
+        if (perfilesNube && perfilesNube.length > 0) {
+          perfilesNube.forEach(prf => {
+            if (prf.email) {
+              alumnosSet.add(prf.email);
+              if (prf.telefono) localStorage.setItem(`telefono_alumno_${prf.email}`, prf.telefono);
+              if (prf.nombre) {
+                const pLocal = JSON.parse(localStorage.getItem(`perfil_atleta_${prf.email}`) || "{}");
+                pLocal.nombre = prf.nombre;
+                localStorage.setItem(`perfil_atleta_${prf.email}`, JSON.stringify(pLocal));
+              }
+            }
+          });
+        }
+      } catch (e) {
+        console.warn("Tabla perfiles_alumnos en sincronización:", e);
+      }
+
+      // Buscar lista compartida en localStorage
+      const listaGlobal = JSON.parse(localStorage.getItem('alumnos_globales_registrados') || "[]");
+      listaGlobal.forEach(em => { if (em) alumnosSet.add(em); });
+
+      // Buscar perfiles locales
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('perfil_atleta_')) {
+          const email = key.replace('perfil_atleta_', '');
+          if (email) alumnosSet.add(email);
+        }
+      }
+
+      const listaAlumnos = Array.from(alumnosSet).sort();
+
+      const selFiltro = document.getElementById('sel-filtro-alumnos');
+      selFiltro.innerHTML = '<option value="TODOS">👤 Todos los Alumnos</option>';
+      listaAlumnos.forEach(a => selFiltro.innerHTML += `<option value="${a}">${a}</option>`);
+
+      const selCreador = document.getElementById('sel-alumno-creador');
+      selCreador.innerHTML = '<option value="">▼ Seleccionar Alumno...</option>';
+      listaAlumnos.forEach(a => {
+        const perfil = JSON.parse(localStorage.getItem(`perfil_atleta_${a}`) || "{}");
+        const nombreDisplay = perfil.nombre ? `${perfil.nombre} (${a})` : a;
+        selCreador.innerHTML += `<option value="${a}">👤 ${nombreDisplay}</option>`;
+      });
+      selCreador.innerHTML += '<option value="OTRO_MANUAL">➕ Ingresar otro correo manualmente...</option>';
+
+      const selRmCoach = document.getElementById('sel-filtro-rm-alumno');
+      selRmCoach.innerHTML = '<option value="">▼ Elegir Alumno...</option>';
+      listaAlumnos.forEach(a => selRmCoach.innerHTML += `<option value="${a}">👤 ${a}</option>`);
+
+      renderizarPlanesAdmin(todasLasPlanificacionesAdmin);
+    }
+
+    function filtrarPlanesPorEntornoYAlumno() {
+      const entorno = document.getElementById('sel-filtro-entorno').value;
+      const alumno = document.getElementById('sel-filtro-alumnos').value;
+
+      let filtrados = todasLasPlanificacionesAdmin;
+      if (entorno !== 'TODOS') {
+        filtrados = filtrados.filter(p => {
+          const sem = (p.semana || '').toUpperCase();
+          if (entorno === 'KOENA') return sem.includes('KOENA');
+          if (entorno === 'ONLINE') return sem.includes('ONLINE');
+          return true;
+        });
+      }
+      if (alumno !== 'TODOS') filtrados = filtrados.filter(p => p.alumno_id === alumno);
+
+      renderizarPlanesAdmin(filtrados);
+    }
+
+    function renderizarPlanesAdmin(lista) {
+      const cont = document.getElementById('contenedor-planes-admin');
+      if (!lista || lista.length === 0) {
+        cont.innerHTML = '<p class="text-slate-500 text-xs col-span-2">No se encontraron planificaciones.</p>';
+        return;
+      }
+
+      cont.innerHTML = lista.map(p => {
+        const perfil = JSON.parse(localStorage.getItem(`perfil_atleta_${p.alumno_id}`) || "{}");
+        const docs = JSON.parse(localStorage.getItem(`documentos_atleta_${p.alumno_id}`) || "[]");
+        const avatar = localStorage.getItem(`avatar_alumno_${p.alumno_id}`) || '🏋️‍♂️';
+
+        const miniAvatar = (avatar && avatar.startsWith('data:image'))
+          ? `<img src="${avatar}" class="w-6 h-6 rounded-full object-cover">`
+          : `<span>${avatar}</span>`;
+
+        return `
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2.5 text-xs">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                ${miniAvatar}
+                <span class="text-[10px] text-emerald-400 font-bold uppercase">${perfil.nombre || p.alumno_id}</span>
+              </div>
+              <button type="button" onclick="verFichaCompletaCoach('${p.alumno_id}')" class="text-xs bg-slate-800 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-bold">
+                📋 Ficha (${docs.length})
+              </button>
+            </div>
+            <div>
+              <span class="font-bold text-white text-sm block">${p.dia || 'Sesión'}</span>
+              <span class="text-slate-400 text-[11px]">${p.semana || 'Plan'}</span>
+            </div>
+            <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+              <span class="text-[11px] text-slate-500">${(p.ejercicios_detalle || []).length} ejercicios</span>
+              <div class="flex gap-1.5">
+                <button type="button" onclick="contactarAlumnoDirectoWhatsApp('${p.alumno_id}')" class="bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded-lg font-bold">💬 WhatsApp</button>
+                <button type="button" onclick="eliminarPlanAdmin('${p.id}')" class="bg-red-500/20 text-red-300 px-2 py-1 rounded-lg font-bold">✕</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function contactarAlumnoDirectoWhatsApp(alumnoEmail) {
+      let tel = localStorage.getItem(`telefono_alumno_${alumnoEmail}`);
+      if (!tel) {
+        const manual = prompt(`Ingresá el WhatsApp de ${alumnoEmail} (ej: 11 2345-6789):`);
+        if (!manual) return;
+        tel = formatearTelefono(manual.trim());
+        localStorage.setItem(`telefono_alumno_${alumnoEmail}`, tel);
+      }
+      const mensaje = `Hola ${alumnoEmail.split('@')[0]}! Te escribo desde el equipo de Ramiro Abbattista para ver cómo venís con las series de esta semana. 💪`;
+      window.open(`https://wa.me/${tel}?text=${encodeURIComponent(mensaje)}`, '_blank');
+    }
+
+    async function eliminarPlanAdmin(id) {
+      if (!confirm("¿Eliminar este registro?")) return;
+      await sb.from('planificaciones').delete().eq('id', id);
+      cargarPlanesAdmin();
+      refrescarRutinas();
+    }
+
+    async function cargarRMsAdminParaAlumno(alumnoEmail) {
+      const cont = document.getElementById('contenedor-rms-admin');
+      if (!alumnoEmail) {
+        cont.innerHTML = '<p class="text-slate-500 text-xs">Seleccioná un alumno arriba.</p>';
+        return;
+      }
+      const { data: planes } = await sb.from('planificaciones').select('*').eq('alumno_id', alumnoEmail);
+      const ejercicios = extraerEjerciciosFuerzaPlanificacion(planes || []);
+      cont.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-xs font-bold text-white">RMs de <strong class="text-emerald-400">${alumnoEmail}</strong></span>
+        </div>
+        ${ejercicios.map(ej => renderizarTarjetaRM(alumnoEmail, ej, true)).join('')}
+      `;
+    }
+
     function renderizarBibliotecaTecnica() {
       const cont = document.getElementById('contenedor-grid-biblioteca');
       if (!cont) return;
@@ -2703,9 +2917,10 @@
       renderizarBibliotecaTecnica();
     }
 
-    sb.auth.onAuthStateChange((event, session) => {
+    sb.auth.onAuthStateChange(async (event, session) => {
       if (session) {
         usuarioActual = session.user;
+        await sincronizarAlumnoEnNube(session.user.email);
         mostrarPanel(session.user);
       } else {
         usuarioActual = null;
