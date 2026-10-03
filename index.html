@@ -17,9 +17,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    .serie-done {
-      background-color: rgba(16, 185, 129, 0.22) !important;
-      border-color: rgba(16, 185, 129, 0.6) !important;
+    .serie-done-box {
+      background-color: rgba(16, 185, 129, 0.15) !important;
+      border-color: rgba(16, 185, 129, 0.5) !important;
     }
     .sortable-ghost {
       opacity: 0.3;
@@ -40,19 +40,6 @@
       color: #ffffff !important;
       font-weight: 800 !important;
       border-color: #10b981 !important;
-    }
-    .medalla-bloqueada {
-      opacity: 0.25;
-      filter: grayscale(100%);
-      border-color: rgba(71, 85, 105, 0.3) !important;
-      transform: scale(0.97);
-    }
-    .medalla-desbloqueada {
-      opacity: 1;
-      filter: none;
-      border-color: rgba(16, 185, 129, 0.8) !important;
-      box-shadow: 0 0 18px rgba(16, 185, 129, 0.3);
-      transform: scale(1);
     }
     .avatar-circulo {
       width: 52px;
@@ -94,7 +81,7 @@
 
   <!-- TOAST DE AUTOGUARDADO -->
   <div id="toast-guardado" class="fixed top-16 right-4 bg-emerald-500 text-slate-950 text-xs font-black px-3 py-1.5 rounded-xl shadow-xl z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex items-center gap-1.5">
-    <span>✓ Guardado</span>
+    <span>✓ Guardado en la Nube</span>
   </div>
 
   <!-- MODAL CALCULADORA VISUAL DE DISCOS -->
@@ -423,7 +410,7 @@
         <div class="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🛠 Diseñador de Planificación Mensual</h3>
-            <p class="text-xs text-slate-400">Metodología PF Ramiro: A (Movilidad) → B (Core) → C (Potencia/Olímpico) → D (Fuerza Progresiva S1-S5) → E (Accesorios) → F (Finisher).</p>
+            <p class="text-xs text-slate-400">Metodología PF Ramiro: A (Movilidad) → B (Core) → C (Potencia/Olímpico) → D (Fuerza Progresiva S1-SN) → E (Accesorios) → F (Finisher).</p>
           </div>
         </div>
 
@@ -463,9 +450,9 @@
             </div>
             <div>
               <label class="text-[11px] text-slate-400 font-semibold block mb-1">Duración del Bloque</label>
-              <select id="admin-duracion-semanas" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-emerald-300 font-bold focus:outline-none focus:border-emerald-500">
-                <option value="5" selected>Mesociclo 5 Semanas (Recomendado)</option>
+              <select id="admin-duracion-semanas" onchange="actualizarColumnasMatrizCoach()" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-emerald-300 font-bold focus:outline-none focus:border-emerald-500">
                 <option value="4">Mesociclo 4 Semanas</option>
+                <option value="5" selected>Mesociclo 5 Semanas (Recomendado)</option>
                 <option value="6">Mesociclo 6 Semanas (Extendido)</option>
               </select>
             </div>
@@ -535,14 +522,14 @@
             </div>
           </div>
 
-          <!-- MATRIZ SEMANAL PROGRESIVA (SEMANAS 1 A 5 - MÁXIMO 4 SERIES) -->
+          <!-- MATRIZ SEMANAL PROGRESIVA ADAPTABLE DINÁMICAMENTE (4, 5 O 6 SEMANAS) -->
           <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 space-y-2.5">
             <div class="flex justify-between items-center">
-              <span class="text-[11px] font-black text-emerald-400 uppercase tracking-wider">🎯 Progresión Ondulada Semanal (% / Carga / Reps - Tope 4 Series):</span>
-              <span class="text-[10px] text-slate-400">Podés poner % (ej: 75%) o kilos fijos (ej: 80kg)</span>
+              <span class="text-[11px] font-black text-emerald-400 uppercase tracking-wider">🎯 Progresión Ondulada Semanal (% / Carga / Reps):</span>
+              <span class="text-[10px] text-slate-400">Configuración adaptada a la duración elegida</span>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs">
+            <div id="grid-matriz-coach" class="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs">
               <div class="bg-slate-950 p-2 rounded-lg border border-slate-800">
                 <span class="text-[10px] font-bold text-slate-400 block mb-1">Semana 1 (Base):</span>
                 <input type="text" id="prog-s1-reps" value="3x8 reps" placeholder="Reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
@@ -563,10 +550,15 @@
                 <input type="text" id="prog-s4-reps" value="4x4 reps" placeholder="Reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
                 <input type="text" id="prog-s4-carga" value="85%" placeholder="% o Kg" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
               </div>
-              <div class="bg-slate-950 p-2 rounded-lg border border-emerald-500/50">
+              <div id="col-s5-coach" class="bg-slate-950 p-2 rounded-lg border border-emerald-500/50">
                 <span class="text-[10px] font-bold text-emerald-400 block mb-1">Semana 5 (Testeo RIR 0):</span>
                 <input type="text" id="prog-s5-reps" value="12-8-6-4 + 1xFallo" placeholder="Reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
                 <input type="text" id="prog-s5-carga" value="90%+" placeholder="% o Kg" class="w-full bg-slate-900 border border-emerald-500 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              </div>
+              <div id="col-s6-coach" class="hidden bg-slate-950 p-2 rounded-lg border border-cyan-500/50">
+                <span class="text-[10px] font-bold text-cyan-400 block mb-1">Semana 6 (Peaking):</span>
+                <input type="text" id="prog-s6-reps" value="12-8-6-4 + 1xFallo" placeholder="Reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+                <input type="text" id="prog-s6-carga" value="92.5%" placeholder="% o Kg" class="w-full bg-slate-900 border border-cyan-500 rounded p-1 text-cyan-300 font-mono font-bold text-[11px]">
               </div>
             </div>
           </div>
@@ -615,7 +607,7 @@
                   <th class="p-3 w-8 text-center">↕</th>
                   <th class="p-3">Sección / Bloque</th>
                   <th class="p-3">Ejercicio</th>
-                  <th class="p-3">Progresión Semanal (S1 a S5)</th>
+                  <th class="p-3">Progresión Semanal</th>
                   <th class="p-3">Pausa</th>
                   <th class="p-3">Video</th>
                   <th class="p-3 text-center">Quitar</th>
@@ -661,7 +653,7 @@
         <div class="flex items-center gap-2" id="barra-solapas-dias"></div>
       </div>
 
-      <!-- SELECTOR DE SEMANA ACTIVA (SEMANA 1 A 5) PARA EL ALUMNO -->
+      <!-- SELECTOR DINÁMICO DE SEMANA ACTIVA (4, 5 O 6 SEMANAS) -->
       <div id="contenedor-tabs-semanas" class="hidden mb-4 bg-slate-900/90 p-2 rounded-2xl border border-slate-800 overflow-x-auto">
         <div class="flex items-center gap-2">
           <span class="text-[11px] font-black uppercase text-emerald-400 px-2 whitespace-nowrap">Semana del Ciclo:</span>
@@ -1157,6 +1149,7 @@
     let todasLasRutinasAlumno = [];
     let entornoActivoAlumno = 'TODOS';
     let semanaActivaAlumno = 1;
+    let totalSemanasCicloActual = 5;
     let chartRMInstance = null;
     let modoAuthActual = 'login';
     let archivoBase64Temporal = null;
@@ -1173,7 +1166,26 @@
       }, 1200);
     }
 
+    function actualizarColumnasMatrizCoach() {
+      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) || 5;
+      const col5 = document.getElementById('col-s5-coach');
+      const col6 = document.getElementById('col-s6-coach');
+
+      if (cant === 4) {
+        col5.classList.add('hidden');
+        col6.classList.add('hidden');
+      } else if (cant === 5) {
+        col5.classList.remove('hidden');
+        col6.classList.add('hidden');
+      } else if (cant === 6) {
+        col5.classList.remove('hidden');
+        col6.classList.remove('hidden');
+      }
+    }
+
     function aplicarPresetProgresionRamiro() {
+      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) || 5;
+      
       document.getElementById('prog-s1-reps').value = "3x8 reps";
       document.getElementById('prog-s1-carga').value = "70%";
 
@@ -1183,15 +1195,26 @@
       document.getElementById('prog-s3-reps').value = "4x6 reps";
       document.getElementById('prog-s3-carga').value = "80%";
 
-      document.getElementById('prog-s4-reps').value = "4x4 reps";
-      document.getElementById('prog-s4-carga').value = "85%";
-
-      document.getElementById('prog-s5-reps').value = "12-8-6-4 + 1xFallo";
-      document.getElementById('prog-s5-carga').value = "90%+";
+      if (cant === 4) {
+        document.getElementById('prog-s4-reps').value = "12-8-6-4 + 1xFallo";
+        document.getElementById('prog-s4-carga').value = "90%+";
+      } else if (cant === 5) {
+        document.getElementById('prog-s4-reps').value = "4x4 reps";
+        document.getElementById('prog-s4-carga').value = "85%";
+        document.getElementById('prog-s5-reps').value = "12-8-6-4 + 1xFallo";
+        document.getElementById('prog-s5-carga').value = "90%+";
+      } else if (cant === 6) {
+        document.getElementById('prog-s4-reps').value = "4x4 reps";
+        document.getElementById('prog-s4-carga').value = "85%";
+        document.getElementById('prog-s5-reps').value = "4x3 reps";
+        document.getElementById('prog-s5-carga').value = "87.5%";
+        document.getElementById('prog-s6-reps').value = "12-8-6-4 + 1xFallo";
+        document.getElementById('prog-s6-carga').value = "92.5%+";
+      }
 
       document.getElementById('inp-series').value = "4";
       document.getElementById('inp-rir').value = "RIR 2";
-      alert("✅ Progresión progresiva de 4 series máximas aplicada.");
+      alert(`✅ Progresión metodológica adaptada a ${cant} semanas aplicada.`);
     }
 
     function formatearTelefono(raw) {
@@ -1204,7 +1227,6 @@
       return limpios;
     }
 
-    // REGISTRO GLOBAL DE ALUMNO EN LA NUBE Y EN STORAGE COMPARTIDO
     async function sincronizarAlumnoEnNube(email, nombre, tel) {
       if (!email) return;
       try {
@@ -1926,7 +1948,7 @@
       const item = {
         bloque: document.getElementById('inp-bloque').value,
         ejercicio: ejercicio,
-        series: parseInt(document.getElementById('inp-series').value) || 3,
+        series: parseInt(document.getElementById('inp-series').value) || 4,
         rir: document.getElementById('inp-rir').value,
         descanso: document.getElementById('inp-descanso').value,
         video: document.getElementById('inp-video').value.trim(),
@@ -1935,7 +1957,8 @@
           s2: { reps: document.getElementById('prog-s2-reps').value, carga: document.getElementById('prog-s2-carga').value },
           s3: { reps: document.getElementById('prog-s3-reps').value, carga: document.getElementById('prog-s3-carga').value },
           s4: { reps: document.getElementById('prog-s4-reps').value, carga: document.getElementById('prog-s4-carga').value },
-          s5: { reps: document.getElementById('prog-s5-reps').value, carga: document.getElementById('prog-s5-carga').value }
+          s5: { reps: document.getElementById('prog-s5-reps').value, carga: document.getElementById('prog-s5-carga').value },
+          s6: { reps: document.getElementById('prog-s6-reps').value, carga: document.getElementById('prog-s6-carga').value }
         }
       };
 
@@ -1978,7 +2001,7 @@
 
       tbody.innerHTML = sesionActual.map((f, i) => {
         const p = f.progresionSemanal || {};
-        const resumenProg = `S1:${p.s1?.carga || '-'} | S2:${p.s2?.carga || '-'} | S3:${p.s3?.carga || '-'} | S4:${p.s4?.carga || '-'} | S5:${p.s5?.carga || '-'}`;
+        const resumenProg = `S1:${p.s1?.carga || '-'} | S2:${p.s2?.carga || '-'} | S3:${p.s3?.carga || '-'} | S4:${p.s4?.carga || '-'}`;
 
         return `
           <tr class="hover:bg-slate-900 transition select-none">
@@ -2024,7 +2047,7 @@
       let alumno = document.getElementById('admin-alumno').value.trim();
       const tel = document.getElementById('admin-alumno-tel').value.trim();
       const mes = document.getElementById('admin-mes').value.trim();
-      const semanas = document.getElementById('admin-duracion-semanas').value;
+      const semanas = parseInt(document.getElementById('admin-duracion-semanas').value) || 5;
       let dia = document.getElementById('admin-dia').value.trim() || 'Lunes';
       const entorno = document.getElementById('admin-entorno').value;
 
@@ -2087,7 +2110,7 @@
       if (error) {
         alert("Error al guardar: " + error.message);
       } else {
-        alert(comoPlantilla ? "¡Plantilla maestra guardada con éxito!" : `¡Planificación asignada con éxito al alumno para el día ${dia}!`);
+        alert(comoPlantilla ? "¡Plantilla maestra guardada con éxito!" : `¡Planificación de ${semanas} semanas asignada con éxito al alumno para el día ${dia}!`);
         sesionActual = [];
         renderTablaSesion();
         cargarPlanesAdmin();
@@ -2115,11 +2138,64 @@
       }
     }
 
-    function toggleSerieCompletada(btn, rutinaId, ejNombre, semIdx, serieIndex) {
-      btn.classList.toggle('serie-done');
+    // OPCIÓN B: TOGGLE DE SERIE INDIVIDUAL CON CRONÓMETRO AUTOMÁTICO Y ACTUALIZACIÓN DE BARRA
+    async function toggleSerieIndividual(btnElement, rutinaId, ejNombre, semIdx, serieIndex, descansoTexto) {
+      const boxParent = btnElement.closest('.serie-item-box');
       const key = `done_${rutinaId}_${ejNombre}_sem${semIdx}_s${serieIndex}`;
-      const estadoActual = localStorage.getItem(key) === 'true';
-      localStorage.setItem(key, (!estadoActual).toString());
+      const estabaHecha = localStorage.getItem(key) === 'true';
+      const ahoraHecha = !estabaHecha;
+
+      localStorage.setItem(key, ahoraHecha.toString());
+
+      const lblReps = btnElement.getAttribute('data-reps') || '';
+
+      if (ahoraHecha) {
+        boxParent.classList.add('serie-done-box');
+        btnElement.className = "btn-toggle-serie flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition border shadow-md bg-emerald-500 text-slate-950 border-emerald-400";
+        btnElement.innerHTML = `<span>✓</span> <span>${lblReps}</span>`;
+        
+        // Disparar cronómetro automático con feedback táctil
+        navigator.vibrate?.(60);
+        iniciarTimerDescanso(parseSegundos(descansoTexto));
+      } else {
+        boxParent.classList.remove('serie-done-box');
+        btnElement.className = "btn-toggle-serie flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition border bg-slate-900 border-rose-500/50 text-rose-300 hover:bg-slate-800";
+        btnElement.innerHTML = `<span>✗</span> <span>${lblReps}</span>`;
+      }
+
+      actualizarBarraProgresoSesion(rutinaId);
+
+      // Sincronizar en la nube
+      if (usuarioActual) {
+        try {
+          await sb.from('registros_cargas').upsert({
+            planificacion_id: String(rutinaId),
+            alumno_id: usuarioActual.email,
+            ejercicio: ejNombre,
+            serie_numero: serieIndex + 1,
+            completada: ahoraHecha
+          }, { onConflict: 'planificacion_id,alumno_id,ejercicio,serie_numero' });
+        } catch (e) {
+          console.warn("Sync serie:", e);
+        }
+      }
+    }
+
+    function actualizarBarraProgresoSesion(rutinaId) {
+      const tarjeta = document.getElementById(`tarjeta-rutina-${rutinaId}`);
+      if (!tarjeta) return;
+
+      const totalBotones = tarjeta.querySelectorAll('.btn-toggle-serie').length;
+      if (totalBotones === 0) return;
+
+      const hechas = tarjeta.querySelectorAll('.btn-toggle-serie.bg-emerald-500').length;
+      const porcentaje = Math.round((hechas / totalBotones) * 100);
+
+      const barra = tarjeta.querySelector('.progreso-barra-fill');
+      const texto = tarjeta.querySelector('.progreso-texto');
+
+      if (barra) barra.style.width = `${porcentaje}%`;
+      if (texto) texto.innerText = `${hechas} / ${totalBotones} series (${porcentaje}%)`;
     }
 
     function toggleBloqueAlumno(idBloque) {
@@ -2129,6 +2205,8 @@
 
     function cambiarSemanaActivaAlumno(numSemana) {
       semanaActivaAlumno = numSemana;
+      localStorage.setItem('semana_activa_guardada', numSemana);
+
       document.querySelectorAll('.btn-tab-semana').forEach(b => {
         b.className = "btn-tab-semana px-3 py-1.5 rounded-xl text-xs font-bold transition border border-slate-700 bg-slate-950 text-slate-300 hover:text-white";
       });
@@ -2151,46 +2229,45 @@
 
       const tarjetaActiva = document.getElementById(`tarjeta-rutina-${rutinaId}`);
       const botonActivo = document.getElementById(`btn-tab-dia-${rutinaId}`);
-      if (tarjetaActiva) tarjetaActiva.classList.remove('hidden');
+      if (tarjetaActiva) {
+        tarjetaActiva.classList.remove('hidden');
+        actualizarBarraProgresoSesion(rutinaId);
+      }
       if (botonActivo) {
         botonActivo.classList.remove('bg-slate-900', 'text-slate-300', 'border-slate-800');
         botonActivo.classList.add('tab-dia-active');
       }
     }
 
-    async function guardarFeedbackSesion(rutinaId, dia, semana) {
-      const selRpe = document.getElementById(`sel-rpe-${rutinaId}`);
-      const txtComentario = document.getElementById(`txt-feedback-${rutinaId}`);
-      const txtVideoAlumno = document.getElementById(`txt-video-alumno-${rutinaId}`);
-      const sueno = document.getElementById(`check-sueno-${rutinaId}`)?.value || '4';
-      const energia = document.getElementById(`check-energia-${rutinaId}`)?.value || '4';
-      const dolor = document.getElementById(`check-dolor-${rutinaId}`)?.value || '1';
+    // DESGLOSE INTELIGENTE DE REPETICIONES POR SERIE (ej: "2x8 + 2x6" o "4x8")
+    function parsearRepsPorSerie(repsTexto, cantidadSeries) {
+      if (!repsTexto) return Array(cantidadSeries).fill('reps');
+      const limpio = repsTexto.toLowerCase();
 
-      const wellnessResumen = `Sueño: ${sueno}/5 | Energía: ${energia}/5 | Agujetas: ${dolor}/5`;
-      localStorage.setItem(`wellness_${rutinaId}`, wellnessResumen);
-
-      const rpeValor = selRpe ? selRpe.value : "Sin RPE";
-      const comentario = txtComentario ? txtComentario.value.trim() : "";
-      const videoUrl = txtVideoAlumno ? txtVideoAlumno.value.trim() : "";
-      const email = usuarioActual ? usuarioActual.email : 'alumno';
-
-      try {
-        await sb.from('feedback_sesiones').insert([{
-          planificacion_id: String(rutinaId),
-          alumno_id: email,
-          semana: `${semana} (Semana ${semanaActivaAlumno})`,
-          dia: dia,
-          rpe: parseInt(rpeValor) || null,
-          comentario: `[${wellnessResumen}] ` + comentario + (videoUrl ? ` | Video Técnica: ${videoUrl}` : '')
-        }]);
-      } catch (e) {
-        console.warn("Feedback guardado");
+      if (limpio.includes('+')) {
+        const partes = limpio.split('+').map(p => p.trim());
+        const resultado = [];
+        partes.forEach(parte => {
+          const match = parte.match(/(\d+)\s*x\s*(\d+)/);
+          if (match) {
+            const veces = parseInt(match[1]);
+            const reps = match[2];
+            for (let v = 0; v < veces; v++) resultado.push(`${reps} reps`);
+          }
+        });
+        if (resultado.length > 0) {
+          while (resultado.length < cantidadSeries) resultado.push(resultado[resultado.length - 1]);
+          return resultado.slice(0, cantidadSeries);
+        }
       }
 
-      alert("🎉 ¡Entrenamiento registrado con éxito!");
-      let textoMensaje = `Hola Ramiro, completé la Semana ${semanaActivaAlumno} de mi entrenamiento "${dia}".%0A%0A*Wellness:* ${wellnessResumen}%0A*RPE:* ${rpeValor}/10%0A*Comentarios:* ${comentario || 'Todo en orden.'}`;
-      if (videoUrl) textoMensaje += `%0A%0A*📹 Video técnica:* ${encodeURIComponent(videoUrl)}`;
-      window.open(`https://wa.me/${WHATSAPP_COACH}?text=${textoMensaje}`, '_blank');
+      const matchSimple = limpio.match(/(\d+)\s*x\s*(\d+)/);
+      if (matchSimple) {
+        const reps = matchSimple[2];
+        return Array(cantidadSeries).fill(`${reps} reps`);
+      }
+
+      return Array(cantidadSeries).fill(repsTexto);
     }
 
     function renderizarListaTarjetas(lista, esHistorial = false) {
@@ -2207,11 +2284,11 @@
 
         const rpeGuardado = localStorage.getItem(`rpe_${r.id}`) || "7";
         const comentarioGuardado = localStorage.getItem(`comentario_${r.id}`) || "";
-        const videoGuardado = localStorage.getItem(`video_alumno_${r.id}`) || "";
         const esKoena = (r.semana || '').toUpperCase().includes('KOENA');
+        const esSemanaTesteoFallo = semanaActivaAlumno === totalSemanasCicloActual;
 
         return `
-          <div id="tarjeta-rutina-${r.id}" class="${!esHistorial && rIdx > 0 ? 'hidden' : ''} bg-slate-900 border ${esKoena ? 'border-cyan-500/30' : (esHistorial ? 'border-slate-800/80 opacity-90' : 'border-slate-800')} p-5 md:p-6 rounded-3xl shadow-xl space-y-6 print-clean">
+          <div id="tarjeta-rutina-${r.id}" class="${!esHistorial && rIdx > 0 ? 'hidden' : ''} bg-slate-900 border ${esKoena ? 'border-cyan-500/30' : (esHistorial ? 'border-slate-800/80 opacity-90' : 'border-slate-800')} p-5 md:p-6 rounded-3xl shadow-xl space-y-5 print-clean">
             
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
               <div>
@@ -2220,7 +2297,7 @@
                     ${r.semana || 'Planificación'}
                   </span>
                   <span class="text-xs bg-slate-800 text-emerald-300 font-black px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-                    Semana ${semanaActivaAlumno} de 5
+                    Semana ${semanaActivaAlumno} de ${totalSemanasCicloActual} ${esSemanaTesteoFallo ? '🔥' : ''}
                   </span>
                 </div>
                 <h4 class="text-2xl font-black text-white mt-1.5">${r.dia || 'Entrenamiento'}</h4>
@@ -2229,6 +2306,17 @@
               <button type="button" onclick="window.print()" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-3 py-2 rounded-xl font-bold transition flex items-center gap-1.5 self-start md:self-auto">
                 📄 Exportar PDF
               </button>
+            </div>
+
+            <!-- BARRA VISUAL DE PROGRESO DE LA SESIÓN -->
+            <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-1.5 no-print">
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-400 font-bold uppercase text-[10px]">Progreso de la sesión:</span>
+                <span class="progreso-texto font-black text-emerald-400 text-xs font-mono">0 / 0 series (0%)</span>
+              </div>
+              <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                <div class="progreso-barra-fill bg-emerald-500 h-full w-0 transition-all duration-300"></div>
+              </div>
             </div>
 
             <!-- SECCIONES DE BLOQUES CON PROGRESIÓN SEMANAL -->
@@ -2254,7 +2342,10 @@
                       const datosSemana = prog[semKey] || { reps: item.reps || '3x8', carga: item.cargaCoach || 'Libre' };
 
                       const resolucion = resolverCargaSegunRM(item.ejercicio, datosSemana.carga, email);
-                      const esSemanaTesteoFallo = semanaActivaAlumno === 5 && (nombreBloque.includes('FUERZA') || nombreBloque.includes('LEVANTAMIENTO'));
+                      const esBloqueFuerza = nombreBloque.includes('FUERZA') || nombreBloque.includes('LEVANTAMIENTO') || nombreBloque.includes('POTENCIA');
+                      const activaRampaFallo = esSemanaTesteoFallo && esBloqueFuerza;
+                      const cantSeries = parseInt(item.series) || 4;
+                      const listaRepsDesglosadas = parsearRepsPorSerie(datosSemana.reps, cantSeries);
 
                       return `
                         <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl space-y-3">
@@ -2270,7 +2361,7 @@
                               </div>
                               
                               <div class="mt-1.5 bg-slate-950 p-2.5 rounded-xl border border-emerald-500/30 text-xs flex flex-wrap items-center gap-2">
-                                <span class="text-emerald-400 font-black">🎯 Semana ${semanaActivaAlumno}:</span>
+                                <span class="text-emerald-400 font-black">🎯 Objetivo Sem ${semanaActivaAlumno}:</span>
                                 <span class="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-black">${resolucion.valorTexto}</span>
                                 <span class="text-white font-bold">${datosSemana.reps}</span>
                                 <span class="text-slate-400">(${item.rir || 'RIR 2'})</span>
@@ -2287,9 +2378,10 @@
                             ` : ''}
                           </div>
 
-                          ${esSemanaTesteoFallo ? `
+                          <!-- CASO TESTEO EN LA ÚLTIMA SEMANA -->
+                          ${activaRampaFallo ? `
                             <div class="bg-slate-950 border border-amber-500/40 p-3.5 rounded-xl space-y-3">
-                              <span class="text-[11px] font-black text-amber-400 uppercase tracking-wider block">🔥 Protocolo de Rampa & Testeo de Fuerza (Semana Final):</span>
+                              <span class="text-[11px] font-black text-amber-400 uppercase tracking-wider block">🔥 Protocolo de Rampa & Testeo de Fuerza (Semana ${semanaActivaAlumno} Final):</span>
                               
                               <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                                 <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
@@ -2312,7 +2404,7 @@
 
                               <div class="bg-slate-900 p-3 rounded-xl border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <div>
-                                  <span class="text-xs font-black text-amber-300 block">5. SERIE EFECTIVA AL FALLO TÉCNICO (RIR 0):</span>
+                                  <span class="text-xs font-black text-amber-300 block">5. SERIE AL FALLO TÉCNICO (RIR 0):</span>
                                   <span class="text-[10px] text-slate-400">Cargá tu peso objetivo y hacé todas las repeticiones que puedas con técnica sólida.</span>
                                 </div>
                                 <div class="flex items-center gap-2">
@@ -2325,25 +2417,33 @@
                               </div>
                             </div>
                           ` : `
+                            <!-- DESGLOSE INDIVIDUAL OPCIÓN B (BOTÓN INTERACTIVO ROJO A VERDE CON REPS EXACTAS) -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-slate-800">
-                              ${Array.from({ length: Math.min(parseInt(item.series) || 3, 4) }).map((_, sIdx) => {
+                              ${Array.from({ length: cantSeries }).map((_, sIdx) => {
                                 const doneKey = `done_${r.id}_${item.ejercicio}_sem${semanaActivaAlumno}_s${sIdx}`;
                                 const isDone = localStorage.getItem(doneKey) === 'true';
                                 const cargaKey = `carga_${r.id}_${item.ejercicio}_sem${semanaActivaAlumno}_s${sIdx}`;
                                 const cargaGuardada = localStorage.getItem(cargaKey) || '';
+                                const repsEstaSerie = listaRepsDesglosadas[sIdx] || 'reps';
 
                                 const cargaSemAnterior = semanaActivaAlumno > 1 ? (localStorage.getItem(`carga_${r.id}_${item.ejercicio}_sem${semanaActivaAlumno - 1}_s${sIdx}`) || '') : '';
 
                                 return `
-                                  <div class="flex flex-col bg-slate-950 p-2 rounded-lg border border-slate-800 ${isDone ? 'serie-done' : ''}">
-                                    <div class="flex items-center gap-2">
-                                      <button type="button" onclick="toggleSerieCompletada(this.closest('.flex-col'), '${r.id}', '${item.ejercicio}', ${semanaActivaAlumno}, ${sIdx})" class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 flex items-center justify-center text-xs font-black transition no-print">
-                                        ✓
+                                  <div class="serie-item-box flex flex-col bg-slate-950 p-2.5 rounded-xl border border-slate-800 ${isDone ? 'serie-done-box' : ''} space-y-1.5 transition">
+                                    <div class="flex items-center justify-between gap-1.5">
+                                      <span class="text-[11px] text-slate-400 font-mono font-bold">S${sIdx + 1}</span>
+                                      
+                                      <button type="button" data-reps="${repsEstaSerie}" onclick="toggleSerieIndividual(this, '${r.id}', '${item.ejercicio}', ${semanaActivaAlumno}, ${sIdx}, '${item.descanso}')" class="btn-toggle-serie flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition border ${isDone ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md' : 'bg-slate-900 border-rose-500/50 text-rose-300 hover:bg-slate-800'}">
+                                        <span>${isDone ? '✓' : '✗'}</span>
+                                        <span>${repsEstaSerie}</span>
                                       </button>
-                                      <span class="text-[11px] text-slate-400 font-bold">S${sIdx + 1}:</span>
-                                      <input type="text" inputmode="decimal" placeholder="${resolucion.pesoCalculado ? resolucion.pesoCalculado + ' kg' : 'Kg'}" value="${cargaGuardada}" onchange="guardarCargaNube('${r.id}', '${item.ejercicio}', ${semanaActivaAlumno}, ${sIdx}, this.value)" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
                                     </div>
-                                    ${cargaSemAnterior ? `<span class="text-[9px] text-slate-500 font-mono mt-1 pl-8">Sem ${semanaActivaAlumno - 1}: ${cargaSemAnterior}kg</span>` : ''}
+
+                                    <div class="flex items-center gap-1.5">
+                                      <input type="text" inputmode="decimal" placeholder="${resolucion.pesoCalculado ? resolucion.pesoCalculado + ' kg' : 'Kg'}" value="${cargaGuardada}" onchange="guardarCargaNube('${r.id}', '${item.ejercicio}', ${semanaActivaAlumno}, ${sIdx}, this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono font-bold">
+                                    </div>
+
+                                    ${cargaSemAnterior ? `<span class="text-[9px] text-slate-500 font-mono block">Sem ${semanaActivaAlumno - 1}: ${cargaSemAnterior}kg</span>` : ''}
                                   </div>
                                 `;
                               }).join('')}
@@ -2434,6 +2534,12 @@
       }
 
       const ultimaSemana = filtradas[0].semana;
+
+      // Extraer automáticamente si el ciclo dura 4, 5 o 6 semanas desde el texto del plan
+      const matchSemanas = (ultimaSemana || '').match(/(\d+)\s*semanas/i);
+      totalSemanasCicloActual = matchSemanas ? parseInt(matchSemanas[1]) : 5;
+      renderizarBarraSemanas(totalSemanasCicloActual);
+
       rutinasActivasAlumno = filtradas.filter(d => d.semana === ultimaSemana);
       const rutinasViejas = filtradas.filter(d => d.semana !== ultimaSemana);
 
@@ -2471,14 +2577,20 @@
       }
 
       todasLasRutinasAlumno = data;
-      renderizarBarraSemanas(5);
+
+      // Recuperar la semana en la que se había quedado el alumno
+      const semanaGuardada = parseInt(localStorage.getItem('semana_activa_guardada')) || 1;
+      semanaActivaAlumno = semanaGuardada;
+
       cambiarEntornoAlumno('TODOS');
     }
 
-    function renderizarBarraSemanas(totalSemanas = 5) {
+    function renderizarBarraSemanas(totalSemanas) {
       const contenedor = document.getElementById('contenedor-tabs-semanas');
       const barra = document.getElementById('barra-solapas-semanas');
       contenedor.classList.remove('hidden');
+
+      if (semanaActivaAlumno > totalSemanas) semanaActivaAlumno = 1;
 
       barra.innerHTML = Array.from({ length: totalSemanas }).map((_, idx) => {
         const sem = idx + 1;
@@ -2651,6 +2763,7 @@
       } else if (vista === 'creador') {
         document.getElementById('vista-c-creador').classList.remove('hidden');
         document.getElementById('tab-c-creador').className = "text-xs px-3.5 py-2 rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+        actualizarColumnasMatrizCoach();
       }
     }
 
@@ -2726,7 +2839,7 @@
       const alumnosSet = new Set();
       todasLasPlanificacionesAdmin.forEach(p => { if (p.alumno_id) alumnosSet.add(p.alumno_id); });
       
-      // Buscar alumnos desde perfiles en Supabase
+      // Sincronizar perfiles desde Supabase
       try {
         const { data: perfilesNube } = await sb.from('perfiles_alumnos').select('*');
         if (perfilesNube && perfilesNube.length > 0) {
@@ -2746,11 +2859,9 @@
         console.warn("Tabla perfiles_alumnos en sincronización:", e);
       }
 
-      // Buscar lista compartida en localStorage
       const listaGlobal = JSON.parse(localStorage.getItem('alumnos_globales_registrados') || "[]");
       listaGlobal.forEach(em => { if (em) alumnosSet.add(em); });
 
-      // Buscar perfiles locales
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key && key.startsWith('perfil_atleta_')) {
