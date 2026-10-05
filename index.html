@@ -63,7 +63,7 @@
       border-left: 4px solid #10b981 !important;
     }
     @media print {
-      header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container, #modal-discos, #modal-ficha-coach, #modal-creador-rapido {
+      header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container, #modal-discos, #modal-ficha-coach, #modal-creador-rapido, #modal-modo-activo {
         display: none !important;
       }
       body {
@@ -87,7 +87,81 @@
     <span>✓ Guardado en la Nube</span>
   </div>
 
-  <!-- MODAL FLOTANTE BULDOZR: CREADOR / DUPLICADOR RÁPIDO DE PLANIFICACIÓN -->
+  <!-- MODAL MODO "ACTIVE WORKOUT" BULDOZR (ENFOQUE EN 1 EJERCICIO A PANTALLA COMPLETA) -->
+  <div id="modal-modo-activo" class="hidden fixed inset-0 bg-slate-950 z-50 flex flex-col p-4 overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+      <div class="flex items-center gap-2">
+        <span class="text-xs bg-emerald-500/20 text-emerald-400 font-black px-2.5 py-1 rounded-full border border-emerald-500/30">
+          ⚡ Entreno Activo
+        </span>
+        <span id="txt-indice-activo" class="text-xs text-slate-400 font-mono font-bold">1 / 1</span>
+      </div>
+      <button type="button" onclick="cerrarModoActivo()" class="bg-slate-900 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-bold">
+        Salir al Resumen ✕
+      </button>
+    </div>
+
+    <div id="contenido-ejercicio-activo" class="max-w-xl mx-auto w-full flex-1 flex flex-col justify-between space-y-4">
+      <!-- Se puebla dinámicamente -->
+    </div>
+  </div>
+
+  <!-- MODAL CALCULADORA VISUAL CON LAS BARRAS MÁS USADAS -->
+  <div id="modal-discos" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h4 class="font-black text-white text-base flex items-center gap-2">⚖️️ Calculadora de Discos</h4>
+        <button type="button" onclick="cerrarModalDiscos()" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
+      </div>
+
+      <div class="space-y-1.5">
+        <span class="text-[11px] text-slate-400 font-bold block uppercase tracking-wider">Barras Principales:</span>
+        <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+          <button type="button" onclick="establecerPesoBarra(20, this)" class="btn-tipo-barra btn-tipo-barra-active bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold transition text-left">
+            🏋️ 20 kg (Olímpica Estándar)
+          </button>
+          <button type="button" onclick="establecerPesoBarra(15, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold transition text-left">
+            🏋️ 15 kg (Olímpica Femenina)
+          </button>
+          <button type="button" onclick="establecerPesoBarra(25, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold transition text-left">
+            🛑 25 kg (Trap Bar Tradicional)
+          </button>
+          <button type="button" onclick="establecerPesoBarra(30, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold transition text-left">
+            🛡️ 30 kg (Safety Squat / Open)
+          </button>
+          <button type="button" onclick="establecerPesoBarra(10, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold transition text-left">
+            ⚡ 10 kg (Olímpica Junior / Z)
+          </button>
+          <button type="button" onclick="establecerPesoBarra(8, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold transition text-left">
+            〰️ 8 kg (Barra Z / W Estándar)
+          </button>
+          <button type="button" onclick="establecerPesoBarra(12, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold transition text-left">
+            ⬛ 12 kg (Barra Romana Neutra)
+          </button>
+          <button type="button" onclick="establecerPesoBarra(0, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold transition text-left">
+            🚫 0 kg (Mancuernas / Polea)
+          </button>
+        </div>
+        <div class="relative pt-1">
+          <input type="number" id="inp-peso-barra-custom" step="0.5" inputmode="decimal" oninput="cambiarPesoBarraCustom(this.value)" placeholder="Ingresar otro peso de barra..." class="w-full bg-slate-950 border border-slate-700 text-center rounded-xl p-2 text-xs font-mono text-emerald-400 font-bold focus:outline-none focus:border-emerald-500">
+        </div>
+      </div>
+
+      <div>
+        <span class="text-xs text-slate-400 block mb-1">Peso total objetivo a levantar:</span>
+        <div class="flex items-center gap-2">
+          <input type="number" id="inp-modal-kilos" step="0.5" inputmode="decimal" class="bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-mono font-bold text-lg w-full" placeholder="ej: 82.5">
+          <button type="button" onclick="calcularDistribucionDiscos()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs">Calcular</button>
+        </div>
+      </div>
+
+      <div id="resultado-discos" class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs space-y-2">
+        <span class="text-slate-500">Ingresá el peso para ver qué discos cargar de cada lado.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL FLOTANTE BULDOZR: CREADOR / DUPLICADOR RÁPIDO -->
   <div id="modal-creador-rapido" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-6">
     <div class="bg-slate-900 border border-slate-700 max-w-3xl w-full rounded-3xl p-5 md:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -98,7 +172,7 @@
         <button type="button" onclick="cerrarModalCreadorRapido()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 p-2 rounded-xl">✕</button>
       </div>
 
-      <!-- CAMPOS CABECERA DE SESIÓN -->
+      <!-- CAMPOS CABECERA -->
       <div class="space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div>
@@ -144,7 +218,7 @@
         </div>
       </div>
 
-      <!-- SELECTOR DE EJERCICIOS BULDOZR CON AUTO-SHORTS, TEMPO Y SUPERSERIES -->
+      <!-- SELECTOR DE EJERCICIOS BULDOZR -->
       <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio</span>
@@ -306,49 +380,6 @@
     </div>
   </div>
 
-  <!-- MODAL CALCULADORA VISUAL DE DISCOS -->
-  <div id="modal-discos" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl p-5 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h4 class="font-black text-white text-base flex items-center gap-2">⚖️ Calculadora de Discos</h4>
-        <button type="button" onclick="cerrarModalDiscos()" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
-      </div>
-      <div>
-        <span class="text-xs text-slate-400 block mb-1">Peso total objetivo a levantar:</span>
-        <div class="flex items-center gap-2">
-          <input type="number" id="inp-modal-kilos" step="0.5" inputmode="decimal" class="bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-mono font-bold text-lg w-full" placeholder="ej: 82.5">
-          <button type="button" onclick="calcularDistribucionDiscos()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs">Calcular</button>
-        </div>
-      </div>
-      <div id="resultado-discos" class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs space-y-2">
-        <span class="text-slate-500">Ingresá el peso para ver qué discos cargar de cada lado.</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL FICHA ANAMNESIS & ARCHIVOS PARA EL COACH -->
-  <div id="modal-ficha-coach" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 max-w-xl w-full rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h4 class="font-black text-white text-base flex items-center gap-2">📋 Ficha Deportiva, Salud & Archivos</h4>
-        <button type="button" onclick="cerrarModalFichaCoach()" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
-      </div>
-      <div id="contenido-ficha-coach" class="space-y-3 text-xs"></div>
-    </div>
-  </div>
-
-  <!-- CRONÓMETRO FLOTANTE -->
-  <div id="timer-box" class="hidden fixed bottom-4 right-4 bg-slate-900 border-2 border-emerald-500 shadow-2xl rounded-2xl p-4 z-50 flex items-center gap-4">
-    <div>
-      <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Descanso</span>
-      <span id="timer-display" class="text-3xl font-black text-emerald-400 font-mono">01:30</span>
-    </div>
-    <div class="flex gap-1.5">
-      <button type="button" id="btn-timer-toggle" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white">Pausa</button>
-      <button type="button" onclick="cerrarTimer()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-2.5 py-1.5 rounded-lg text-xs font-bold">✕</button>
-    </div>
-  </div>
-
   <!-- ENCABEZADO SUPERIOR -->
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 md:px-8 py-3 flex justify-between items-center sticky top-0 z-40">
     <div class="flex items-center gap-3">
@@ -419,7 +450,7 @@
           <input type="text" id="reg-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="ej: Imanol Gómez">
         </div>
         <div>
-          <label class="block text-xs font-semibold uppercase text-emerald-400 mb-1">WhatsApp (para contacto con Ramiro)</label>
+          <label class="block text-xs font-semibold uppercase text-emerald-400 mb-1">WhatsApp</label>
           <input type="tel" id="reg-telefono" inputmode="tel" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm font-mono" placeholder="ej: 11 2345-6789">
         </div>
       </div>
@@ -441,11 +472,9 @@
   <!-- PANTALLA PRINCIPAL -->
   <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- DASHBOARD DEL ALUMNO CON AVATAR / FOTO Y RACHA -->
+    <!-- DASHBOARD DEL ALUMNO -->
     <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 p-5 md:p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-5">
-      
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-        
         <div class="flex items-center gap-3.5">
           <div id="avatar-alumno-display" class="avatar-circulo shadow-lg">
             🏋️‍♂️
@@ -463,7 +492,7 @@
         </div>
 
         <div class="flex items-center gap-3 self-start sm:self-auto">
-          <!-- CONMUTADOR DE SEDE (KOENA VS ONLINE) -->
+          <!-- CONMUTADOR DE SEDE -->
           <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1.5">
             <button type="button" onclick="cambiarEntornoAlumno('KOENA')" id="btn-env-koena" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5">
               <img src="logo-koena.webp" onerror="this.onerror=null; this.src='logo-koena.png'; this.onerror=()=>{this.style.display='none';};" class="h-4 w-auto object-contain">
@@ -485,11 +514,9 @@
 
     <!-- PANEL DEL ENTRENADOR -->
     <div id="seccion-admin" class="hidden space-y-6">
-
-      <!-- BOTONES DE NAVEGACIÓN COACH -->
       <div class="flex items-center justify-between bg-slate-900 p-3 rounded-2xl border border-slate-800">
         <div class="flex flex-wrap gap-2">
-          <button type="button" onclick="cambiarSolapaCoach('alumnos')" id="tab-c-alumnos" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition">👥 Alumnos & Fichas</button>
+          <button type="button" onclick="cambiarSolapaCoach('alumnos')" id="tab-c-alumnos" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-blue-500 text-slate-950 transition">👥 Alumnos & Semáforo</button>
           <button type="button" onclick="cambiarSolapaCoach('rms')" id="tab-c-rms" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📊 Planilla RMs Alumnos</button>
           <button type="button" onclick="cambiarSolapaCoach('plantillas')" id="tab-c-plantillas" class="text-xs px-3.5 py-2 rounded-xl font-bold bg-slate-800 text-slate-300 hover:text-white transition">📑 Plantillas Maestras</button>
           
@@ -500,12 +527,12 @@
         <button type="button" onclick="cerrarModoAdmin()" class="text-xs bg-red-500/20 text-red-300 px-3 py-2 rounded-xl font-bold">Cerrar Coach</button>
       </div>
 
-      <!-- SECTOR 1: GESTOR DE ALUMNOS CON FOTO/ICONO & FICHA -->
+      <!-- SECTOR 1: GESTOR DE ALUMNOS CON SEMÁFORO DE ADHERENCIA BULDOZR -->
       <div id="vista-c-alumnos" class="bg-slate-900 p-5 md:p-7 rounded-3xl border border-blue-500/40 shadow-2xl space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
           <div>
-            <h3 class="text-lg font-black text-blue-400 flex items-center gap-2">👥 Supervisión de Alumnos & Fichas Anamnesis</h3>
-            <p class="text-xs text-slate-400">Consultá fotos, objetivos, lesiones, antropometrías y contactá directo por WhatsApp.</p>
+            <h3 class="text-lg font-black text-blue-400 flex items-center gap-2">👥 Supervisión de Alumnos & Semáforo de Adherencia</h3>
+            <p class="text-xs text-slate-400">Verde: activo (<48h) | Amarillo: atrasado (3-5d) | Rojo: inactivo (>6d).</p>
           </div>
           
           <div class="flex flex-wrap items-center gap-2">
@@ -528,12 +555,12 @@
         </div>
       </div>
 
-      <!-- SECTOR: SUPERVISIÓN DE RMs POR EL COACH -->
+      <!-- SECTOR: SUPERVISIÓN DE RMs -->
       <div id="vista-c-rms" class="hidden bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
           <div>
-            <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">📊 Monitoreo y Edición de RMs de Alumnos</h3>
-            <p class="text-xs text-slate-400">Consultá o editá las marcas y porcentajes Epley de cada atleta.</p>
+            <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">📊 Monitoreo de 1RM de Alumnos</h3>
+            <p class="text-xs text-slate-400">Consultá las marcas y porcentajes Epley de cada atleta.</p>
           </div>
           <select id="sel-filtro-rm-alumno" onchange="cargarRMsAdminParaAlumno(this.value)" class="bg-slate-950 border border-slate-700 text-emerald-400 text-xs rounded-xl p-2.5 font-bold focus:outline-none focus:border-emerald-500">
             <option value="">▼ Elegir Alumno...</option>
@@ -544,7 +571,7 @@
         </div>
       </div>
 
-      <!-- SECTOR 2: BANCO DE PLANTILLAS INTELIGENTES -->
+      <!-- SECTOR 2: BANCO DE PLANTILLAS -->
       <div id="vista-c-plantillas" class="hidden bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/40 shadow-2xl space-y-4">
         <div class="flex justify-between items-center border-b border-slate-800 pb-3">
           <div>
@@ -559,7 +586,7 @@
       </div>
     </div>
 
-    <!-- PESTAÑAS PRINCIPALES DEL ALUMNO (RUTINA / RMs / BIBLIOTECA / PERFIL / HISTORIAL) -->
+    <!-- PESTAÑAS PRINCIPALES DEL ALUMNO -->
     <div>
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div class="flex flex-wrap items-center gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
@@ -569,15 +596,22 @@
           <button type="button" onclick="cambiarSolapaAlumno('perfil')" id="tab-a-perfil" class="text-xs px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition">👤 Mi Perfil & Salud</button>
           <button type="button" onclick="cambiarSolapaAlumno('historial')" id="tab-a-historial" class="text-xs px-3 py-2 rounded-xl font-bold text-slate-400 hover:text-white transition">📁 Historial</button>
         </div>
-        <button type="button" onclick="refrescarRutinas()" class="text-xs bg-slate-900 border border-slate-800 hover:bg-slate-800 px-3 py-2 rounded-xl text-slate-300 font-bold transition">Actualizar</button>
+        
+        <div class="flex items-center gap-2">
+          <!-- BOTÓN MODO ACTIVO ESTILO BULDOZR -->
+          <button type="button" onclick="iniciarModoActivo()" class="text-xs bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-3.5 py-2 rounded-xl shadow-lg transition flex items-center gap-1.5">
+            ⚡ Iniciar Entreno Activo
+          </button>
+          <button type="button" onclick="refrescarRutinas()" class="text-xs bg-slate-900 border border-slate-800 hover:bg-slate-800 px-3 py-2 rounded-xl text-slate-300 font-bold transition">Actualizar</button>
+        </div>
       </div>
 
-      <!-- SOLAPAS TIPO EXCEL POR DÍA -->
+      <!-- SOLAPAS POR DÍA -->
       <div id="contenedor-tabs-dias" class="tabs-dias-container hidden mb-3 overflow-x-auto pb-1">
         <div class="flex items-center gap-2" id="barra-solapas-dias"></div>
       </div>
 
-      <!-- SELECTOR DINÁMICO DE SEMANA ACTIVA (4, 5 O 6 SEMANAS) -->
+      <!-- SELECTOR DINÁMICO DE SEMANA (4, 5 O 6 SEMANAS) -->
       <div id="contenedor-tabs-semanas" class="hidden mb-4 bg-slate-900/90 p-2 rounded-2xl border border-slate-800 overflow-x-auto">
         <div class="flex items-center gap-2">
           <span class="text-[11px] font-black uppercase text-emerald-400 px-2 whitespace-nowrap">Semana del Ciclo:</span>
@@ -590,13 +624,13 @@
         <p class="text-slate-500 text-sm">Cargando tus entrenamientos...</p>
       </div>
 
-      <!-- SECCIÓN 2: PLANILLA DE RMs CON SELECTOR DESPLEGABLE & GRÁFICO EVOLUTIVO -->
+      <!-- SECCIÓN 2: PLANILLA DE RMs -->
       <div id="seccion-rms-alumno" class="hidden space-y-6">
         <div class="bg-slate-900 p-5 md:p-6 rounded-3xl border border-emerald-500/40 shadow-xl space-y-5">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
             <div>
               <h3 class="text-lg font-black text-emerald-400">📊 Planilla de Fuerza Máxima (1RM) & Porcentajes</h3>
-              <p class="text-xs text-slate-400">Ingresá los kilos y las repeticiones para calcular tu 1RM estimado (Epley) y actualizar las sugerencias de tus rutinas.</p>
+              <p class="text-xs text-slate-400">Ingresá los kilos y las repeticiones para calcular tu 1RM estimado (Epley).</p>
             </div>
             
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 self-start md:self-auto">
@@ -627,7 +661,6 @@
             </div>
           </div>
 
-          <!-- GRÁFICO EVOLUTIVO DE FUERZA (CHART.JS) -->
           <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2">
             <span class="text-xs font-bold text-slate-300 block">📈 Curva de Progresión de Fuerza (1RM):</span>
             <div class="h-52 w-full">
@@ -641,13 +674,13 @@
         </div>
       </div>
 
-      <!-- SECCIÓN 3: BIBLIOTECA TÉCNICA LIBRE PF RAMIRO ABBATTISTA -->
+      <!-- SECCIÓN 3: BIBLIOTECA TÉCNICA -->
       <div id="seccion-biblioteca-alumno" class="hidden space-y-6">
         <div class="bg-slate-900 p-5 md:p-6 rounded-3xl border border-slate-800 shadow-xl space-y-5">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
             <div>
               <h3 class="text-lg font-black text-white">📖 Biblioteca Técnica de Ejercicios — PF Ramiro Abbattista</h3>
-              <p class="text-xs text-slate-400">Consultá en cualquier momento los patrones motrices y Shorts de ejecución técnica.</p>
+              <p class="text-xs text-slate-400">Consultá los Shorts de ejecución técnica en cualquier momento.</p>
             </div>
             
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
@@ -671,20 +704,19 @@
         </div>
       </div>
 
-      <!-- SECCIÓN 4: PERFIL PROPIO DEL ALUMNO CON FOTO/AVATAR, ANAMNESIS & ARCHIVOS -->
+      <!-- SECCIÓN 4: PERFIL DEL ALUMNO -->
       <div id="seccion-perfil-alumno" class="hidden space-y-6">
         <div class="bg-slate-900 p-5 md:p-7 rounded-3xl border border-emerald-500/30 shadow-2xl space-y-6">
           <div class="border-b border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 class="text-xl font-black text-white flex items-center gap-2">👤 Anamnesis Deportiva, Salud & Archivos</h3>
-              <p class="text-xs text-slate-400">Personalizá tu foto, completá tus datos y subí tus estudios médicos o planillas viejas de RM.</p>
+              <h3 class="text-xl font-black text-white flex items-center gap-2">👤 Anamnesis Deportiva & Salud</h3>
+              <p class="text-xs text-slate-400">Completá tus datos para que Ramiro ajuste tus progresiones.</p>
             </div>
             <button type="button" onclick="guardarMiPerfilDeportivo()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg active:scale-95 self-start sm:self-auto">
               💾 Guardar Mi Ficha
             </button>
           </div>
 
-          <!-- BLOQUE DE FOTO DE PERFIL / SELECTOR DE AVATAR -->
           <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="flex items-center gap-3.5">
               <div id="preview-avatar-perfil" class="avatar-circulo">
@@ -692,7 +724,7 @@
               </div>
               <div>
                 <span class="text-xs font-bold text-white block">Foto o Icono de Perfil</span>
-                <span class="text-[11px] text-slate-400">Elegí tu foto real desde tu celular o seleccioná un icono deportivo.</span>
+                <span class="text-[11px] text-slate-400">Elegí tu foto real desde tu celular o un icono.</span>
               </div>
             </div>
 
@@ -704,18 +736,16 @@
 
               <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
                 <button type="button" onclick="seleccionarEmojiAvatar('🏋️‍♂️')" class="hover:scale-125 transition text-base px-1">🏋️‍♂️</button>
-                <button type="button" onclick="seleccionarEmojiAvatar('🏄‍♂️')" class="hover:scale-125 transition text-base px-1">🏄‍♂️️</button>
+                <button type="button" onclick="seleccionarEmojiAvatar('🏄‍♂️')" class="hover:scale-125 transition text-base px-1">🏄‍♂</button>
                 <button type="button" onclick="seleccionarEmojiAvatar('⚡')" class="hover:scale-125 transition text-base px-1">⚡</button>
                 <button type="button" onclick="seleccionarEmojiAvatar('🥇')" class="hover:scale-125 transition text-base px-1">🥇</button>
                 <button type="button" onclick="seleccionarEmojiAvatar('🥊')" class="hover:scale-125 transition text-base px-1">🥊</button>
-                <button type="button" onclick="seleccionarEmojiAvatar('🏃‍♂️')" class="hover:scale-125 transition text-base px-1">🏃‍♂️</button>
               </div>
             </div>
           </div>
 
-          <!-- BLOQUE 1: BIOMETRÍA & DISPONIBILIDAD -->
           <div class="space-y-3">
-            <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider block">1. Datos Físicos & Disponibilidad de Tiempo</span>
+            <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider block">1. Datos Físicos</span>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
               <div>
                 <label class="text-[11px] font-bold text-slate-400 block mb-1">Nombre Completo</label>
@@ -738,7 +768,7 @@
         </div>
       </div>
 
-      <!-- SECCIÓN 5: CONTENEDOR HISTORIAL DE RUTINAS VIEJAS -->
+      <!-- SECCIÓN 5: HISTORIAL -->
       <div id="lista-historial" class="hidden space-y-4">
         <p class="text-slate-500 text-sm">Cargando historial de rutinas anteriores...</p>
       </div>
@@ -755,7 +785,6 @@
 
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // BIBLIOTECA BULDOZR CON SHORTS DIRECTOS
     const BIBLIOTECA_DEFAULT = {
       calentamiento_dinamico: [
         { nombre: "Inching Worm (Gusano con empuje)", video: "https://www.youtube.com/shorts/TP_r4vO8x9g" },
@@ -801,7 +830,7 @@
       personalizados: []
     };
 
-    let biblioteca = JSON.parse(localStorage.getItem('pf_biblioteca_v4')) || BIBLIOTECA_DEFAULT;
+    let biblioteca = JSON.parse(localStorage.getItem('pf_biblioteca_v5')) || BIBLIOTECA_DEFAULT;
     let sesionActual = [];
     let usuarioActual = null;
     let sortableInstance = null;
@@ -816,8 +845,11 @@
     let totalSemanasCicloActual = 5;
     let chartRMInstance = null;
     let modoAuthActual = 'login';
-    let archivoBase64Temporal = null;
     let pesoBarraSeleccionada = 20;
+
+    // Estado del Modo Activo Buldozr
+    let indiceEjercicioActivo = 0;
+    let listaEjerciciosModoActivo = [];
 
     function mostrarToastGuardado() {
       const toast = document.getElementById('toast-guardado');
@@ -830,6 +862,7 @@
       }, 1200);
     }
 
+    // MODAL CREADOR RÁPIDO
     function abrirModalCreadorRapido() {
       document.getElementById('modal-creador-rapido').classList.remove('hidden');
       actualizarColumnasMatrizCoach();
@@ -1100,7 +1133,6 @@
       document.getElementById('perfil-telefono').value = datos.telefono || localStorage.getItem(`telefono_alumno_${email}`) || '';
       document.getElementById('perfil-peso').value = datos.peso || '';
       document.getElementById('perfil-altura').value = datos.altura || '';
-      document.getElementById('perfil-edad').value = datos.edad || '';
 
       const avatarGuardado = localStorage.getItem(`avatar_alumno_${email}`) || '🏋️‍♂️';
       renderizarElementoAvatar(document.getElementById('avatar-alumno-display'), avatarGuardado);
@@ -1114,8 +1146,7 @@
         nombre: document.getElementById('perfil-nombre').value.trim(),
         telefono: formatearTelefono(document.getElementById('perfil-telefono').value.trim()),
         peso: parseFloat(document.getElementById('perfil-peso').value) || null,
-        altura: parseInt(document.getElementById('perfil-altura').value) || null,
-        edad: parseInt(document.getElementById('perfil-edad').value) || null
+        altura: parseInt(document.getElementById('perfil-altura').value) || null
       };
 
       localStorage.setItem(`perfil_atleta_${email}`, JSON.stringify(perfil));
@@ -1193,6 +1224,7 @@
       refrescarRutinas();
     }
 
+    // GESTIÓN DE BARRAS EN LA CALCULADORA
     function establecerPesoBarra(peso, boton) {
       pesoBarraSeleccionada = parseFloat(peso);
       document.querySelectorAll('.btn-tipo-barra').forEach(b => b.classList.remove('btn-tipo-barra-active'));
@@ -1277,8 +1309,6 @@
 
     async function alternarWakeLock() {
       const txtStatus = document.getElementById('txt-wake-status');
-      const btn = document.getElementById('btn-wake-lock');
-
       if (!('wakeLock' in navigator)) return;
 
       if (wakeLockSentinel !== null) {
@@ -1387,7 +1417,7 @@
       const cat = document.getElementById('sel-categoria').value;
       if (!biblioteca[cat]) biblioteca[cat] = [];
       biblioteca[cat].push({ nombre: nombre.trim(), video: video.trim() });
-      localStorage.setItem('pf_biblioteca_v4', JSON.stringify(biblioteca));
+      localStorage.setItem('pf_biblioteca_v5', JSON.stringify(biblioteca));
       cargarEjerciciosPorCategoria();
       renderizarBibliotecaTecnica();
       document.getElementById('sel-ejercicio').value = nombre.trim();
@@ -1568,7 +1598,6 @@
       }
     }
 
-    // CLONAR / DUPLICAR SESIÓN A OTRO ALUMNO CON 1 CLIC
     async function duplicarPlanParaOtroAlumno(planId) {
       const plan = todasLasPlanificacionesAdmin.find(p => p.id == planId);
       if (!plan) return;
@@ -1591,6 +1620,22 @@
       } else {
         alert("Error al duplicar: " + error.message);
       }
+    }
+
+    // REEMPLAZO RÁPIDO DE EJERCICIO ("SWAP") BULDOZR
+    function reemplazarEjercicioSesion(rutinaId, indiceEj, nombreOriginal) {
+      const motivo = prompt(`¿Por qué vas a reemplazar "${nombreOriginal}"?\n(ej: Máquina ocupada / Molestia)`);
+      if (motivo === null) return;
+
+      const nuevoEj = prompt(`Ingresá el nombre del ejercicio sustituto:`);
+      if (!nuevoEj || !nuevoEj.trim()) return;
+
+      const plan = todasLasRutinasAlumno.find(p => p.id == rutinaId);
+      if (!plan) return;
+
+      plan.ejercicios_detalle[indiceEj].ejercicio = `${nuevoEj.trim()} (Sustituto: ${motivo || 'Variante'})`;
+      aplicarFiltroEntornoRutinas();
+      alert("✅ Ejercicio sustituido.");
     }
 
     async function guardarCargaNube(rutinaId, ejNombre, semIdx, serieIdx, valor) {
@@ -1655,6 +1700,11 @@
       }
     }
 
+    function guardarRirRealSerie(rutinaId, ejNombre, semIdx, serieIdx, valorRir) {
+      localStorage.setItem(`rir_real_${rutinaId}_${ejNombre}_sem${semIdx}_s${serieIdx}`, valorRir);
+      mostrarToastGuardado();
+    }
+
     function actualizarBarraProgresoSesion(rutinaId) {
       const tarjeta = document.getElementById(`tarjeta-rutina-${rutinaId}`);
       if (!tarjeta) return;
@@ -1672,7 +1722,6 @@
       if (texto) texto.innerText = `${hechas} / ${totalBotones} series (${porcentaje}%)`;
     }
 
-    // TONELAJE TOTAL BULDOZR: SERIES x REPS x KILOS
     function calcularYActualizarTonelajeSesion(rutinaId) {
       const tarjeta = document.getElementById(`tarjeta-rutina-${rutinaId}`);
       if (!tarjeta) return;
@@ -1693,7 +1742,7 @@
 
       const badgeTonelaje = tarjeta.querySelector('.badge-tonelaje-sesion');
       if (badgeTonelaje) {
-        badgeTonelaje.innerText = `🏋️ Tonelaje: ${Math.round(tonelajeTotal)} kg`;
+        badgeTonelaje.innerText = `🏋️️ Tonelaje: ${Math.round(tonelajeTotal)} kg`;
       }
     }
 
@@ -1769,6 +1818,125 @@
       return Array(cantidadSeries).fill(repsTexto);
     }
 
+    // MODO "ACTIVE WORKOUT" BULDOZR
+    function iniciarModoActivo() {
+      if (rutinasActivasAlumno.length === 0) return alert("No hay entrenamientos cargados.");
+      const rutinaVisible = rutinasActivasAlumno.find(r => {
+        const el = document.getElementById(`tarjeta-rutina-${r.id}`);
+        return el && !el.classList.contains('hidden');
+      }) || rutinasActivasAlumno[0];
+
+      listaEjerciciosModoActivo = rutinaVisible.ejercicios_detalle || [];
+      if (listaEjerciciosModoActivo.length === 0) return alert("Esta sesión no tiene ejercicios.");
+
+      indiceEjercicioActivo = 0;
+      document.getElementById('modal-modo-activo').classList.remove('hidden');
+      renderizarEjercicioActivo(rutinaVisible.id);
+    }
+
+    function cerrarModoActivo() {
+      document.getElementById('modal-modo-activo').classList.add('hidden');
+      aplicarFiltroEntornoRutinas();
+    }
+
+    function moverEjercicioActivo(delta, rutinaId) {
+      indiceEjercicioActivo += delta;
+      if (indiceEjercicioActivo < 0) indiceEjercicioActivo = 0;
+      if (indiceEjercicioActivo >= listaEjerciciosModoActivo.length) {
+        indiceEjercicioActivo = listaEjerciciosModoActivo.length - 1;
+        alert("🎉 ¡Llegaste al último ejercicio de la sesión!");
+      }
+      renderizarEjercicioActivo(rutinaId);
+    }
+
+    function renderizarEjercicioActivo(rutinaId) {
+      const cont = document.getElementById('contenido-ejercicio-activo');
+      const item = listaEjerciciosModoActivo[indiceEjercicioActivo];
+      const email = usuarioActual ? usuarioActual.email : 'alumno';
+
+      document.getElementById('txt-indice-activo').innerText = `${indiceEjercicioActivo + 1} de ${listaEjerciciosModoActivo.length}`;
+
+      const prog = item.progresionSemanal || {};
+      const semKey = `s${semanaActivaAlumno}`;
+      const datosSemana = prog[semKey] || { reps: item.reps || '3x8', carga: item.cargaCoach || 'Libre' };
+      const resolucion = resolverCargaSegunRM(item.ejercicio, datosSemana.carga, email);
+      const cantSeries = parseInt(item.series) || 4;
+      const listaRepsDesglosadas = parsearRepsPorSerie(datosSemana.reps, cantSeries);
+
+      cont.innerHTML = `
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <span class="text-[10px] text-emerald-400 font-bold uppercase block">${item.bloque}</span>
+              <h3 class="text-xl font-black text-white">${item.ejercicio}</h3>
+            </div>
+            ${item.video ? `
+              <a href="${item.video}" target="_blank" class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-xl text-xs font-bold">
+                ▶ Ver Short
+              </a>
+            ` : ''}
+          </div>
+
+          <div class="bg-slate-950 p-3 rounded-xl border border-emerald-500/30 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div>
+              <span class="text-slate-400 block text-[10px]">Pauta del Coach:</span>
+              <span class="text-emerald-400 font-black">${resolucion.valorTexto}</span> • <span class="text-white font-bold">${datosSemana.reps}</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              ${item.tempo ? `<span class="bg-cyan-500/10 text-cyan-300 px-2 py-0.5 rounded text-[10px] font-mono">Tempo: ${item.tempo}</span>` : ''}
+              <button type="button" onclick="iniciarTimerDescanso(${parseSegundos(item.descanso)})" class="bg-slate-900 border border-slate-700 text-slate-300 px-2 py-1 rounded text-[10px] font-bold">
+                ⏱️ ${item.descanso}
+              </button>
+            </div>
+          </div>
+
+          <!-- SERIES GRANDES MODO ACTIVO -->
+          <div class="space-y-2 pt-2">
+            ${Array.from({ length: cantSeries }).map((_, sIdx) => {
+              const doneKey = `done_${rutinaId}_${item.ejercicio}_sem${semanaActivaAlumno}_s${sIdx}`;
+              const isDone = localStorage.getItem(doneKey) === 'true';
+              const cargaKey = `carga_${rutinaId}_${item.ejercicio}_sem${semanaActivaAlumno}_s${sIdx}`;
+              const cargaGuardada = localStorage.getItem(cargaKey) || '';
+              const rirGuardado = localStorage.getItem(`rir_real_${rutinaId}_${item.ejercicio}_sem${semanaActivaAlumno}_s${sIdx}`) || '2';
+              const repsEstaSerie = listaRepsDesglosadas[sIdx] || 'reps';
+
+              return `
+                <div class="serie-item-box bg-slate-950 p-3 rounded-2xl border border-slate-800 ${isDone ? 'serie-done-box' : ''} flex items-center justify-between gap-3">
+                  <span class="font-mono font-bold text-slate-400 text-sm">S${sIdx + 1}</span>
+
+                  <div class="flex items-center gap-2 flex-1">
+                    <input type="text" inputmode="decimal" placeholder="Kilos" value="${cargaGuardada}" onchange="guardarCargaNube('${rutinaId}', '${item.ejercicio}', ${semanaActivaAlumno}, ${sIdx}, this.value)" class="w-24 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-400">
+                    
+                    <select onchange="guardarRirRealSerie('${rutinaId}', '${item.ejercicio}', ${semanaActivaAlumno}, ${sIdx}, this.value)" class="bg-slate-900 border border-slate-800 text-[11px] text-slate-300 rounded-xl p-2 font-bold focus:outline-none">
+                      <option value="0" ${rirGuardado === "0" ? "selected" : ""}>RIR 0</option>
+                      <option value="1" ${rirGuardado === "1" ? "selected" : ""}>RIR 1</option>
+                      <option value="2" ${rirGuardado === "2" ? "selected" : ""}>RIR 2</option>
+                      <option value="3" ${rirGuardado === "3" ? "selected" : ""}>RIR 3</option>
+                    </select>
+                  </div>
+
+                  <button type="button" data-reps="${repsEstaSerie}" onclick="toggleSerieIndividual(this, '${rutinaId}', '${item.ejercicio}', ${semanaActivaAlumno}, ${sIdx}, '${item.descanso}')" class="btn-toggle-serie flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black transition border ${isDone ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md' : 'bg-slate-900 border-rose-500/50 text-rose-300'}">
+                    <span>${isDone ? '✓' : '✗'}</span>
+                    <span>${repsEstaSerie}</span>
+                  </button>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- NAVEGACIÓN INFERIOR -->
+        <div class="flex items-center justify-between gap-3 pt-2">
+          <button type="button" onclick="moverEjercicioActivo(-1, '${rutinaId}')" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 px-5 py-3 rounded-2xl text-xs font-bold text-white transition flex-1">
+            ◀ Ejercicio Anterior
+          </button>
+          <button type="button" onclick="moverEjercicioActivo(1, '${rutinaId}')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 px-5 py-3 rounded-2xl text-xs font-black transition shadow-lg flex-1">
+            Siguiente Ejercicio ▶
+          </button>
+        </div>
+      `;
+    }
+
     function renderizarListaTarjetas(lista, esHistorial = false) {
       const email = usuarioActual ? usuarioActual.email : 'alumno';
 
@@ -1810,7 +1978,7 @@
               </button>
             </div>
 
-            <!-- CUESTIONARIO WELLNESS PRE-ENTRENO ESTILO BULDOZR -->
+            <!-- CHECK-IN WELLNESS PRE-ENTRENO -->
             <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80 space-y-2 no-print">
               <span class="text-[10px] font-black uppercase text-emerald-400 tracking-wider block">🚦 Check-in Diario del Atleta:</span>
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
@@ -1833,7 +2001,7 @@
               </div>
             </div>
 
-            <!-- BARRA VISUAL DE PROGRESO -->
+            <!-- BARRA DE PROGRESO -->
             <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-1.5 no-print">
               <div class="flex justify-between items-center text-xs">
                 <span class="text-slate-400 font-bold uppercase text-[10px]">Progreso de la sesión:</span>
@@ -1844,7 +2012,7 @@
               </div>
             </div>
 
-            <!-- SECCIONES DE BLOQUES & SUPERSERIES -->
+            <!-- BLOQUES DE EJERCICIOS -->
             <div class="space-y-6">
               ${Object.keys(bloques).map((nombreBloque, bIdx) => {
                 const bloqueId = `bloque_c_${r.id}_${bIdx}`;
@@ -1879,6 +2047,11 @@
                               <div class="flex flex-wrap items-center gap-2">
                                 ${item.superserie ? `<span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-black px-2 py-0.5 rounded border border-emerald-500/30">${item.superserie}</span>` : ''}
                                 <h6 class="font-bold text-white text-base">${item.ejercicio}</h6>
+                                
+                                <button type="button" onclick="reemplazarEjercicioSesion('${r.id}', ${item.originalIndex}, '${item.ejercicio}')" class="text-[10px] text-slate-400 hover:text-white bg-slate-800 px-2 py-0.5 rounded transition">
+                                  🔄 Cambiar
+                                </button>
+
                                 ${resolucion.pesoCalculado > 0 ? `
                                   <button type="button" onclick="abrirModalDiscos(${resolucion.pesoCalculado})" class="text-[10px] text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 px-2 py-0.5 rounded font-bold hover:bg-cyan-500/20">
                                     ⚖️ Discos
@@ -1944,16 +2117,15 @@
                               </div>
                             </div>
                           ` : `
-                            <!-- DESGLOSE INDIVIDUAL OPCIÓN B CON AUTO-CRONÓMETRO Y TEMPO -->
+                            <!-- DESGLOSE POR SERIE CON REGISTRO DE RIR REAL BULDOZR -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-2 border-t border-slate-800">
                               ${Array.from({ length: cantSeries }).map((_, sIdx) => {
                                 const doneKey = `done_${r.id}_${item.ejercicio}_sem${semanaActivaAlumno}_s${sIdx}`;
                                 const isDone = localStorage.getItem(doneKey) === 'true';
                                 const cargaKey = `carga_${r.id}_${item.ejercicio}_sem${semanaActivaAlumno}_s${sIdx}`;
                                 const cargaGuardada = localStorage.getItem(cargaKey) || '';
+                                const rirGuardado = localStorage.getItem(`rir_real_${r.id}_${item.ejercicio}_sem${semanaActivaAlumno}_s${sIdx}`) || '2';
                                 const repsEstaSerie = listaRepsDesglosadas[sIdx] || 'reps';
-
-                                const cargaSemAnterior = semanaActivaAlumno > 1 ? (localStorage.getItem(`carga_${r.id}_${item.ejercicio}_sem${semanaActivaAlumno - 1}_s${sIdx}`) || '') : '';
 
                                 return `
                                   <div class="serie-item-box flex flex-col bg-slate-950 p-2.5 rounded-xl border border-slate-800 ${isDone ? 'serie-done-box' : ''} space-y-1.5 transition">
@@ -1967,10 +2139,15 @@
                                     </div>
 
                                     <div class="flex items-center gap-1.5">
-                                      <input type="text" inputmode="decimal" placeholder="${resolucion.pesoCalculado ? resolucion.pesoCalculado + ' kg' : 'Kg'}" value="${cargaGuardada}" onchange="guardarCargaNube('${r.id}', '${item.ejercicio}', ${semanaActivaAlumno}, ${sIdx}, this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono font-bold">
+                                      <input type="text" inputmode="decimal" placeholder="${resolucion.pesoCalculado ? resolucion.pesoCalculado + ' kg' : 'Kg'}" value="${cargaGuardada}" onchange="guardarCargaNube('${r.id}', '${item.ejercicio}', ${semanaActivaAlumno}, ${sIdx}, this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono font-bold">
+                                      
+                                      <select onchange="guardarRirRealSerie('${r.id}', '${item.ejercicio}', ${semanaActivaAlumno}, ${sIdx}, this.value)" class="bg-slate-900 border border-slate-800 text-[10px] text-slate-300 rounded-lg p-1 font-bold focus:outline-none">
+                                        <option value="0" ${rirGuardado === "0" ? "selected" : ""}>RIR 0</option>
+                                        <option value="1" ${rirGuardado === "1" ? "selected" : ""}>RIR 1</option>
+                                        <option value="2" ${rirGuardado === "2" ? "selected" : ""}>RIR 2</option>
+                                        <option value="3" ${rirGuardado === "3" ? "selected" : ""}>RIR 3</option>
+                                      </select>
                                     </div>
-
-                                    ${cargaSemAnterior ? `<span class="text-[9px] text-slate-500 font-mono block">Sem ${semanaActivaAlumno - 1}: ${cargaSemAnterior}kg</span>` : ''}
                                   </div>
                                 `;
                               }).join('')}
@@ -1985,7 +2162,7 @@
               }).join('')}
             </div>
 
-            <!-- FEEDBACK Y TONELAJE FINAL -->
+            <!-- FEEDBACK FINAL -->
             <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-2xl space-y-3 no-print">
               <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider block">
                 📊 Retroalimentación de la Semana ${semanaActivaAlumno}
@@ -2452,6 +2629,15 @@
       renderizarPlanesAdmin(filtrados);
     }
 
+    // SEMÁFORO DE ADHERENCIA BULDOZR (VERDE, AMARILLO O ROJO)
+    function calcularSemaforoAdherencia(fechaIso) {
+      if (!fechaIso) return { emoji: '🔴', texto: 'Inactivo' };
+      const diffDias = Math.floor((new Date() - new Date(fechaIso)) / (1000 * 60 * 60 * 24));
+      if (diffDias <= 2) return { emoji: '🟢', texto: 'Al día' };
+      if (diffDias <= 5) return { emoji: '🟡', texto: 'Atrasado' };
+      return { emoji: '🔴', texto: 'Inactivo' };
+    }
+
     function renderizarPlanesAdmin(lista) {
       const cont = document.getElementById('contenedor-planes-admin');
       if (!lista || lista.length === 0) {
@@ -2462,6 +2648,7 @@
       cont.innerHTML = lista.map(p => {
         const perfil = JSON.parse(localStorage.getItem(`perfil_atleta_${p.alumno_id}`) || "{}");
         const avatar = localStorage.getItem(`avatar_alumno_${p.alumno_id}`) || '🏋️‍♂️';
+        const semaforo = calcularSemaforoAdherencia(p.created_at);
 
         const miniAvatar = (avatar && avatar.startsWith('data:image'))
           ? `<img src="${avatar}" class="w-6 h-6 rounded-full object-cover">`
@@ -2473,6 +2660,7 @@
               <div class="flex items-center gap-2">
                 ${miniAvatar}
                 <span class="text-[10px] text-emerald-400 font-bold uppercase">${perfil.nombre || p.alumno_id}</span>
+                <span class="text-[10px]" title="${semaforo.texto}">${semaforo.emoji}</span>
               </div>
               <button type="button" onclick="duplicarPlanParaOtroAlumno('${p.id}')" class="text-xs bg-slate-800 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-bold hover:bg-slate-700">
                 📋 Duplicar a otro
