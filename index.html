@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PF Ramiro Abbattista - Rendimiento & Fuerza</title>
   
+  <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PF Ramiro">
   <meta name="theme-color" content="#020617">
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -35,312 +37,188 @@
       font-size: 24px; background-color: #0f172a; border: 2px solid #10b981; flex-shrink: 0;
     }
     .btn-tipo-barra-active { background-color: #10b981 !important; color: #020617 !important; font-weight: 900 !important; }
+    @media print {
+      header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container,
+      #modal-discos, #modal-creador-rapido, #modal-modo-activo, #modal-video-player, #modal-pr-celebracion {
+        display: none !important;
+      }
+      body { background: white !important; color: black !important; }
+      .print-clean { border: 1px solid #ccc !important; background: transparent !important; color: black !important; box-shadow: none !important; }
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-32 antialiased">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-32 antialiased select-none">
 
-  <!-- CONSOLA DE ERRORES EN PANTALLA (Para ver fallos en el móvil) -->
+  <!-- CONSOLA DE DIAGNÓSTICO EN PANTALLA -->
   <div id="debug-error-box" class="hidden fixed top-2 left-2 right-2 bg-red-950 border-2 border-red-500 text-red-200 p-3 rounded-2xl z-50 text-xs font-mono shadow-2xl space-y-1">
     <div class="flex justify-between items-center font-bold text-red-400">
-      <span>⚠️ Error Detectado:</span>
-      <button type="button" onclick="document.getElementById('debug-error-box').classList.add('hidden')" class="text-white bg-red-800 px-2 py-0.5 rounded">Cerrar</button>
+      <span>⚠️ Error del Sistema:</span>
+      <button type="button" onclick="document.getElementById('debug-error-box').classList.add('hidden')" class="text-white bg-red-800 px-2 py-0.5 rounded">✕</button>
     </div>
     <div id="debug-error-txt" class="break-words"></div>
   </div>
 
-  <!-- TOAST -->
+  <!-- TOAST DE AUTOGUARDADO -->
   <div id="toast-guardado" class="fixed top-16 right-4 bg-emerald-500 text-slate-950 text-xs font-black px-3 py-1.5 rounded-xl shadow-xl z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex items-center gap-1.5">
     <span id="toast-texto">✓ Guardado en Supabase</span>
   </div>
 
-  <!-- ENCABEZADO -->
-  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 md:px-8 py-3 flex justify-between items-center sticky top-0 z-40">
-    <div class="flex items-center gap-3">
-      <div class="avatar-circulo text-xl">🏋️‍♂️</div>
+  <!-- REPRODUCTOR MODAL NATIVO DE SHORTS (SILENCIADO PARA SPOTIFY) -->
+  <div id="modal-video-player" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+      <div class="flex items-center justify-between p-3.5 border-b border-slate-800">
+        <span id="player-video-titulo" class="text-xs font-black text-white truncate max-w-[200px]">Demostración Técnica</span>
+        <button type="button" onclick="cerrarPlayerVideo()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 px-2.5 py-1 rounded-lg">✕</button>
+      </div>
+      <div class="relative w-full aspect-[9/16] max-h-[70vh] bg-black">
+        <iframe id="iframe-video-player" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE PR SOCIAL -->
+  <div id="modal-pr-celebracion" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500 max-w-sm w-full rounded-3xl p-6 shadow-2xl text-center space-y-4">
+      <div class="text-4xl">🏆</div>
       <div>
-        <h1 class="text-base font-black tracking-wide text-white leading-tight">PF RAMIRO ABBATTISTA</h1>
-        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Rendimiento & Fuerza</span>
+        <span class="text-[10px] font-black uppercase text-emerald-400 tracking-widest block">Nuevo Récord Personal</span>
+        <h3 id="pr-share-ejercicio" class="text-xl font-black text-white mt-1">Ejercicio</h3>
+      </div>
+      <div class="bg-slate-950/80 border border-emerald-500/40 p-4 rounded-2xl">
+        <span id="pr-share-peso" class="text-4xl font-black text-emerald-400 font-mono">0 kg</span>
+        <span class="text-[11px] text-slate-400 block mt-1">1RM Estimado (Fórmula Epley)</span>
+      </div>
+      <div class="text-xs text-slate-400 font-medium">PF Ramiro Abbattista • Rendimiento & Fuerza</div>
+      <div class="grid grid-cols-2 gap-2 pt-2">
+        <button type="button" onclick="compartirPRSocial()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition">📲 Compartir</button>
+        <button type="button" onclick="cerrarModalPR()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs uppercase transition">Cerrar</button>
       </div>
     </div>
-    
-    <div class="flex items-center gap-2">
-      <div id="usuario-info" class="hidden items-center gap-2">
-        <span id="tag-rol-user" class="text-[10px] font-black uppercase px-2 py-0.5 rounded border border-emerald-500/40 text-emerald-400">Alumno</span>
-        <button type="button" onclick="cerrarSesion()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Salir</button>
+  </div>
+
+  <!-- MODAL ACTIVE WORKOUT (BULDOZR STYLE) -->
+  <div id="modal-modo-activo" class="hidden fixed inset-0 bg-slate-950 z-50 flex flex-col p-4 overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+      <div class="flex items-center gap-2">
+        <span class="text-xs bg-emerald-500/20 text-emerald-400 font-black px-2.5 py-1 rounded-full border border-emerald-500/30">⚡ Entreno Activo</span>
+        <span id="txt-indice-activo" class="text-xs text-slate-400 font-mono font-bold">1 / 1</span>
       </div>
+      <button type="button" onclick="cerrarModoActivo()" class="bg-slate-900 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-bold">Salir al Panel ✕</button>
     </div>
-  </header>
+    <div id="contenido-ejercicio-activo" class="max-w-xl mx-auto w-full flex-1 flex flex-col justify-between space-y-4"></div>
+  </div>
 
-  <!-- PANTALLA AUTH -->
-  <main id="seccion-auth" class="max-w-md mx-auto mt-10 p-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl text-center space-y-6">
-    <div>
-      <h2 class="text-2xl font-black text-white tracking-wide">Acceso al Sistema</h2>
-      <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma Cloud</p>
-    </div>
-
-    <!-- Pestañas Auth -->
-    <div class="flex bg-slate-950 p-1 rounded-2xl border border-slate-800">
-      <button type="button" id="tab-auth-login" onclick="cambiarModoAuth('login')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950">Ingresar</button>
-      <button type="button" id="tab-auth-registro" onclick="cambiarModoAuth('registro')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white">Crear Cuenta</button>
-    </div>
-
-    <div class="space-y-4 text-left">
-      <div id="campo-registro-nombre" class="hidden">
-        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Nombre Completo</label>
-        <input type="text" id="reg-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="ej: Ramiro Abbattista">
-      </div>
-      <div id="campo-registro-telefono" class="hidden">
-        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">WhatsApp</label>
-        <input type="tel" id="reg-telefono" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm font-mono" placeholder="ej: 11 2345-6789">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Correo Electrónico</label>
-        <input type="email" id="auth-email" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="tu@email.com" value="pf.ramiroabba@gmail.com">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Contraseña</label>
-        <input type="password" id="auth-password" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="••••••••">
-      </div>
-
-      <button type="button" id="btn-auth-accion" onclick="ejecutarAuth()" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-950 font-black py-3 rounded-xl transition text-xs uppercase tracking-wider shadow-lg">
-        Ingresar a mi Plan
-      </button>
-    </div>
-    <p id="auth-mensaje" class="text-xs text-emerald-400 font-semibold text-center min-h-[1rem]"></p>
-  </main>
-
-  <!-- PANTALLA PRINCIPAL -->
-  <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
-    <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 to-slate-950 p-5 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-        <div>
-          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block">Atleta Conectado</span>
-          <h3 class="text-xl font-black text-white" id="dash-alumno-nombre">Bienvenido</h3>
-        </div>
-        <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
-          <span class="text-base">🔥</span>
-          <div>
-            <span class="text-[9px] text-slate-400 uppercase font-bold block">Racha Semanal</span>
-            <span id="stat-racha" class="text-xs font-black text-emerald-400">0 sem</span>
-          </div>
-        </div>
+  <!-- CALCULADORA DE DISCOS Y CARGAS -->
+  <div id="modal-discos" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h4 class="font-black text-white text-base">⚖ Calculadora de Cargas</h4>
+        <button type="button" onclick="cerrarModalDiscos()" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
       </div>
       <div class="space-y-1.5">
-        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia:</span>
-        <div id="grid-calendario-adherencia" class="grid grid-cols-7 gap-1 text-center text-[10px] font-mono"></div>
+        <span class="text-[11px] text-slate-400 font-bold block uppercase tracking-wider">Barra:</span>
+        <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+          <button type="button" onclick="establecerPesoBarra(20, this)" class="btn-tipo-barra btn-tipo-barra-active bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold text-left">20 kg (Olímpica)</button>
+          <button type="button" onclick="establecerPesoBarra(15, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold text-left">15 kg (Femenina)</button>
+          <button type="button" onclick="establecerPesoBarra(25, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold text-left">25 kg (Trap Bar)</button>
+          <button type="button" onclick="establecerPesoBarra(0, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold text-left">0 kg (Mancuerna/Polea)</button>
+        </div>
       </div>
+      <div>
+        <label class="text-xs text-slate-400 block mb-1">Peso total objetivo:</label>
+        <div class="flex items-center gap-2">
+          <input type="number" id="inp-modal-kilos" step="0.5" class="bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-mono font-bold text-lg w-full" placeholder="ej: 80">
+          <button type="button" onclick="calcularDistribucionDiscos()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs">Calcular</button>
+        </div>
+      </div>
+      <div id="resultado-discos" class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs"></div>
     </div>
+  </div>
 
-    <!-- PANEL DEL COACH -->
-    <div id="seccion-admin" class="hidden space-y-4 bg-slate-900 border border-blue-500/40 p-5 rounded-3xl">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+  <!-- MODAL CREADOR COMPLETO DEL COACH -->
+  <div id="modal-creador-rapido" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-6">
+    <div class="bg-slate-900 border border-slate-700 max-w-3xl w-full rounded-3xl p-5 md:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
-          <h3 class="text-base font-black text-blue-400 flex items-center gap-2">🛡️ Panel del Coach</h3>
-          <p class="text-xs text-slate-400">Supervisión en tiempo real de atletas y asignación de mesociclos.</p>
+          <h4 id="titulo-creador" class="font-black text-white text-base">🛠️ Diseñador de Planificación</h4>
+          <span id="sub-creador" class="text-[11px] text-slate-400">Progresión semanal ondulada y guardado directo en Supabase.</span>
         </div>
+        <button type="button" onclick="cerrarModalCreadorRapido()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 p-2 rounded-xl">✕</button>
       </div>
-      <div id="contenedor-atletas-coach" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-80 overflow-y-auto"></div>
-    </div>
 
-    <!-- CONTENEDOR DE RUTINAS -->
-    <div class="space-y-4">
-      <div id="contenedor-tabs-dias" class="hidden overflow-x-auto pb-1">
-        <div class="flex items-center gap-2" id="barra-solapas-dias"></div>
-      </div>
-      <div id="lista-rutinas" class="space-y-6"></div>
-    </div>
-  </main>
-
-  <script>
-    // 1. CAPTURA Y MUESTRA DE ERRORES DIRECTO EN PANTALLA
-    window.onerror = function(msg, url, lineNo, columnNo, error) {
-      const box = document.getElementById('debug-error-box');
-      const txt = document.getElementById('debug-error-txt');
-      if (box && txt) {
-        box.classList.remove('hidden');
-        txt.innerText = `${msg} (Línea ${lineNo})`;
-      }
-      return false;
-    };
-
-    // 2. ELIMINACIÓN FORZADA DE SERVICE WORKERS PREVIOS
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(registrations) {
-        for (let registration of registrations) {
-          registration.unregister();
-        }
-      });
-    }
-
-    // 3. INICIALIZACIÓN DE SUPABASE
-    const SUPABASE_URL = 'https://zuwqfzfncybtwvzwlqmw.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1d3FmemZuY3lidHd2endscW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2OTgzMTYsImV4cCI6MjEwNjI3NDMxNn0.B2NPB2q5Blni4KNcBoyvfp8yW70hC0KqOgm3O2q1gGI';
-    
-    let sb = null;
-    if (window.supabase && typeof window.supabase.createClient === 'function') {
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    } else {
-      setTimeout(() => {
-        if (window.supabase) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      }, 500);
-    }
-
-    let usuarioActual = null;
-    let modoAuth = 'login';
-
-    function cambiarModoAuth(modo) {
-      modoAuth = modo;
-      const tabL = document.getElementById('tab-auth-login');
-      const tabR = document.getElementById('tab-auth-registro');
-      const nom = document.getElementById('campo-registro-nombre');
-      const tel = document.getElementById('campo-registro-telefono');
-      const btn = document.getElementById('btn-auth-accion');
-
-      if (modo === 'login') {
-        tabL.className = "w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950";
-        tabR.className = "w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white";
-        nom.classList.add('hidden');
-        tel.classList.add('hidden');
-        btn.innerText = "Ingresar a mi Plan";
-      } else {
-        tabR.className = "w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950";
-        tabL.className = "w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white";
-        nom.classList.remove('hidden');
-        tel.classList.remove('hidden');
-        btn.innerText = "Crear Cuenta de Atleta";
-      }
-    }
-
-    async function ejecutarAuth() {
-      const msg = document.getElementById('auth-mensaje');
-      msg.innerText = '';
-
-      if (!sb) {
-        msg.innerText = "Conectando con la base de datos... intentá de nuevo en un segundo.";
-        if (window.supabase) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        return;
-      }
-
-      const email = document.getElementById('auth-email').value.trim();
-      const password = document.getElementById('auth-password').value;
-
-      if (!email || !password) {
-        msg.innerText = "Por favor completá correo y contraseña.";
-        return;
-      }
-
-      msg.innerText = "Verificando credenciales...";
-
-      try {
-        if (modoAuth === 'login') {
-          const { data, error } = await sb.auth.signInWithPassword({ email, password });
-          if (error) {
-            msg.innerText = error.message;
-          } else {
-            usuarioActual = data.user;
-            msg.innerText = "¡Ingreso correcto!";
-            await cargarPerfilYRoles();
-          }
-        } else {
-          const nombre = document.getElementById('reg-nombre').value.trim();
-          const telefono = document.getElementById('reg-telefono').value.trim();
-          const { error } = await sb.auth.signUp({
-            email,
-            password,
-            options: { data: { nombre, telefono } }
-          });
-          if (error) {
-            msg.innerText = error.message;
-          } else {
-            alert("Cuenta creada con éxito. Ya podés ingresar.");
-            cambiarModoAuth('login');
-          }
-        }
-      } catch (err) {
-        msg.innerText = "Error: " + err.message;
-      }
-    }
-
-    async function cargarPerfilYRoles() {
-      if (!usuarioActual || !sb) return;
-
-      const { data: perfil } = await sb
-        .from('perfiles_usuarios')
-        .select('*')
-        .eq('id', usuarioActual.id)
-        .maybeSingle();
-
-      const rol = perfil?.rol || 'alumno';
-
-      document.getElementById('seccion-auth').classList.add('hidden');
-      document.getElementById('seccion-panel').classList.remove('hidden');
-      document.getElementById('usuario-info').classList.remove('hidden');
-      document.getElementById('usuario-info').classList.add('flex');
-      document.getElementById('dash-alumno-nombre').innerText = `Hola, ${perfil?.nombre || usuarioActual.email.split('@')[0]}`;
-      document.getElementById('tag-rol-user').innerText = rol.toUpperCase();
-
-      if (rol === 'coach') {
-        document.getElementById('seccion-admin').classList.remove('hidden');
-        cargarVistaCoach();
-      } else {
-        document.getElementById('seccion-admin').classList.add('hidden');
-      }
-
-      cargarRutinasAlumno();
-    }
-
-    async function cargarVistaCoach() {
-      if (!sb) return;
-      const { data: atletas } = await sb.from('perfiles_usuarios').select('*').eq('rol', 'alumno');
-      const cont = document.getElementById('contenedor-atletas-coach');
-      if (!cont) return;
-
-      cont.innerHTML = (atletas || []).map(a => `
-        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1 text-xs">
-          <div class="flex justify-between items-center">
-            <span class="font-bold text-white text-sm">${a.nombre || a.email}</span>
-            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">Activo</span>
+      <div class="space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="text-[11px] font-bold text-cyan-400 block mb-1">Modalidad / Entorno:</label>
+            <select id="admin-entorno" class="w-full bg-slate-900 border border-cyan-500/40 text-cyan-300 rounded-xl p-2 text-xs font-bold">
+              <option value="ONLINE">🌐 Personalizado Online</option>
+              <option value="KOENA">Koena (Presencial)</option>
+            </select>
           </div>
-          <div class="text-slate-400">${a.email} • WhatsApp: ${a.telefono || 'Sin cargar'}</div>
+          <div>
+            <label class="text-[11px] font-bold text-emerald-400 block mb-1">Alumno Asignado:</label>
+            <select id="sel-alumno-creador" class="w-full bg-slate-900 border border-emerald-500/50 text-white rounded-xl p-2 text-xs font-bold"></select>
+          </div>
         </div>
-      `).join('');
-    }
 
-    async function cargarRutinasAlumno() {
-      if (!sb || !usuarioActual) return;
-      const { data: planes } = await sb.from('planificaciones').select('*')
-        .eq('alumno_id', usuarioActual.id)
-        .order('created_at', { ascending: true });
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 border-t border-slate-800">
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block mb-1">Mesociclo</label>
+            <input type="text" id="admin-mes" placeholder="Mes 1 - Fuerza Base" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block mb-1">Duración Semanas</label>
+            <select id="admin-duracion-semanas" onchange="actualizarColumnasMatrizCoach()" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-emerald-300 font-bold">
+              <option value="4">4 Semanas</option>
+              <option value="5" selected>5 Semanas</option>
+              <option value="6">6 Semanas</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold block mb-1">Día</label>
+            <input type="text" id="admin-dia" placeholder="Lunes (Día 1)" class="w-full bg-slate-900 border border-emerald-500/50 rounded-xl p-2 text-xs text-emerald-300 font-bold">
+          </div>
+        </div>
+      </div>
 
-      const cont = document.getElementById('lista-rutinas');
-      if (!planes || planes.length === 0) {
-        cont.innerHTML = '<div class="p-8 bg-slate-900 rounded-3xl text-center text-slate-500">No hay planes activos asignados por el Coach todavía.</div>';
-        return;
-      }
-      cont.innerHTML = `<div class="p-4 bg-slate-900 rounded-2xl text-xs text-emerald-400 font-bold">Tienes ${planes.length} entrenamiento(s) cargado(s).</div>`;
-    }
+      <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio</span>
+          <button type="button" onclick="aplicarPresetProgresionRamiro()" class="text-[11px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-lg font-black">
+            ⚡ Preset Ondulado
+          </button>
+        </div>
 
-    async function cerrarSesion() {
-      if (sb) await sb.auth.signOut();
-      usuarioActual = null;
-      document.getElementById('seccion-auth').classList.remove('hidden');
-      document.getElementById('seccion-panel').classList.add('hidden');
-      document.getElementById('usuario-info').classList.add('hidden');
-    }
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-2">
+          <div class="md:col-span-2">
+            <label class="text-[10px] text-slate-400 font-bold">Bloque</label>
+            <select id="inp-bloque" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-emerald-300 font-bold mt-1">
+              <option value="BLOQUE A — MOVILIDAD & CALOR">BLOQUE A — MOVILIDAD & CALOR</option>
+              <option value="BLOQUE B — ACTIVACIÓN & CORE">BLOQUE B — ACTIVACIÓN & CORE</option>
+              <option value="BLOQUE C — POTENCIA / OLÍMPICO">BLOQUE C — POTENCIA / OLÍMPICO</option>
+              <option value="BLOQUE D — FUERZA PRINCIPAL" selected>BLOQUE D — FUERZA PRINCIPAL</option>
+              <option value="BLOQUE E — TRACCIONES & ACCESORIOS">BLOQUE E — TRACCIONES & ACCESORIOS</option>
+            </select>
+          </div>
+          <div class="md:col-span-2">
+            <label class="text-[10px] text-slate-400 font-bold">Ejercicio</label>
+            <input type="text" id="inp-ejercicio-nombre" placeholder="ej: Sentadilla Trasera con Barra" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white mt-1">
+          </div>
+          <div class="md:col-span-2">
+            <label class="text-[10px] text-slate-400 font-bold">Video Short (YouTube)</label>
+            <input type="text" id="inp-video" placeholder="https://youtube.com/shorts/..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white font-mono mt-1">
+          </div>
+        </div>
 
-    // Comprobación de sesión al abrir
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        if (sb) {
-          sb.auth.getSession().then(({ data: { session } }) => {
-            if (session) {
-              usuarioActual = session.user;
-              cargarPerfilYRoles();
-            }
-          });
-        }
-      }, 300);
-    });
-  </script>
-</body>
-</html>
+        <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-2">
+          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">🎯 Prescripción Semanal:</span>
+          <div id="grid-matriz-coach" class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs">
+            <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Semana 1:</span>
+              <input type="text" id="prog-s1-reps" value="3x8 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s1-carga" value="70%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+            </div>
+            <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Semana 2:</span>
+              <input type="text" id="prog-s2-reps" value="4x8 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s2-carga" value="75%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold
