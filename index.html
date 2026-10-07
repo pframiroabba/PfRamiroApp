@@ -49,10 +49,10 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-32 antialiased select-none">
 
-  <!-- CONSOLA DE DIAGNÓSTICO EN PANTALLA -->
+  <!-- CONSOLA DE DIAGNÓSTICO EN PANTALLA (SI OCURRE ALGÚN FALLO SE VERÁ AQUÍ) -->
   <div id="debug-error-box" class="hidden fixed top-2 left-2 right-2 bg-red-950 border-2 border-red-500 text-red-200 p-3 rounded-2xl z-50 text-xs font-mono shadow-2xl space-y-1">
     <div class="flex justify-between items-center font-bold text-red-400">
-      <span>⚠️ Error del Sistema:</span>
+      <span>⚠️ Aviso del Sistema:</span>
       <button type="button" onclick="document.getElementById('debug-error-box').classList.add('hidden')" class="text-white bg-red-800 px-2 py-0.5 rounded">✕</button>
     </div>
     <div id="debug-error-txt" class="break-words"></div>
@@ -63,7 +63,7 @@
     <span id="toast-texto">✓ Guardado en Supabase</span>
   </div>
 
-  <!-- REPRODUCTOR MODAL NATIVO DE SHORTS (SILENCIADO PARA SPOTIFY) -->
+  <!-- REPRODUCTOR MODAL NATIVO DE SHORTS -->
   <div id="modal-video-player" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl overflow-hidden shadow-2xl flex flex-col">
       <div class="flex items-center justify-between p-3.5 border-b border-slate-800">
@@ -96,7 +96,7 @@
     </div>
   </div>
 
-  <!-- MODAL ACTIVE WORKOUT (BULDOZR STYLE) -->
+  <!-- MODAL ACTIVE WORKOUT -->
   <div id="modal-modo-activo" class="hidden fixed inset-0 bg-slate-950 z-50 flex flex-col p-4 overflow-y-auto">
     <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
       <div class="flex items-center gap-2">
@@ -108,7 +108,7 @@
     <div id="contenido-ejercicio-activo" class="max-w-xl mx-auto w-full flex-1 flex flex-col justify-between space-y-4"></div>
   </div>
 
-  <!-- CALCULADORA DE DISCOS Y CARGAS -->
+  <!-- CALCULADORA DE DISCOS -->
   <div id="modal-discos" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -329,8 +329,8 @@
 
     <!-- Pestañas Auth -->
     <div class="flex bg-slate-950 p-1 rounded-2xl border border-slate-800">
-      <button type="button" id="tab-auth-login" class="w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950">Ingresar</button>
-      <button type="button" id="tab-auth-registro" class="w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white">Crear Cuenta</button>
+      <button type="button" id="tab-auth-login" onclick="cambiarModoAuth('login')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950">Ingresar</button>
+      <button type="button" id="tab-auth-registro" onclick="cambiarModoAuth('registro')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white">Crear Cuenta</button>
     </div>
 
     <div class="space-y-4 text-left">
@@ -351,14 +351,14 @@
         <input type="password" id="auth-password" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="••••••••">
       </div>
 
-      <button type="button" id="btn-auth-accion" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3 rounded-xl transition text-xs uppercase tracking-wider">
+      <button type="button" id="btn-auth-accion" onclick="ejecutarAuth()" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-950 font-black py-3 rounded-xl transition text-xs uppercase tracking-wider shadow-lg">
         Ingresar a mi Plan
       </button>
-      <button type="button" id="btn-olvido-pass" class="w-full text-xs text-slate-400 hover:text-emerald-400 transition pt-1 text-center block">
+      <button type="button" onclick="recuperarPassword()" class="w-full text-xs text-slate-400 hover:text-emerald-400 transition pt-1 text-center block">
         ¿Olvidaste tu contraseña?
       </button>
     </div>
-    <p id="auth-mensaje" class="text-xs text-emerald-400 font-semibold text-center"></p>
+    <p id="auth-mensaje" class="text-xs text-emerald-400 font-semibold text-center min-h-[1.25rem]"></p>
   </main>
 
   <!-- PANTALLA PRINCIPAL -->
@@ -390,7 +390,7 @@
       </div>
     </div>
 
-    <!-- PANEL DEL COACH -->
+    <!-- PANEL EXCLUSIVO DEL COACH -->
     <div id="seccion-admin" class="hidden space-y-4 bg-slate-900 border border-blue-500/40 p-5 rounded-3xl">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div>
@@ -444,6 +444,15 @@
       return false;
     };
 
+    function mostrarErrorPantalla(texto) {
+      const box = document.getElementById('debug-error-box');
+      const txt = document.getElementById('debug-error-txt');
+      if (box && txt) {
+        box.classList.remove('hidden');
+        txt.innerText = texto;
+      }
+    }
+
     // 2. ELIMINACIÓN FORZADA DE SERVICE WORKERS PREVIOS
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -460,10 +469,6 @@
     let sb = null;
     if (window.supabase && typeof window.supabase.createClient === 'function') {
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    } else {
-      setTimeout(() => {
-        if (window.supabase) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      }, 500);
     }
 
     let usuarioActual = null;
@@ -488,25 +493,6 @@
 
     let indiceEjercicioActivo = 0;
     let listaEjerciciosModoActivo = [];
-
-    // VINCULACIÓN DIRECTA DE EVENTOS
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('tab-auth-login').addEventListener('click', () => cambiarModoAuth('login'));
-      document.getElementById('tab-auth-registro').addEventListener('click', () => cambiarModoAuth('registro'));
-      document.getElementById('btn-auth-accion').addEventListener('click', ejecutarAuth);
-      document.getElementById('btn-olvido-pass').addEventListener('click', recuperarPassword);
-
-      if (sb) {
-        sb.auth.getSession().then(({ data: { session } }) => {
-          if (session) {
-            usuarioActual = session.user;
-            cargarPerfilYRoles();
-          }
-        }).catch(err => {
-          console.warn("Sin sesión previa:", err);
-        });
-      }
-    });
 
     function nombreEj(planId, idx) {
       const r = rutinasActivas.find(x => String(x.id) === String(planId));
@@ -538,6 +524,7 @@
     async function recuperarPassword() {
       const email = document.getElementById('auth-email').value.trim();
       if (!email) return alert('Escribí tu correo primero en el campo correspondiente.');
+      if (!sb) return alert('Conectando a la base de datos... intentá en un segundo.');
       const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
       document.getElementById('auth-mensaje').innerText = error ? error.message : 'Te enviamos un enlace por correo para restablecer la contraseña.';
     }
@@ -586,18 +573,24 @@
       const email = document.getElementById('auth-email').value.trim();
       const password = document.getElementById('auth-password').value;
       const msg = document.getElementById('auth-mensaje');
+      const btn = document.getElementById('btn-auth-accion');
       msg.innerText = '';
 
       if (!sb) {
-        msg.innerText = "Conectando con Supabase... probá en un segundo.";
         if (window.supabase) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        return;
+        else {
+          msg.innerText = "Conectando con Supabase... por favor probá en un segundo.";
+          return;
+        }
       }
 
       if (!email || !password) {
         msg.innerText = "Por favor ingresá correo y contraseña.";
         return;
       }
+
+      btn.disabled = true;
+      btn.innerText = 'Cargando...';
 
       try {
         if (modoAuth === 'login') {
@@ -631,6 +624,9 @@
         }
       } catch (err) {
         msg.innerText = 'Error: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerText = modoAuth === 'login' ? 'Ingresar a mi Plan' : 'Crear Cuenta de Atleta';
       }
     }
 
@@ -646,41 +642,49 @@
     async function cargarPerfilYRoles() {
       if (!usuarioActual || !sb) return;
 
-      const { data: perfil } = await sb
-        .from('perfiles_usuarios')
-        .select('*')
-        .eq('id', usuarioActual.id)
-        .maybeSingle();
+      try {
+        const { data: perfil } = await sb
+          .from('perfiles_usuarios')
+          .select('*')
+          .eq('id', usuarioActual.id)
+          .maybeSingle();
 
-      perfilActual = perfil || { rol: 'alumno', nombre: usuarioActual.email.split('@')[0] };
+        perfilActual = perfil || { rol: 'alumno', nombre: usuarioActual.email.split('@')[0] };
 
-      document.getElementById('seccion-auth').classList.add('hidden');
-      document.getElementById('seccion-panel').classList.remove('hidden');
-      document.getElementById('usuario-info').classList.remove('hidden');
-      document.getElementById('usuario-info').classList.add('flex');
-      document.getElementById('dash-alumno-nombre').innerText = `Hola, ${perfilActual.nombre || 'Atleta'}`;
-      document.getElementById('tag-rol-user').innerText = perfilActual.rol.toUpperCase();
+        document.getElementById('seccion-auth').classList.add('hidden');
+        document.getElementById('seccion-panel').classList.remove('hidden');
+        document.getElementById('usuario-info').classList.remove('hidden');
+        document.getElementById('usuario-info').classList.add('flex');
+        document.getElementById('dash-alumno-nombre').innerText = `Hola, ${perfilActual.nombre || 'Atleta'}`;
+        document.getElementById('tag-rol-user').innerText = (perfilActual.rol || 'alumno').toUpperCase();
 
-      if (perfilActual.rol === 'coach') {
-        document.getElementById('seccion-admin').classList.remove('hidden');
-        await cargarVistaCoach();
-        await cargarPlanesCoach();
-      } else {
-        document.getElementById('seccion-admin').classList.add('hidden');
+        if (perfilActual.rol === 'coach') {
+          document.getElementById('seccion-admin').classList.remove('hidden');
+          await cargarVistaCoach();
+          await cargarPlanesCoach();
+        } else {
+          document.getElementById('seccion-admin').classList.add('hidden');
+        }
+
+        await cargarMarcasRM();
+        await cargarRutinasAlumno();
+        await calcularRachaYCalendario();
+      } catch (err) {
+        console.error("Error cargando perfil:", err);
       }
-
-      await cargarMarcasRM();
-      await cargarRutinasAlumno();
-      await calcularRachaYCalendario();
     }
 
     async function cargarMarcasRM() {
       if (!usuarioActual || !sb) return;
-      const { data } = await sb.from('marcas_rm').select('*').eq('user_id', usuarioActual.id);
-      marcasRMAlumno = {};
-      (data || []).forEach(r => {
-        marcasRMAlumno[r.ejercicio.trim().toLowerCase()] = r.rm_calculado;
-      });
+      try {
+        const { data } = await sb.from('marcas_rm').select('*').eq('user_id', usuarioActual.id);
+        marcasRMAlumno = {};
+        (data || []).forEach(r => {
+          marcasRMAlumno[r.ejercicio.trim().toLowerCase()] = r.rm_calculado;
+        });
+      } catch (e) {
+        console.warn("Aviso RM:", e);
+      }
     }
 
     function resolverCargaKilos(ejercicioNombre, textoPrescripcion) {
@@ -700,12 +704,18 @@
 
     async function cargarRutinasAlumno() {
       if (!sb || !usuarioActual) return;
-      const { data: planes } = await sb.from('planificaciones').select('*')
-        .eq('alumno_id', usuarioActual.id).eq('estado', 'activa')
-        .order('created_at', { ascending: true });
-      rutinasActivas = planes || [];
-      diaActivoId = null;
-      renderizarSolapasYRutas();
+      try {
+        const { data: planes } = await sb.from('planificaciones').select('*')
+          .or(`alumno_id.eq.${usuarioActual.id},alumno_id.eq.${usuarioActual.email}`)
+          .order('created_at', { ascending: true });
+
+        // Resiliencia: si existe la columna estado filtra activas, sino toma todas
+        rutinasActivas = (planes || []).filter(p => !p.estado || p.estado === 'activa');
+        diaActivoId = null;
+        renderizarSolapasYRutas();
+      } catch (err) {
+        console.error("Error rutinas alumno:", err);
+      }
     }
 
     function renderizarSolapasYRutas() {
@@ -977,7 +987,11 @@
       const rm = Math.round(p * (1 + r / 30) * 10) / 10;
       const previo = marcasRMAlumno[ejercicio.trim().toLowerCase()] || 0;
       const fila = { user_id: usuarioActual.id, ejercicio: ejercicio.trim(), peso_levantado: p, reps_hechas: r, rm_calculado: rm };
-      await sb.from('marcas_rm_historial').insert(fila);
+      
+      try {
+        await sb.from('marcas_rm_historial').insert(fila);
+      } catch (e) { console.warn("Historial:", e); }
+
       await sb.from('marcas_rm').upsert({ ...fila, updated_at: new Date().toISOString() }, { onConflict: 'user_id,ejercicio' });
       await cargarMarcasRM();
       if (rm > previo) abrirModalPR(ejercicio, rm); else mostrarToast(`1RM estimado: ${rm} kg (récord: ${previo} kg)`);
@@ -1257,16 +1271,18 @@
       if (!cont || !sb) return;
       const filtro = document.getElementById('filtro-planes-estado').value;
       
-      let resPlanes;
-      if (filtro !== 'todos') {
-        resPlanes = await sb.from('planificaciones').select('*').eq('estado', filtro).order('created_at', { ascending: true });
-      } else {
-        resPlanes = await sb.from('planificaciones').select('*').order('created_at', { ascending: true });
-      }
+      const [resPlanes, resPerfiles] = await Promise.all([
+        sb.from('planificaciones').select('*').order('created_at', { ascending: true }),
+        sb.from('perfiles_usuarios').select('id,nombre,email')
+      ]);
 
-      const resPerfiles = await sb.from('perfiles_usuarios').select('id,nombre,email');
-      const planes = resPlanes.data || [];
+      let planes = resPlanes.data || [];
       const perfiles = resPerfiles.data || [];
+
+      // Resiliencia en memoria
+      if (filtro !== 'todos') {
+        planes = planes.filter(p => (p.estado || 'activa') === filtro);
+      }
 
       const nombres = {};
       perfiles.forEach(p => { nombres[p.id] = p.nombre || p.email; });
@@ -1540,6 +1556,24 @@
     function cerrarPlayerVideo() {
       document.getElementById('iframe-video-player').src = '';
       document.getElementById('modal-video-player').classList.add('hidden');
+    }
+
+    // INICIALIZACIÓN DE LA SESIÓN DE FORMA COMPATIBLE
+    function iniciarApp() {
+      if (sb) {
+        sb.auth.getSession().then(({ data: { session } }) => {
+          if (session) {
+            usuarioActual = session.user;
+            cargarPerfilYRoles();
+          }
+        }).catch(err => console.warn(err));
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', iniciarApp);
+    } else {
+      iniciarApp();
     }
   </script>
 </body>
