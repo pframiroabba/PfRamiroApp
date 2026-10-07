@@ -63,7 +63,7 @@
       border-left: 4px solid #10b981 !important;
     }
     @media print {
-      header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container, #modal-discos, #modal-ficha-coach, #modal-creador-rapido, #modal-modo-activo {
+      header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container, #modal-discos, #modal-ficha-coach, #modal-creador-rapido, #modal-modo-activo, #modal-video-player, #modal-pr-celebracion {
         display: none !important;
       }
       body {
@@ -87,7 +87,49 @@
     <span>✓ Guardado en la Nube</span>
   </div>
 
-  <!-- MODAL MODO "ACTIVE WORKOUT" BULDOZR (ENFOQUE EN 1 EJERCICIO A PANTALLA COMPLETA) -->
+  <!-- REPRODUCTOR MODAL NATIVO DE SHORTS (IN-APP PLAYER) -->
+  <div id="modal-video-player" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+      <div class="flex items-center justify-between p-3.5 border-b border-slate-800">
+        <span id="player-video-titulo" class="text-xs font-black text-white truncate max-w-[220px]">Demostración Técnica</span>
+        <button type="button" onclick="cerrarPlayerVideo()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 px-2.5 py-1 rounded-lg">✕</button>
+      </div>
+      <div class="relative w-full aspect-[9/16] max-h-[70vh] bg-black">
+        <iframe id="iframe-video-player" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- TARJETA SOCIAL DE RÉCORD PERSONAL (PR STORIES SHARE) -->
+  <div id="modal-pr-celebracion" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500 max-w-sm w-full rounded-3xl p-6 shadow-2xl text-center space-y-4">
+      <div class="text-4xl animate-bounce">🏆</div>
+      <div>
+        <span class="text-[10px] font-black uppercase text-emerald-400 tracking-widest block">Nuevo Récord Personal</span>
+        <h3 id="pr-share-ejercicio" class="text-xl font-black text-white mt-1">Sentadilla Trasera</h3>
+      </div>
+
+      <div class="bg-slate-950/80 border border-emerald-500/40 p-4 rounded-2xl">
+        <span id="pr-share-peso" class="text-4xl font-black text-emerald-400 font-mono">140 kg</span>
+        <span class="text-[11px] text-slate-400 block mt-1">1RM Estimado (Fórmula Epley)</span>
+      </div>
+
+      <div class="text-xs text-slate-400 font-medium">
+        <span>PF Ramiro Abbattista • Rendimiento & Fuerza</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 pt-2">
+        <button type="button" onclick="compartirPRSocial()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow-lg">
+          📲 Compartir
+        </button>
+        <button type="button" onclick="cerrarModalPR()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs uppercase transition">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MODO "ACTIVE WORKOUT" BULDOZR -->
   <div id="modal-modo-activo" class="hidden fixed inset-0 bg-slate-950 z-50 flex flex-col p-4 overflow-y-auto">
     <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
       <div class="flex items-center gap-2">
@@ -101,16 +143,14 @@
       </button>
     </div>
 
-    <div id="contenido-ejercicio-activo" class="max-w-xl mx-auto w-full flex-1 flex flex-col justify-between space-y-4">
-      <!-- Se puebla dinámicamente -->
-    </div>
+    <div id="contenido-ejercicio-activo" class="max-w-xl mx-auto w-full flex-1 flex flex-col justify-between space-y-4"></div>
   </div>
 
   <!-- MODAL CALCULADORA VISUAL CON LAS BARRAS MÁS USADAS -->
   <div id="modal-discos" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h4 class="font-black text-white text-base flex items-center gap-2">⚖️️ Calculadora de Discos</h4>
+        <h4 class="font-black text-white text-base flex items-center gap-2">⚖ Calculadora de Discos</h4>
         <button type="button" onclick="cerrarModalDiscos()" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
       </div>
 
@@ -130,7 +170,7 @@
             🛡️ 30 kg (Safety Squat / Open)
           </button>
           <button type="button" onclick="establecerPesoBarra(10, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold transition text-left">
-            ⚡ 10 kg (Olímpica Junior / Z)
+            ⚡ 10 kg (Junior / Z Olímpica)
           </button>
           <button type="button" onclick="establecerPesoBarra(8, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold transition text-left">
             〰️ 8 kg (Barra Z / W Estándar)
@@ -167,7 +207,7 @@
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
           <h4 class="font-black text-white text-base flex items-center gap-2">🛠️ Diseñador Rápido de Planificación</h4>
-          <span class="text-[11px] text-slate-400">Configura sesiones, superseries (A1+A2), tempo y videos cortos de YouTube.</span>
+          <span class="text-[11px] text-slate-400">Configura sesiones, superseries (A1+A2), tempo y shorts técnicos.</span>
         </div>
         <button type="button" onclick="cerrarModalCreadorRapido()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 p-2 rounded-xl">✕</button>
       </div>
@@ -472,7 +512,7 @@
   <!-- PANTALLA PRINCIPAL -->
   <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- DASHBOARD DEL ALUMNO -->
+    <!-- DASHBOARD DEL ALUMNO CON HABIT TRACKER / CALENDARIO BULDOZR -->
     <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 p-5 md:p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div class="flex items-center gap-3.5">
@@ -508,6 +548,17 @@
               <span id="stat-racha" class="text-xs font-black text-emerald-400">0 sem</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- CALENDARIO DE ADHERENCIA MENSUAL (HABIT TRACKER BULDOZR) -->
+      <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-400 font-bold uppercase text-[10px]">📅 Calendario de Adherencia Mensual (Días Completados):</span>
+          <span class="text-[10px] text-emerald-400 font-black">Principio: No Romper la Cadena</span>
+        </div>
+        <div id="grid-calendario-adherencia" class="grid grid-cols-7 gap-1.5 text-center text-[10px] font-mono">
+          <!-- Se genera dinámicamente -->
         </div>
       </div>
     </div>
@@ -830,7 +881,7 @@
       personalizados: []
     };
 
-    let biblioteca = JSON.parse(localStorage.getItem('pf_biblioteca_v5')) || BIBLIOTECA_DEFAULT;
+    let biblioteca = JSON.parse(localStorage.getItem('pf_biblioteca_v6')) || BIBLIOTECA_DEFAULT;
     let sesionActual = [];
     let usuarioActual = null;
     let sortableInstance = null;
@@ -847,7 +898,6 @@
     let modoAuthActual = 'login';
     let pesoBarraSeleccionada = 20;
 
-    // Estado del Modo Activo Buldozr
     let indiceEjercicioActivo = 0;
     let listaEjerciciosModoActivo = [];
 
@@ -860,6 +910,104 @@
         toast.classList.remove('opacity-100');
         toast.classList.add('opacity-0');
       }, 1200);
+    }
+
+    // REPRODUCTOR IN-APP DE YOUTUBE SHORTS
+    function extraerIdYouTube(url) {
+      if (!url) return null;
+      const matchShort = url.match(/shorts\/([a-zA-Z0-9_-]+)/);
+      if (matchShort) return matchShort[1];
+      const matchWatch = url.match(/v=([a-zA-Z0-9_-]+)/);
+      if (matchWatch) return matchWatch[1];
+      const matchShortUrl = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+      if (matchShortUrl) return matchShortUrl[1];
+      return null;
+    }
+
+    function abrirPlayerVideo(urlVideo, titulo) {
+      const videoId = extraerIdYouTube(urlVideo);
+      if (!videoId) {
+        window.open(urlVideo, '_blank');
+        return;
+      }
+      document.getElementById('player-video-titulo').innerText = titulo || "Demostración Técnica";
+      document.getElementById('iframe-video-player').src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=1&rel=0`;
+      document.getElementById('modal-video-player').classList.remove('hidden');
+    }
+
+    function cerrarPlayerVideo() {
+      document.getElementById('iframe-video-player').src = "";
+      document.getElementById('modal-video-player').classList.add('hidden');
+    }
+
+    // CELEBRACIÓN Y TARJETA SOCIAL DE 1RM (PR)
+    function abrirModalPR(ejercicio, peso) {
+      document.getElementById('pr-share-ejercicio').innerText = ejercicio;
+      document.getElementById('pr-share-peso').innerText = `${peso} kg`;
+      document.getElementById('modal-pr-celebracion').classList.remove('hidden');
+    }
+
+    function cerrarModalPR() {
+      document.getElementById('modal-pr-celebracion').classList.add('hidden');
+    }
+
+    async function compartirPRSocial() {
+      const ej = document.getElementById('pr-share-ejercicio').innerText;
+      const peso = document.getElementById('pr-share-peso').innerText;
+      const texto = `🔥 ¡Nuevo Récord Personal! Acabo de levantar ${peso} en ${ej} entrenando con PF Ramiro Abbattista. 💪`;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'Nuevo Récord Personal - PF Ramiro',
+            text: texto,
+            url: window.location.href
+          });
+        } catch (e) {
+          console.warn("Share cancelado");
+        }
+      } else {
+        navigator.clipboard?.writeText(texto);
+        alert("📋 ¡Texto de récord copiado al portapapeles para pegarlo en tus Stories!");
+      }
+    }
+
+    // CALENDARIO DE ADHERENCIA (HABIT TRACKER)
+    function renderizarCalendarioAdherencia() {
+      const cont = document.getElementById('grid-calendario-adherencia');
+      if (!cont) return;
+
+      const diasSemana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+      const fechaHoy = new Date();
+      const diasEnMes = new Date(fechaHoy.getFullYear(), fechaHoy.getMonth() + 1, 0).getDate();
+      const primerDiaSemana = (new Date(fechaHoy.getFullYear(), fechaHoy.getMonth(), 1).getDay() + 6) % 7;
+
+      let html = diasSemana.map(d => `<span class="text-slate-500 font-bold">${d}</span>`).join('');
+
+      for (let i = 0; i < primerDiaSemana; i++) {
+        html += `<div class="h-6"></div>`;
+      }
+
+      for (let dia = 1; dia <= diasEnMes; dia++) {
+        const keyDia = `entreno_done_${fechaHoy.getFullYear()}_${fechaHoy.getMonth() + 1}_${dia}`;
+        const entrenado = localStorage.getItem(keyDia) === 'true';
+        const esHoy = dia === fechaHoy.getDate();
+
+        html += `
+          <div class="h-6 flex items-center justify-center rounded-lg ${entrenado ? 'bg-emerald-500 text-slate-950 font-black shadow-sm' : (esHoy ? 'border border-emerald-400 text-emerald-400 font-bold' : 'bg-slate-900/60 text-slate-400')}">
+            ${dia}
+          </div>
+        `;
+      }
+
+      cont.innerHTML = html;
+    }
+
+    function registrarDiaCompletadoCalendario() {
+      const fecha = new Date();
+      const keyDia = `entreno_done_${fecha.getFullYear()}_${fecha.getMonth() + 1}_${fecha.getDate()}`;
+      localStorage.setItem(keyDia, 'true');
+      renderizarCalendarioAdherencia();
     }
 
     // MODAL CREADOR RÁPIDO
@@ -968,7 +1116,7 @@
           updated_at: new Date().toISOString()
         }, { onConflict: 'email' });
       } catch (e) {
-        console.warn("Aviso:", e);
+        console.warn("Aviso sync:", e);
       }
     }
 
@@ -1089,6 +1237,7 @@
       }
 
       cargarRutinas(user.email, user.id);
+      renderizarCalendarioAdherencia();
     }
 
     function mostrarMensaje(txt, esError = false) {
@@ -1102,7 +1251,7 @@
       if (valorAvatar && valorAvatar.startsWith('data:image')) {
         contenedor.innerHTML = `<img src="${valorAvatar}" class="w-full h-full rounded-full object-cover">`;
       } else {
-        contenedor.innerHTML = valorAvatar || '🏋️‍♂️️';
+        contenedor.innerHTML = valorAvatar || '🏋️‍♂';
       }
     }
 
@@ -1220,7 +1369,8 @@
         notas: dataObj.notas
       }, { onConflict: 'alumno_id,ejercicio' }).then();
 
-      alert(`🔥 ¡Nuevo 1RM estimado en ${ejercicioNombre}: ${nuevoRM} kg!`);
+      // Disparar tarjeta social estilo Instagram Stories
+      abrirModalPR(ejercicioNombre, nuevoRM);
       refrescarRutinas();
     }
 
@@ -1417,7 +1567,7 @@
       const cat = document.getElementById('sel-categoria').value;
       if (!biblioteca[cat]) biblioteca[cat] = [];
       biblioteca[cat].push({ nombre: nombre.trim(), video: video.trim() });
-      localStorage.setItem('pf_biblioteca_v5', JSON.stringify(biblioteca));
+      localStorage.setItem('pf_biblioteca_v6', JSON.stringify(biblioteca));
       cargarEjerciciosPorCategoria();
       renderizarBibliotecaTecnica();
       document.getElementById('sel-ejercicio').value = nombre.trim();
@@ -1490,7 +1640,7 @@
             ${f.ejercicio}
           </td>
           <td class="flex items-center gap-2">
-            ${f.video ? `<a href="${f.video}" target="_blank" class="text-cyan-400 text-[10px] font-bold bg-cyan-500/10 px-2 py-0.5 rounded">▶ Short</a>` : ''}
+            ${f.video ? `<button type="button" onclick="abrirPlayerVideo('${f.video}', '${f.ejercicio}')" class="text-cyan-400 text-[10px] font-bold bg-cyan-500/10 px-2 py-0.5 rounded">▶ Short</button>` : ''}
             <button type="button" onclick="eliminarFila(${i})" class="text-red-400 hover:text-red-300 font-bold px-2 py-1 text-xs">✕</button>
           </td>
         </tr>
@@ -1622,7 +1772,6 @@
       }
     }
 
-    // REEMPLAZO RÁPIDO DE EJERCICIO ("SWAP") BULDOZR
     function reemplazarEjercicioSesion(rutinaId, indiceEj, nombreOriginal) {
       const motivo = prompt(`¿Por qué vas a reemplazar "${nombreOriginal}"?\n(ej: Máquina ocupada / Molestia)`);
       if (motivo === null) return;
@@ -1676,6 +1825,7 @@
         
         navigator.vibrate?.(60);
         iniciarTimerDescanso(parseSegundos(descansoTexto));
+        registrarDiaCompletadoCalendario();
       } else {
         boxParent.classList.remove('serie-done-box');
         btnElement.className = "btn-toggle-serie flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition border bg-slate-900 border-rose-500/50 text-rose-300 hover:bg-slate-800";
@@ -1742,7 +1892,7 @@
 
       const badgeTonelaje = tarjeta.querySelector('.badge-tonelaje-sesion');
       if (badgeTonelaje) {
-        badgeTonelaje.innerText = `🏋️️ Tonelaje: ${Math.round(tonelajeTotal)} kg`;
+        badgeTonelaje.innerText = `🏋 Tonelaje: ${Math.round(tonelajeTotal)} kg`;
       }
     }
 
@@ -1871,9 +2021,9 @@
               <h3 class="text-xl font-black text-white">${item.ejercicio}</h3>
             </div>
             ${item.video ? `
-              <a href="${item.video}" target="_blank" class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-xl text-xs font-bold">
+              <button type="button" onclick="abrirPlayerVideo('${item.video}', '${item.ejercicio}')" class="bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-xl text-xs font-bold">
                 ▶ Ver Short
-              </a>
+              </button>
             ` : ''}
           </div>
 
@@ -2072,9 +2222,9 @@
                             </div>
                             
                             ${item.video ? `
-                              <a href="${item.video}" target="_blank" class="text-xs bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-500/30 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1 self-start md:self-auto transition no-print">
+                              <button type="button" onclick="abrirPlayerVideo('${item.video}', '${item.ejercicio}')" class="text-xs bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-500/30 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1 self-start md:self-auto transition no-print">
                                 ▶ Ver Short
-                              </a>
+                              </button>
                             ` : ''}
                           </div>
 
@@ -2214,6 +2364,7 @@
         console.warn("Feedback:", e);
       }
 
+      registrarDiaCompletadoCalendario();
       alert("🎉 ¡Entrenamiento registrado con éxito!");
       let textoMensaje = `Hola Ramiro, completé la Semana ${semanaActivaAlumno} de mi entrenamiento "${dia}".%0A%0A*RPE:* ${rpeValor}/10%0A*Comentarios:* ${comentario || 'Todo en orden.'}`;
       window.open(`https://wa.me/${WHATSAPP_COACH}?text=${textoMensaje}`, '_blank');
@@ -2378,8 +2529,13 @@
               <span class="text-[10px] text-emerald-400 font-bold uppercase">1RM Base</span>
               <h4 class="text-base font-black text-white">${ejNombre}</h4>
             </div>
-            <div class="bg-slate-900 border border-emerald-500/30 px-3 py-1 rounded-xl">
-              <span class="text-emerald-400 font-mono font-black text-sm">${rmActual} kg</span>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="abrirModalPR('${ejNombre}', ${rmActual})" class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 rounded-lg hover:bg-emerald-500/30">
+                📲 Compartir PR
+              </button>
+              <div class="bg-slate-900 border border-emerald-500/30 px-3 py-1 rounded-xl">
+                <span class="text-emerald-400 font-mono font-black text-sm">${rmActual} kg</span>
+              </div>
             </div>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -2629,7 +2785,6 @@
       renderizarPlanesAdmin(filtrados);
     }
 
-    // SEMÁFORO DE ADHERENCIA BULDOZR (VERDE, AMARILLO O ROJO)
     function calcularSemaforoAdherencia(fechaIso) {
       if (!fechaIso) return { emoji: '🔴', texto: 'Inactivo' };
       const diffDias = Math.floor((new Date() - new Date(fechaIso)) / (1000 * 60 * 60 * 24));
@@ -2749,7 +2904,7 @@
             <span class="text-white font-bold text-sm block">${item.nombre}</span>
           </div>
           <div class="flex items-center gap-1.5">
-            ${item.video ? `<a href="${item.video}" target="_blank" class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-1 rounded-lg text-[10px] font-bold">▶ Short</a>` : ''}
+            ${item.video ? `<button type="button" onclick="abrirPlayerVideo('${item.video}', '${item.nombre}')" class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-1 rounded-lg text-[10px] font-bold">▶ Short</button>` : ''}
             <button type="button" onclick="abrirModalDiscos(60)" class="bg-slate-900 border border-slate-700 text-slate-300 hover:text-emerald-400 px-2 py-1 rounded-lg font-bold">
               ⚖
             </button>
