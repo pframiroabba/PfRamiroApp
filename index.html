@@ -49,12 +49,12 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-32 antialiased">
 
-  <!-- TOAST DE NOTIFICACIÓN -->
+  <!-- TOAST -->
   <div id="toast-guardado" class="fixed top-16 right-4 bg-emerald-500 text-slate-950 text-xs font-black px-3 py-1.5 rounded-xl shadow-xl z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex items-center gap-1.5">
     <span id="toast-texto">✓ Guardado en Supabase</span>
   </div>
 
-  <!-- REPRODUCTOR IN-APP DE SHORTS -->
+  <!-- REPRODUCTOR DE SHORTS -->
   <div id="modal-video-player" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl overflow-hidden shadow-2xl flex flex-col">
       <div class="flex items-center justify-between p-3.5 border-b border-slate-800">
@@ -67,7 +67,7 @@
     </div>
   </div>
 
-  <!-- TARJETA SOCIAL DE RÉCORD PERSONAL (PR) -->
+  <!-- TARJETA DE PR -->
   <div id="modal-pr-celebracion" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500 max-w-sm w-full rounded-3xl p-6 shadow-2xl text-center space-y-4">
       <div class="text-4xl">🏆</div>
@@ -126,7 +126,7 @@
     </div>
   </div>
 
-  <!-- MODAL CREADOR COMPLETO DEL COACH -->
+  <!-- MODAL CREADOR DEL COACH -->
   <div id="modal-creador-rapido" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-6">
     <div class="bg-slate-900 border border-slate-700 max-w-3xl w-full rounded-3xl p-5 md:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -292,7 +292,7 @@
     </div>
   </div>
 
-  <!-- ENCABEZADO -->
+  <!-- HEADER -->
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 md:px-8 py-3 flex justify-between items-center sticky top-0 z-40">
     <div class="flex items-center gap-3">
       <div class="avatar-circulo text-xl">🏋️‍♂️</div>
@@ -381,7 +381,7 @@
       </div>
     </div>
 
-    <!-- PANEL EXCLUSIVO DEL COACH -->
+    <!-- PANEL DEL COACH -->
     <div id="seccion-admin" class="hidden space-y-4 bg-slate-900 border border-blue-500/40 p-5 rounded-3xl">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div>
@@ -526,37 +526,45 @@
     }
 
     async function ejecutarAuth() {
-      if (modoAuth === 'login') {
-        const email = document.getElementById('auth-email').value.trim();
-        const password = document.getElementById('auth-password').value;
-        if (!email || !password) return alert("Completá correo y contraseña.");
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const msg = document.getElementById('auth-mensaje');
+      msg.innerText = '';
 
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) {
-          document.getElementById('auth-mensaje').innerText = error.message;
+      if (!email || !password) return alert("Completá correo y contraseña.");
+
+      try {
+        if (modoAuth === 'login') {
+          msg.innerText = 'Verificando credenciales...';
+          const { data, error } = await sb.auth.signInWithPassword({ email, password });
+          if (error) {
+            msg.innerText = error.message;
+          } else {
+            usuarioActual = data.user;
+            msg.innerText = '';
+            await cargarPerfilYRoles();
+          }
         } else {
-          usuarioActual = data.user;
-          await cargarPerfilYRoles();
-        }
-      } else {
-        const email = document.getElementById('auth-email').value.trim();
-        const password = document.getElementById('auth-password').value;
-        const nombre = document.getElementById('reg-nombre').value.trim();
-        const telefono = document.getElementById('reg-telefono').value.trim();
-        if (!email || !password) return alert("Completá correo y contraseña.");
+          const nombre = document.getElementById('reg-nombre').value.trim();
+          const telefono = document.getElementById('reg-telefono').value.trim();
+          msg.innerText = 'Creando cuenta...';
 
-        const { error } = await sb.auth.signUp({
-          email,
-          password,
-          options: { data: { nombre, telefono } }
-        });
+          const { error } = await sb.auth.signUp({
+            email,
+            password,
+            options: { data: { nombre, telefono } }
+          });
 
-        if (error) {
-          document.getElementById('auth-mensaje').innerText = error.message;
-        } else {
-          alert("Cuenta creada con éxito. Ya podés ingresar.");
-          cambiarModoAuth('login');
+          if (error) {
+            msg.innerText = error.message;
+          } else {
+            msg.innerText = '';
+            alert("Cuenta creada con éxito. Ya podés ingresar.");
+            cambiarModoAuth('login');
+          }
         }
+      } catch (err) {
+        msg.innerText = 'Error de conexión: ' + err.message;
       }
     }
 
@@ -588,7 +596,8 @@
 
       if (perfilActual.rol === 'coach') {
         document.getElementById('seccion-admin').classList.remove('hidden');
-        cargarVistaCoach().then(cargarPlanesCoach);
+        await cargarVistaCoach();
+        await cargarPlanesCoach();
       } else {
         document.getElementById('seccion-admin').classList.add('hidden');
       }
@@ -598,7 +607,6 @@
       await calcularRachaYCalendario();
     }
 
-    // CARGA DE MARCAS RM PARA CONVERSIÓN % -> KG
     async function cargarMarcasRM() {
       if (!usuarioActual) return;
       const { data } = await sb.from('marcas_rm').select('*').eq('user_id', usuarioActual.id);
@@ -623,7 +631,6 @@
       return { textoDisplay: textoPrescripcion, kgCalculado: null };
     }
 
-    // CARGA DE RUTINAS
     async function cargarRutinasAlumno() {
       const { data: planes } = await sb.from('planificaciones').select('*')
         .eq('alumno_id', usuarioActual.id).eq('estado', 'activa')
@@ -692,9 +699,13 @@
       const rutina = rutinasActivas.find(r => String(r.id) === String(rutinaId));
       if (!rutina) return;
 
-      const traer = async sem => (await sb.from('registros_series').select('*')
-        .eq('planificacion_id', String(rutinaId)).eq('user_id', usuarioActual.id)
-        .eq('semana_num', sem)).data || [];
+      const traer = async sem => {
+        const res = await sb.from('registros_series').select('*')
+          .eq('planificacion_id', String(rutinaId)).eq('user_id', usuarioActual.id)
+          .eq('semana_num', sem);
+        return res.data || [];
+      };
+
       const [actual, previa] = await Promise.all([traer(semanaActiva), semanaActiva > 1 ? traer(semanaActiva - 1) : []]);
       const mapa = {}, mapaPrev = {};
       actual.forEach(x => mapa[`${x.ejercicio_index}_${x.serie_num}`] = x);
@@ -745,7 +756,6 @@
                     ` : ''}
                   </div>
 
-                  <!-- Testeo al Fallo si es última semana -->
                   ${esUltimaSemana ? `
                     <div class="bg-slate-900 border border-amber-500/30 p-2.5 rounded-xl flex items-center justify-between text-xs">
                       <span class="text-amber-400 font-bold">🔥 Testeo al Fallo Técnico: Calculá tu nuevo 1RM al terminar la serie máxima.</span>
@@ -814,7 +824,6 @@
       });
     }
 
-    // PERSISTENCIA DE SERIES EN SUPABASE
     async function guardarCargaCloud(planId, ejercicioIdx, sem, serie, carga) {
       if (!usuarioActual) return;
       const { error } = await sb.from('registros_series').upsert({
@@ -893,7 +902,6 @@
       }
     }
 
-    // TESTEO AL FALLO Y CÁLCULO DE RM EPLEY
     async function procesarTesteoFallo(ejercicio, itmIdx) {
       const p = parseFloat(prompt(`Peso de la serie máxima de ${ejercicio} (kg):`));
       const r = parseInt(prompt('Repeticiones completadas al fallo:'));
@@ -930,7 +938,6 @@
       }
     }
 
-    // RACHA SEMANAL Y CALENDARIO (HORA LOCAL)
     function obtenerFechaLocalString(d = new Date()) {
       const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -970,7 +977,6 @@
       document.getElementById('stat-racha').innerText = `${calcularRacha(diasEntrenados)} sem`;
     }
 
-    // MODO ENTRENO ACTIVO
     function iniciarModoActivo() {
       if (rutinasActivas.length === 0) return alert("No hay entrenamientos cargados.");
       const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) || rutinasActivas[0];
@@ -1081,7 +1087,6 @@
       document.getElementById('btn-sig-act').onclick = () => moverEjercicioActivo(1, rId);
     }
 
-    // PANEL DEL COACH
     async function cargarVistaCoach() {
       const { data: atletas } = await sb.from('perfiles_usuarios').select('*').eq('rol', 'alumno');
       const desde = new Date(Date.now() - 14 * 86400000).toISOString();
@@ -1125,7 +1130,6 @@
       });
     }
 
-    // CREADOR DE PLANIFICACIÓN DEL COACH
     function tituloCreador(t, sub, warn) {
       document.getElementById('titulo-creador').innerText = t;
       const e = document.getElementById('sub-creador');
@@ -1182,22 +1186,33 @@
       const cont = document.getElementById('lista-planes-coach');
       if (!cont) return;
       const filtro = document.getElementById('filtro-planes-estado').value;
-      let q = sb.from('planificaciones').select('*').order('created_at', { ascending: true });
-      if (filtro !== 'todos') q = q.eq('estado', filtro);
-      const [{ data: planes }, { data: perfiles }] = await Promise.all([q, sb.from('perfiles_usuarios').select('id,nombre,email')]);
+      
+      let resPlanes;
+      if (filtro !== 'todos') {
+        resPlanes = await sb.from('planificaciones').select('*').eq('estado', filtro).order('created_at', { ascending: true });
+      } else {
+        resPlanes = await sb.from('planificaciones').select('*').order('created_at', { ascending: true });
+      }
+
+      const resPerfiles = await sb.from('perfiles_usuarios').select('id,nombre,email');
+      const planes = resPlanes.data || [];
+      const perfiles = resPerfiles.data || [];
+
       const nombres = {};
-      (perfiles || []).forEach(p => { nombres[p.id] = p.nombre || p.email; });
+      perfiles.forEach(p => { nombres[p.id] = p.nombre || p.email; });
       window.planesCoach = {};
       const grupos = {};
-      (planes || []).forEach(p => {
+      planes.forEach(p => {
         window.planesCoach[p.id] = p;
         const k = p.alumno_id + '||' + (p.mesociclo || 'Sin mesociclo');
         (grupos[k] = grupos[k] || []).push(p);
       });
-      if (!planes || planes.length === 0) {
+
+      if (planes.length === 0) {
         cont.innerHTML = '<div class="text-xs text-slate-500 text-center p-3">No hay planes para mostrar.</div>';
         return;
       }
+
       const btn = 'px-2 py-1 rounded-lg text-[11px] font-bold border border-slate-700 bg-slate-900 text-slate-300';
       cont.innerHTML = Object.entries(grupos).map(([k, lista]) => {
         const i = k.indexOf('||'), alId = k.slice(0, i), mes = k.slice(i + 2);
@@ -1235,7 +1250,7 @@
         if (acc === 'estado' && p) {
           ({ error } = await sb.from('planificaciones').update({ estado: p.estado === 'archivada' ? 'activa' : 'archivada' }).eq('id', p.id));
         } else if (acc === 'borrar' && p) {
-          if (!confirm(`¿Eliminar "${p.dia}"? Esto no se puede deshacer. Si solo querés sacarlo de la vista del alumno, archivalo.`)) return;
+          if (!confirm(`¿Eliminar "${p.dia}"? Esto no se puede deshacer.`)) return;
           ({ error } = await sb.from('planificaciones').delete().eq('id', p.id));
         } else if (acc === 'mes') {
           let u = sb.from('planificaciones').update({ estado: b.dataset.estado }).eq('alumno_id', b.dataset.al);
@@ -1351,7 +1366,6 @@
       cargarPlanesCoach();
     }
 
-    // CALCULADORA DE DISCOS
     function establecerPesoBarra(p, b) {
       pesoBarraSeleccionada = p;
       document.querySelectorAll('.btn-tipo-barra').forEach(x => x.classList.remove('btn-tipo-barra-active'));
@@ -1400,7 +1414,6 @@
       `;
     }
 
-    // CRONÓMETRO Y SHORTS
     function parseSegundos(txt) {
       const n = parseInt(String(txt).replace(/\D/g, ''));
       return isNaN(n) ? 90 : n;
@@ -1459,9 +1472,7 @@
       document.getElementById('modal-video-player').classList.add('hidden');
     }
 
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
-
-    // EVENTOS DE AUTH FILTRADOS
+    // LISTENER AUTH SEGURO
     sb.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
         if (session && (!usuarioActual || usuarioActual.id !== session.user.id)) {
