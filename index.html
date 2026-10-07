@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PF Ramiro Abbattista - Rendimiento & Fuerza</title>
   
-  <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="PF Ramiro">
   <meta name="theme-color" content="#020617">
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -37,259 +35,22 @@
       font-size: 24px; background-color: #0f172a; border: 2px solid #10b981; flex-shrink: 0;
     }
     .btn-tipo-barra-active { background-color: #10b981 !important; color: #020617 !important; font-weight: 900 !important; }
-    @media print {
-      header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container,
-      #modal-discos, #modal-creador-rapido, #modal-modo-activo, #modal-video-player, #modal-pr-celebracion {
-        display: none !important;
-      }
-      body { background: white !important; color: black !important; }
-      .print-clean { border: 1px solid #ccc !important; background: transparent !important; color: black !important; box-shadow: none !important; }
-    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-32 antialiased">
 
-  <!-- TOAST DE NOTIFICACIÓN -->
+  <!-- CONSOLA DE ERRORES EN PANTALLA (Para ver fallos en el móvil) -->
+  <div id="debug-error-box" class="hidden fixed top-2 left-2 right-2 bg-red-950 border-2 border-red-500 text-red-200 p-3 rounded-2xl z-50 text-xs font-mono shadow-2xl space-y-1">
+    <div class="flex justify-between items-center font-bold text-red-400">
+      <span>⚠️ Error Detectado:</span>
+      <button type="button" onclick="document.getElementById('debug-error-box').classList.add('hidden')" class="text-white bg-red-800 px-2 py-0.5 rounded">Cerrar</button>
+    </div>
+    <div id="debug-error-txt" class="break-words"></div>
+  </div>
+
+  <!-- TOAST -->
   <div id="toast-guardado" class="fixed top-16 right-4 bg-emerald-500 text-slate-950 text-xs font-black px-3 py-1.5 rounded-xl shadow-xl z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex items-center gap-1.5">
     <span id="toast-texto">✓ Guardado en Supabase</span>
-  </div>
-
-  <!-- REPRODUCTOR IN-APP DE SHORTS -->
-  <div id="modal-video-player" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl overflow-hidden shadow-2xl flex flex-col">
-      <div class="flex items-center justify-between p-3.5 border-b border-slate-800">
-        <span id="player-video-titulo" class="text-xs font-black text-white truncate max-w-[200px]">Demostración Técnica</span>
-        <button type="button" onclick="cerrarPlayerVideo()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 px-2.5 py-1 rounded-lg">✕</button>
-      </div>
-      <div class="relative w-full aspect-[9/16] max-h-[70vh] bg-black">
-        <iframe id="iframe-video-player" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-      </div>
-    </div>
-  </div>
-
-  <!-- TARJETA SOCIAL DE RÉCORD PERSONAL (PR) -->
-  <div id="modal-pr-celebracion" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500 max-w-sm w-full rounded-3xl p-6 shadow-2xl text-center space-y-4">
-      <div class="text-4xl">🏆</div>
-      <div>
-        <span class="text-[10px] font-black uppercase text-emerald-400 tracking-widest block">Nuevo Récord Personal</span>
-        <h3 id="pr-share-ejercicio" class="text-xl font-black text-white mt-1">Ejercicio</h3>
-      </div>
-      <div class="bg-slate-950/80 border border-emerald-500/40 p-4 rounded-2xl">
-        <span id="pr-share-peso" class="text-4xl font-black text-emerald-400 font-mono">0 kg</span>
-        <span class="text-[11px] text-slate-400 block mt-1">1RM Estimado (Epley)</span>
-      </div>
-      <div class="text-xs text-slate-400 font-medium">PF Ramiro Abbattista • Rendimiento & Fuerza</div>
-      <div class="grid grid-cols-2 gap-2 pt-2">
-        <button type="button" onclick="compartirPRSocial()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition">📲 Compartir</button>
-        <button type="button" onclick="cerrarModalPR()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs uppercase transition">Cerrar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL ACTIVE WORKOUT -->
-  <div id="modal-modo-activo" class="hidden fixed inset-0 bg-slate-950 z-50 flex flex-col p-4 overflow-y-auto">
-    <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
-      <div class="flex items-center gap-2">
-        <span class="text-xs bg-emerald-500/20 text-emerald-400 font-black px-2.5 py-1 rounded-full border border-emerald-500/30">⚡ Entreno Activo</span>
-        <span id="txt-indice-activo" class="text-xs text-slate-400 font-mono font-bold">1 / 1</span>
-      </div>
-      <button type="button" onclick="cerrarModoActivo()" class="bg-slate-900 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-xl text-xs font-bold">Salir al Panel ✕</button>
-    </div>
-    <div id="contenido-ejercicio-activo" class="max-w-xl mx-auto w-full flex-1 flex flex-col justify-between space-y-4"></div>
-  </div>
-
-  <!-- CALCULADORA DE DISCOS -->
-  <div id="modal-discos" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl p-5 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h4 class="font-black text-white text-base">⚖ Calculadora de Cargas</h4>
-        <button type="button" onclick="cerrarModalDiscos()" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
-      </div>
-      <div class="space-y-1.5">
-        <span class="text-[11px] text-slate-400 font-bold block uppercase tracking-wider">Barra:</span>
-        <div class="grid grid-cols-2 gap-1.5 text-[11px]">
-          <button type="button" onclick="establecerPesoBarra(20, this)" class="btn-tipo-barra btn-tipo-barra-active bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold text-left">20 kg (Olímpica)</button>
-          <button type="button" onclick="establecerPesoBarra(15, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold text-left">15 kg (Femenina)</button>
-          <button type="button" onclick="establecerPesoBarra(25, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold text-left">25 kg (Trap Bar)</button>
-          <button type="button" onclick="establecerPesoBarra(0, this)" class="btn-tipo-barra bg-slate-950 border border-slate-700 p-2 rounded-xl text-slate-300 font-bold text-left">0 kg (Mancuerna/Polea)</button>
-        </div>
-      </div>
-      <div>
-        <label class="text-xs text-slate-400 block mb-1">Peso total objetivo:</label>
-        <div class="flex items-center gap-2">
-          <input type="number" id="inp-modal-kilos" step="0.5" class="bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-white font-mono font-bold text-lg w-full" placeholder="ej: 80">
-          <button type="button" onclick="calcularDistribucionDiscos()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 py-2.5 rounded-xl text-xs">Calcular</button>
-        </div>
-      </div>
-      <div id="resultado-discos" class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs"></div>
-    </div>
-  </div>
-
-  <!-- MODAL CREADOR COMPLETO DEL COACH -->
-  <div id="modal-creador-rapido" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-6">
-    <div class="bg-slate-900 border border-slate-700 max-w-3xl w-full rounded-3xl p-5 md:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div>
-          <h4 id="titulo-creador" class="font-black text-white text-base">🛠️ Diseñador de Planificación</h4>
-          <span id="sub-creador" class="text-[11px] text-slate-400">Progresión semanal ondulada y guardado directo en Supabase.</span>
-        </div>
-        <button type="button" onclick="cerrarModalCreadorRapido()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 p-2 rounded-xl">✕</button>
-      </div>
-
-      <div class="space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <div>
-            <label class="text-[11px] font-bold text-cyan-400 block mb-1">Modalidad / Entorno:</label>
-            <select id="admin-entorno" class="w-full bg-slate-900 border border-cyan-500/40 text-cyan-300 rounded-xl p-2 text-xs font-bold">
-              <option value="ONLINE">🌐 Personalizado Online</option>
-              <option value="KOENA">Koena (Presencial)</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-[11px] font-bold text-emerald-400 block mb-1">Alumno:</label>
-            <select id="sel-alumno-creador" class="w-full bg-slate-900 border border-emerald-500/50 text-white rounded-xl p-2 text-xs font-bold"></select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 border-t border-slate-800">
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold block mb-1">Mesociclo</label>
-            <input type="text" id="admin-mes" placeholder="Mes 1 - Fuerza Base" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
-          </div>
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold block mb-1">Duración Semanas</label>
-            <select id="admin-duracion-semanas" onchange="actualizarColumnasMatrizCoach()" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-emerald-300 font-bold">
-              <option value="4">4 Semanas</option>
-              <option value="5" selected>5 Semanas</option>
-              <option value="6">6 Semanas</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold block mb-1">Día</label>
-            <input type="text" id="admin-dia" placeholder="Lunes (Día 1)" class="w-full bg-slate-900 border border-emerald-500/50 rounded-xl p-2 text-xs text-emerald-300 font-bold">
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio</span>
-          <button type="button" onclick="aplicarPresetProgresionRamiro()" class="text-[11px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-lg font-black">
-            ⚡ Preset Ondulado
-          </button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-2">
-          <div class="md:col-span-2">
-            <label class="text-[10px] text-slate-400 font-bold">Bloque</label>
-            <select id="inp-bloque" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-emerald-300 font-bold mt-1">
-              <option value="BLOQUE A — MOVILIDAD & CALOR">BLOQUE A — MOVILIDAD & CALOR</option>
-              <option value="BLOQUE B — ACTIVACIÓN & CORE">BLOQUE B — ACTIVACIÓN & CORE</option>
-              <option value="BLOQUE C — POTENCIA / OLÍMPICO">BLOQUE C — POTENCIA / OLÍMPICO</option>
-              <option value="BLOQUE D — FUERZA PRINCIPAL" selected>BLOQUE D — FUERZA PRINCIPAL</option>
-              <option value="BLOQUE E — TRACCIONES & ACCESORIOS">BLOQUE E — TRACCIONES & ACCESORIOS</option>
-            </select>
-          </div>
-          <div class="md:col-span-2">
-            <label class="text-[10px] text-slate-400 font-bold">Ejercicio</label>
-            <input type="text" id="inp-ejercicio-nombre" placeholder="ej: Sentadilla Trasera con Barra" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white mt-1">
-          </div>
-          <div class="md:col-span-2">
-            <label class="text-[10px] text-slate-400 font-bold">Video Short (YouTube)</label>
-            <input type="text" id="inp-video" placeholder="https://youtube.com/shorts/..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white font-mono mt-1">
-          </div>
-        </div>
-
-        <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-2">
-          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">🎯 Prescripción Semanal:</span>
-          <div id="grid-matriz-coach" class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs">
-            <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Semana 1:</span>
-              <input type="text" id="prog-s1-reps" value="3x8 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s1-carga" value="70%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
-            </div>
-            <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Semana 2:</span>
-              <input type="text" id="prog-s2-reps" value="4x8 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s2-carga" value="75%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
-            </div>
-            <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Semana 3:</span>
-              <input type="text" id="prog-s3-reps" value="4x6 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s3-carga" value="80%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
-            </div>
-            <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Semana 4:</span>
-              <input type="text" id="prog-s4-reps" value="4x4 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s4-carga" value="85%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
-            </div>
-            <div id="col-s5-coach" class="bg-slate-950 p-1.5 rounded-lg border border-emerald-500/50">
-              <span class="text-[9px] font-bold text-emerald-400 block mb-0.5">Semana 5 (Fallo):</span>
-              <input type="text" id="prog-s5-reps" value="12-8-6-4 + 1xFallo" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s5-carga" value="90%+" class="w-full bg-slate-900 border border-emerald-500 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
-            </div>
-            <div id="col-s6-coach" class="hidden bg-slate-950 p-1.5 rounded-lg border border-cyan-500/50">
-              <span class="text-[9px] font-bold text-cyan-400 block mb-0.5">Semana 6:</span>
-              <input type="text" id="prog-s6-reps" value="12-8-6-4 + 1xFallo" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s6-carga" value="92.5%" class="w-full bg-slate-900 border border-cyan-500 rounded p-1 text-cyan-300 font-mono font-bold text-[11px]">
-            </div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold">Series Base</label>
-            <input type="number" id="inp-series" value="4" min="1" max="6" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white font-bold">
-          </div>
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold">RIR Prescripto</label>
-            <input type="text" id="inp-rir" value="RIR 2" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
-          </div>
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold">Tempo</label>
-            <input type="text" id="inp-tempo" value="3-0-1-0" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white font-mono">
-          </div>
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold">Pausa</label>
-            <select id="inp-descanso" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
-              <option value="60s">60 seg</option>
-              <option value="90s" selected>90 seg</option>
-              <option value="120s">120 seg</option>
-            </select>
-          </div>
-        </div>
-
-        <button type="button" onclick="agregarFilaRutina()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black p-2.5 rounded-xl text-xs transition active:scale-95 shadow-md">
-          ＋ Agregar Ejercicio a la Planificación
-        </button>
-      </div>
-
-      <div class="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950 max-h-48 overflow-y-auto">
-        <table class="w-full text-left text-xs">
-          <tbody id="tabla-ejercicios-body" class="divide-y divide-slate-800">
-            <tr id="fila-vacia"><td class="p-3 text-center text-slate-500">Todavía no agregaste ejercicios a la sesión.</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800">
-        <button type="button" onclick="guardarPlanificacionCoach()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3 rounded-2xl text-xs uppercase tracking-wider transition">🚀 Guardar en Supabase</button>
-        <button type="button" onclick="cerrarModalCreadorRapido()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-2xl text-xs uppercase transition">Cerrar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CRONÓMETRO FLOTANTE -->
-  <div id="timer-box" class="hidden fixed bottom-4 right-4 bg-slate-900 border-2 border-emerald-500 shadow-2xl rounded-2xl p-4 z-50 flex items-center gap-4">
-    <div>
-      <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Descanso</span>
-      <span id="timer-display" class="text-3xl font-black text-emerald-400 font-mono">01:30</span>
-    </div>
-    <div class="flex gap-1.5">
-      <button type="button" id="btn-timer-toggle" onclick="pausarReanudarTimer()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white">Pausa</button>
-      <button type="button" onclick="cerrarTimer()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-2.5 py-1.5 rounded-lg text-xs font-bold">✕</button>
-    </div>
   </div>
 
   <!-- ENCABEZADO -->
@@ -303,7 +64,6 @@
     </div>
     
     <div class="flex items-center gap-2">
-      <button type="button" onclick="abrirModalDiscos(0)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs px-2.5 py-1.5 rounded-lg font-bold transition">⚖️ Cargas</button>
       <div id="usuario-info" class="hidden items-center gap-2">
         <span id="tag-rol-user" class="text-[10px] font-black uppercase px-2 py-0.5 rounded border border-emerald-500/40 text-emerald-400">Alumno</span>
         <button type="button" onclick="cerrarSesion()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition">Salir</button>
@@ -315,19 +75,19 @@
   <main id="seccion-auth" class="max-w-md mx-auto mt-10 p-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl text-center space-y-6">
     <div>
       <h2 class="text-2xl font-black text-white tracking-wide">Acceso al Sistema</h2>
-      <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma Cloud Blindada</p>
+      <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma Cloud</p>
     </div>
 
     <!-- Pestañas Auth -->
     <div class="flex bg-slate-950 p-1 rounded-2xl border border-slate-800">
-      <button type="button" id="tab-auth-login" class="w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950">Ingresar</button>
-      <button type="button" id="tab-auth-registro" class="w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white">Crear Cuenta</button>
+      <button type="button" id="tab-auth-login" onclick="cambiarModoAuth('login')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950">Ingresar</button>
+      <button type="button" id="tab-auth-registro" onclick="cambiarModoAuth('registro')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white">Crear Cuenta</button>
     </div>
 
     <div class="space-y-4 text-left">
       <div id="campo-registro-nombre" class="hidden">
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Nombre Completo</label>
-        <input type="text" id="reg-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="ej: Imanol Gómez">
+        <input type="text" id="reg-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="ej: Ramiro Abbattista">
       </div>
       <div id="campo-registro-telefono" class="hidden">
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">WhatsApp</label>
@@ -335,48 +95,38 @@
       </div>
       <div>
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Correo Electrónico</label>
-        <input type="email" id="auth-email" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="tu@email.com">
+        <input type="email" id="auth-email" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="tu@email.com" value="pf.ramiroabba@gmail.com">
       </div>
       <div>
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Contraseña</label>
         <input type="password" id="auth-password" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="••••••••">
       </div>
 
-      <button type="button" id="btn-auth-accion" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3 rounded-xl transition text-xs uppercase tracking-wider">
+      <button type="button" id="btn-auth-accion" onclick="ejecutarAuth()" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-950 font-black py-3 rounded-xl transition text-xs uppercase tracking-wider shadow-lg">
         Ingresar a mi Plan
       </button>
-      <button type="button" id="btn-olvido-pass" class="w-full text-xs text-slate-400 hover:text-emerald-400 transition pt-1 text-center block">
-        ¿Olvidaste tu contraseña?
-      </button>
     </div>
-    <p id="auth-mensaje" class="text-xs text-emerald-400 font-semibold text-center"></p>
+    <p id="auth-mensaje" class="text-xs text-emerald-400 font-semibold text-center min-h-[1rem]"></p>
   </main>
 
   <!-- PANTALLA PRINCIPAL -->
   <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
-
-    <!-- DASHBOARD -->
     <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 to-slate-950 p-5 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
           <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block">Atleta Conectado</span>
           <h3 class="text-xl font-black text-white" id="dash-alumno-nombre">Bienvenido</h3>
         </div>
-        <div class="flex items-center gap-3">
-          <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
-            <span class="text-base">🔥</span>
-            <div>
-              <span class="text-[9px] text-slate-400 uppercase font-bold block">Racha Semanal</span>
-              <span id="stat-racha" class="text-xs font-black text-emerald-400">0 sem</span>
-            </div>
+        <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
+          <span class="text-base">🔥</span>
+          <div>
+            <span class="text-[9px] text-slate-400 uppercase font-bold block">Racha Semanal</span>
+            <span id="stat-racha" class="text-xs font-black text-emerald-400">0 sem</span>
           </div>
-          <button type="button" onclick="iniciarModoActivo()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black px-4 py-2 rounded-xl text-xs uppercase tracking-wider transition">⚡ Entreno Activo</button>
         </div>
       </div>
-
-      <!-- CALENDARIO -->
       <div class="space-y-1.5">
-        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia (Mes Actual):</span>
+        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia:</span>
         <div id="grid-calendario-adherencia" class="grid grid-cols-7 gap-1 text-center text-[10px] font-mono"></div>
       </div>
     </div>
@@ -388,137 +138,55 @@
           <h3 class="text-base font-black text-blue-400 flex items-center gap-2">🛡️ Panel del Coach</h3>
           <p class="text-xs text-slate-400">Supervisión en tiempo real de atletas y asignación de mesociclos.</p>
         </div>
-        <div class="flex gap-2">
-          <button type="button" onclick="nuevoPlan()" class="bg-blue-600 hover:bg-blue-500 text-white font-black px-3 py-1.5 rounded-xl text-xs">＋ Planificar Día</button>
-          <button type="button" onclick="exportarBaseAlumnosCSV()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold px-3 py-1.5 rounded-xl text-xs">📥 Exportar CSV</button>
-        </div>
       </div>
-
       <div id="contenedor-atletas-coach" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-80 overflow-y-auto"></div>
-      <div class="border-t border-slate-800 pt-4 space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-black text-blue-300 uppercase tracking-wider">📋 Planes asignados</span>
-          <select id="filtro-planes-estado" onchange="cargarPlanesCoach()" class="bg-slate-950 border border-slate-700 text-slate-300 rounded-lg p-1.5 text-xs font-bold">
-            <option value="activa">Activos</option><option value="archivada">Archivados</option><option value="todos">Todos</option>
-          </select>
-        </div>
-        <div id="lista-planes-coach" class="space-y-3 max-h-96 overflow-y-auto"></div>
-      </div>
     </div>
 
-    <!-- PESTAÑAS DEL ALUMNO -->
+    <!-- CONTENEDOR DE RUTINAS -->
     <div class="space-y-4">
-      <div id="contenedor-tabs-dias" class="tabs-dias-container hidden overflow-x-auto pb-1">
+      <div id="contenedor-tabs-dias" class="hidden overflow-x-auto pb-1">
         <div class="flex items-center gap-2" id="barra-solapas-dias"></div>
       </div>
-
-      <div id="contenedor-tabs-semanas" class="hidden bg-slate-900/90 p-2 rounded-2xl border border-slate-800 overflow-x-auto">
-        <div class="flex items-center gap-2">
-          <span class="text-[11px] font-black uppercase text-emerald-400 px-2">Semana:</span>
-          <div class="flex items-center gap-1.5" id="barra-solapas-semanas"></div>
-        </div>
-      </div>
-
       <div id="lista-rutinas" class="space-y-6"></div>
     </div>
   </main>
 
   <script>
+    // 1. CAPTURA Y MUESTRA DE ERRORES DIRECTO EN PANTALLA
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
+      const box = document.getElementById('debug-error-box');
+      const txt = document.getElementById('debug-error-txt');
+      if (box && txt) {
+        box.classList.remove('hidden');
+        txt.innerText = `${msg} (Línea ${lineNo})`;
+      }
+      return false;
+    };
+
+    // 2. ELIMINACIÓN FORZADA DE SERVICE WORKERS PREVIOS
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+
+    // 3. INICIALIZACIÓN DE SUPABASE
     const SUPABASE_URL = 'https://zuwqfzfncybtwvzwlqmw.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1d3FmemZuY3lidHd2endscW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2OTgzMTYsImV4cCI6MjEwNjI3NDMxNn0.B2NPB2q5Blni4KNcBoyvfp8yW70hC0KqOgm3O2q1gGI';
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    let sb = null;
+    if (window.supabase && typeof window.supabase.createClient === 'function') {
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } else {
+      setTimeout(() => {
+        if (window.supabase) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }, 500);
+    }
 
     let usuarioActual = null;
-    let perfilActual = null;
-    let rutinasActivas = [];
-    let marcasRMAlumno = {};
-    let semanaActiva = 1;
-    let diaActivoId = null;
-    let planEditandoId = null;
-    let ejEditIdx = null;
-    window.planesCoach = {};
-    let finTimer = 0;
-    window.mapaPrevSemana = {};
-    let totalSemanas = 5;
-    let sesionCoachTemporal = [];
-    let pesoBarraSeleccionada = 20;
     let modoAuth = 'login';
-
-    let timerInterval = null;
-    let tiempoRestante = 90;
-    let timerEnPausa = false;
-
-    let indiceEjercicioActivo = 0;
-    let listaEjerciciosModoActivo = [];
-
-    // VINCULACIÓN DE LISTENERS
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('tab-auth-login').addEventListener('click', () => cambiarModoAuth('login'));
-      document.getElementById('tab-auth-registro').addEventListener('click', () => cambiarModoAuth('registro'));
-      document.getElementById('btn-auth-accion').addEventListener('click', ejecutarAuth);
-      document.getElementById('btn-olvido-pass').addEventListener('click', recuperarPassword);
-
-      // Comprobación inicial de sesión
-      sb.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
-          usuarioActual = session.user;
-          cargarPerfilYRoles();
-        }
-      }).catch(err => {
-        console.warn("Sin sesión previa:", err);
-      });
-    });
-
-    function nombreEj(planId, idx) {
-      const r = rutinasActivas.find(x => String(x.id) === String(planId));
-      return r?.ejercicios_detalle?.[idx]?.ejercicio || 'N/A';
-    }
-
-    function semanaISO(d) {
-      const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-      const dia = t.getUTCDay() || 7;
-      t.setUTCDate(t.getUTCDate() + 4 - dia);
-      const ini = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
-      return t.getUTCFullYear() * 100 + Math.ceil(((t - ini) / 86400000 + 1) / 7);
-    }
-
-    function calcularRacha(diasSet) {
-      const porSem = {};
-      diasSet.forEach(f => {
-        const [y, m, d] = f.split('-').map(Number);
-        const k = semanaISO(new Date(y, m - 1, d));
-        (porSem[k] = porSem[k] || new Set()).add(f);
-      });
-      let racha = 0;
-      const cursor = new Date();
-      if ((porSem[semanaISO(cursor)]?.size || 0) < 2) cursor.setDate(cursor.getDate() - 7);
-      while ((porSem[semanaISO(cursor)]?.size || 0) >= 2) { racha++; cursor.setDate(cursor.getDate() - 7); }
-      return racha;
-    }
-
-    async function recuperarPassword() {
-      const email = document.getElementById('auth-email').value.trim();
-      if (!email) return alert('Escribí tu correo primero en el campo correspondiente.');
-      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
-      document.getElementById('auth-mensaje').innerText = error ? error.message : 'Te enviamos un enlace por correo para restablecer la contraseña.';
-    }
-
-    function escaparHTML(str) {
-      if (str === null || str === undefined) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function mostrarToast(txt) {
-      const t = document.getElementById('toast-guardado');
-      document.getElementById('toast-texto').innerText = txt || "✓ Guardado en Supabase";
-      t.classList.remove('opacity-0');
-      setTimeout(() => t.classList.add('opacity-0'), 1500);
-    }
 
     function cambiarModoAuth(modo) {
       modoAuth = modo;
@@ -544,955 +212,135 @@
     }
 
     async function ejecutarAuth() {
-      const email = document.getElementById('auth-email').value.trim();
-      const password = document.getElementById('auth-password').value;
       const msg = document.getElementById('auth-mensaje');
       msg.innerText = '';
 
-      if (!email || !password) {
-        msg.innerText = "Por favor ingresá correo y contraseña.";
+      if (!sb) {
+        msg.innerText = "Conectando con la base de datos... intentá de nuevo en un segundo.";
+        if (window.supabase) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         return;
       }
 
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+
+      if (!email || !password) {
+        msg.innerText = "Por favor completá correo y contraseña.";
+        return;
+      }
+
+      msg.innerText = "Verificando credenciales...";
+
       try {
         if (modoAuth === 'login') {
-          msg.innerText = 'Verificando credenciales...';
           const { data, error } = await sb.auth.signInWithPassword({ email, password });
           if (error) {
             msg.innerText = error.message;
           } else {
             usuarioActual = data.user;
-            msg.innerText = '';
+            msg.innerText = "¡Ingreso correcto!";
             await cargarPerfilYRoles();
           }
         } else {
           const nombre = document.getElementById('reg-nombre').value.trim();
           const telefono = document.getElementById('reg-telefono').value.trim();
-          msg.innerText = 'Creando cuenta...';
-
           const { error } = await sb.auth.signUp({
             email,
             password,
             options: { data: { nombre, telefono } }
           });
-
           if (error) {
             msg.innerText = error.message;
           } else {
-            msg.innerText = '';
             alert("Cuenta creada con éxito. Ya podés ingresar.");
             cambiarModoAuth('login');
           }
         }
       } catch (err) {
-        msg.innerText = 'Error de conexión: ' + err.message;
+        msg.innerText = "Error: " + err.message;
       }
     }
 
-    async function cerrarSesion() {
-      await sb.auth.signOut();
-      usuarioActual = null;
-      perfilActual = null;
-      document.getElementById('seccion-auth').classList.remove('hidden');
-      document.getElementById('seccion-panel').classList.add('hidden');
-      document.getElementById('usuario-info').classList.add('hidden');
-    }
-
     async function cargarPerfilYRoles() {
-      if (!usuarioActual) return;
+      if (!usuarioActual || !sb) return;
 
       const { data: perfil } = await sb
         .from('perfiles_usuarios')
         .select('*')
         .eq('id', usuarioActual.id)
-        .single();
+        .maybeSingle();
 
-      perfilActual = perfil || { rol: 'alumno', nombre: usuarioActual.email.split('@')[0] };
+      const rol = perfil?.rol || 'alumno';
 
       document.getElementById('seccion-auth').classList.add('hidden');
       document.getElementById('seccion-panel').classList.remove('hidden');
       document.getElementById('usuario-info').classList.remove('hidden');
       document.getElementById('usuario-info').classList.add('flex');
-      document.getElementById('dash-alumno-nombre').innerText = `Hola, ${perfilActual.nombre || 'Atleta'}`;
-      document.getElementById('tag-rol-user').innerText = perfilActual.rol.toUpperCase();
+      document.getElementById('dash-alumno-nombre').innerText = `Hola, ${perfil?.nombre || usuarioActual.email.split('@')[0]}`;
+      document.getElementById('tag-rol-user').innerText = rol.toUpperCase();
 
-      if (perfilActual.rol === 'coach') {
+      if (rol === 'coach') {
         document.getElementById('seccion-admin').classList.remove('hidden');
-        await cargarVistaCoach();
-        await cargarPlanesCoach();
+        cargarVistaCoach();
       } else {
         document.getElementById('seccion-admin').classList.add('hidden');
       }
 
-      await cargarMarcasRM();
-      await cargarRutinasAlumno();
-      await calcularRachaYCalendario();
-    }
-
-    async function cargarMarcasRM() {
-      if (!usuarioActual) return;
-      const { data } = await sb.from('marcas_rm').select('*').eq('user_id', usuarioActual.id);
-      marcasRMAlumno = {};
-      (data || []).forEach(r => {
-        marcasRMAlumno[r.ejercicio.trim().toLowerCase()] = r.rm_calculado;
-      });
-    }
-
-    function resolverCargaKilos(ejercicioNombre, textoPrescripcion) {
-      if (!textoPrescripcion) return { textoDisplay: 'Libre', kgCalculado: null };
-      const nombreNorm = (ejercicioNombre || '').trim().toLowerCase();
-      const rm = marcasRMAlumno[nombreNorm];
-
-      if (textoPrescripcion.includes('%') && rm && rm > 0) {
-        const pct = parseFloat(textoPrescripcion.replace(/[^0-9.]/g, ''));
-        if (!isNaN(pct)) {
-          const kg = Math.round(rm * (pct / 100) * 10) / 10;
-          return { textoDisplay: `${pct}% (${kg} kg)`, kgCalculado: kg };
-        }
-      }
-      return { textoDisplay: textoPrescripcion, kgCalculado: null };
-    }
-
-    async function cargarRutinasAlumno() {
-      const { data: planes } = await sb.from('planificaciones').select('*')
-        .eq('alumno_id', usuarioActual.id).eq('estado', 'activa')
-        .order('created_at', { ascending: true });
-      rutinasActivas = planes || [];
-      diaActivoId = null;
-      renderizarSolapasYRutas();
-    }
-
-    function renderizarSolapasYRutas() {
-      const contDias = document.getElementById('barra-solapas-dias');
-      const contSem = document.getElementById('barra-solapas-semanas');
-
-      if (rutinasActivas.length === 0) {
-        document.getElementById('lista-rutinas').innerHTML = '<div class="p-8 bg-slate-900 rounded-3xl text-center text-slate-500">No hay planes activos asignados.</div>';
-        return;
-      }
-
-      const planActual = rutinasActivas[0];
-      totalSemanas = planActual.duracion_semanas || 5;
-
-      document.getElementById('contenedor-tabs-dias').classList.remove('hidden');
-      document.getElementById('contenedor-tabs-semanas').classList.remove('hidden');
-
-      contDias.innerHTML = '';
-      rutinasActivas.forEach((r, i) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.id = `btn-dia-${r.id}`;
-        btn.className = `px-4 py-2 rounded-xl text-xs font-bold border transition whitespace-nowrap ${i === 0 ? 'tab-dia-active' : 'bg-slate-900 border-slate-800 text-slate-400'}`;
-        btn.textContent = r.dia || `Día ${i + 1}`;
-        btn.dataset.id = String(r.id);
-        btn.addEventListener('click', () => activarDia(r.id));
-        contDias.appendChild(btn);
-      });
-
-      renderizarBotonesSemanas();
-      activarDia(rutinasActivas[0].id);
-    }
-
-    function renderizarBotonesSemanas() {
-      const contSem = document.getElementById('barra-solapas-semanas');
-      contSem.innerHTML = Array.from({ length: totalSemanas }).map((_, idx) => {
-        const s = idx + 1;
-        return `
-          <button type="button" onclick="cambiarSemana(${s})" class="btn-sem px-3 py-1.5 rounded-xl text-xs font-bold transition border ${s === semanaActiva ? 'tab-sem-active' : 'bg-slate-950 border-slate-700 text-slate-400'}">
-            Sem ${s} ${s === totalSemanas ? '🔥' : ''}
-          </button>
-        `;
-      }).join('');
-    }
-
-    function cambiarSemana(num) {
-      semanaActiva = num;
-      renderizarBotonesSemanas();
-      activarDia(diaActivoId || rutinasActivas[0].id);
-    }
-
-    async function activarDia(rutinaId) {
-      diaActivoId = rutinaId;
-      document.querySelectorAll('#barra-solapas-dias button').forEach(b => {
-        b.className = "px-4 py-2 rounded-xl text-xs font-bold border transition whitespace-nowrap bg-slate-900 border-slate-800 text-slate-400";
-      });
-      const btn = document.getElementById(`btn-dia-${rutinaId}`);
-      if (btn) btn.className = "px-4 py-2 rounded-xl text-xs font-bold border transition whitespace-nowrap tab-dia-active";
-      const rutina = rutinasActivas.find(r => String(r.id) === String(rutinaId));
-      if (!rutina) return;
-
-      const traer = async sem => {
-        const res = await sb.from('registros_series').select('*')
-          .eq('planificacion_id', String(rutinaId)).eq('user_id', usuarioActual.id)
-          .eq('semana_num', sem);
-        return res.data || [];
-      };
-
-      const [actual, previa] = await Promise.all([traer(semanaActiva), semanaActiva > 1 ? traer(semanaActiva - 1) : []]);
-      const mapa = {}, mapaPrev = {};
-      actual.forEach(x => mapa[`${x.ejercicio_index}_${x.serie_num}`] = x);
-      previa.forEach(x => mapaPrev[`${x.ejercicio_index}_${x.serie_num}`] = x);
-      window.mapaPrevSemana = mapaPrev;
-      renderizarTarjetaRutina(rutina, mapa);
-    }
-
-    function renderizarTarjetaRutina(rutina, mapaSeries) {
-      const cont = document.getElementById('lista-rutinas');
-      const detalles = rutina.ejercicios_detalle || [];
-      const esUltimaSemana = semanaActiva === totalSemanas;
-
-      cont.innerHTML = `
-        <div id="card-rutina-${rutina.id}" class="bg-slate-900 border border-slate-800 p-5 md:p-6 rounded-3xl space-y-4">
-          <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-            <div>
-              <span class="text-xs text-emerald-400 font-bold uppercase block">${escaparHTML(rutina.mesociclo || 'Mesociclo')}</span>
-              <h3 class="text-xl font-black text-white">${escaparHTML(rutina.dia)}</h3>
-            </div>
-            <div class="flex gap-2">
-              <span class="text-xs bg-slate-950 text-cyan-300 font-mono px-3 py-1 rounded-full border border-cyan-500/30">Semana ${semanaActiva} de ${totalSemanas}</span>
-            </div>
-          </div>
-
-          <div class="space-y-4">
-            ${detalles.map((ej, itmIdx) => {
-              const prog = ej.progresionSemanal || {};
-              const semData = prog[`s${semanaActiva}`] || { reps: ej.reps || '3x8', carga: 'Libre' };
-              const cantSeries = (parseInt(ej.series) || 4) + ((esUltimaSemana || /fallo/i.test(semData.reps)) ? 1 : 0);
-              const cargaResuelta = resolverCargaKilos(ej.ejercicio, semData.carga);
-
-              return `
-                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 space-y-3">
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <h4 class="font-bold text-white text-base">${escaparHTML(ej.ejercicio)}</h4>
-                      <div class="text-[11px] text-slate-400 flex flex-wrap gap-2 mt-0.5">
-                        <span>${escaparHTML(ej.bloque || '')}</span>
-                        <span>• Pauta: <strong class="text-emerald-400">${escaparHTML(cargaResuelta.textoDisplay)}</strong></span>
-                        <span>• Reps: <strong>${escaparHTML(semData.reps)}</strong></span>${ej.tempo ? `<span>• Tempo: <strong class="text-cyan-300 font-mono">${escaparHTML(ej.tempo)}</strong></span>` : ''}
-                      </div>
-                    </div>
-                    ${ej.video ? `
-                      <button type="button" class="btn-play-short bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-xs font-bold" data-video="${escaparHTML(ej.video)}" data-title="${escaparHTML(ej.ejercicio)}">
-                        ▶ Short
-                      </button>
-                    ` : ''}
-                  </div>
-
-                  ${esUltimaSemana ? `
-                    <div class="bg-slate-900 border border-amber-500/30 p-2.5 rounded-xl flex items-center justify-between text-xs">
-                      <span class="text-amber-400 font-bold">🔥 Testeo al Fallo Técnico: Calculá tu nuevo 1RM al terminar la serie máxima.</span>
-                      <button type="button" class="btn-calc-rm-fallo bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-1 rounded-lg font-bold" data-ej="${escaparHTML(ej.ejercicio)}" data-idx="${itmIdx}">
-                        Calcular RM
-                      </button>
-                    </div>
-                  ` : ''}
-
-                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
-                    ${Array.from({ length: cantSeries }).map((_, sIdx) => {
-                      const sNum = sIdx + 1;
-                      const sData = mapaSeries[`${itmIdx}_${sNum}`] || {};
-                      const hecha = sData.completada || false;
-
-                      return `
-                        <div class="serie-box bg-slate-900 p-2.5 rounded-xl border border-slate-800 ${hecha ? 'serie-done-box' : ''} space-y-1.5" id="box-${rutina.id}-${itmIdx}-${sNum}">
-                          <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-400 font-mono font-bold">Serie ${sNum}</span>
-                            <button type="button" class="btn-toggle-serie px-2.5 py-0.5 rounded-lg text-[11px] font-black border ${hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-950 text-rose-300 border-rose-500/40'}"
-                              data-plan="${rutina.id}" data-idx="${itmIdx}" data-sem="${semanaActiva}" data-serie="${sNum}" data-descanso="${ej.descanso || '90s'}" data-target="box-${rutina.id}-${itmIdx}-${sNum}">
-                              ${hecha ? '✓' : '✗'}
-                            </button>
-                          </div>
-                          <div class="flex gap-1.5">
-                            <input type="number" step="0.5" inputmode="decimal" placeholder="${(window.mapaPrevSemana || {})[`${itmIdx}_${sNum}`]?.carga ?? 'Kg'}" value="${sData.carga !== undefined && sData.carga !== null ? sData.carga : ''}"
-                              class="inp-carga w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold"
-                              data-plan="${rutina.id}" data-idx="${itmIdx}" data-sem="${semanaActiva}" data-serie="${sNum}">
-                            <input type="number" inputmode="numeric" placeholder="${(window.mapaPrevSemana || {})[`${itmIdx}_${sNum}`]?.rir_real ?? 'RIR'}" value="${sData.rir_real !== undefined && sData.rir_real !== null ? sData.rir_real : ''}"
-                              class="inp-rir w-14 bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold"
-                              data-plan="${rutina.id}" data-idx="${itmIdx}" data-sem="${semanaActiva}" data-serie="${sNum}">
-                          </div>
-                        </div>
-                      `;
-                    }).join('')}
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-      `;
-
-      enlazarEventosDinamicos();
-    }
-
-    function enlazarEventosDinamicos() {
-      document.querySelectorAll('.btn-play-short').forEach(b => {
-        b.onclick = () => abrirPlayerVideo(b.dataset.video, b.dataset.title);
-      });
-
-      document.querySelectorAll('.btn-toggle-serie').forEach(b => {
-        b.onclick = () => toggleSerieCloud(b.dataset.plan, parseInt(b.dataset.idx), parseInt(b.dataset.sem), parseInt(b.dataset.serie), b.dataset.descanso, b, b.dataset.target);
-      });
-
-      document.querySelectorAll('.inp-carga').forEach(inp => {
-        inp.onchange = () => guardarCargaCloud(inp.dataset.plan, parseInt(inp.dataset.idx), parseInt(inp.dataset.sem), parseInt(inp.dataset.serie), inp.value);
-      });
-
-      document.querySelectorAll('.inp-rir').forEach(inp => {
-        inp.onchange = () => guardarRIRCloud(inp.dataset.plan, parseInt(inp.dataset.idx), parseInt(inp.dataset.sem), parseInt(inp.dataset.serie), inp.value);
-      });
-
-      document.querySelectorAll('.btn-calc-rm-fallo').forEach(btn => {
-        btn.onclick = () => procesarTesteoFallo(btn.dataset.ej, parseInt(btn.dataset.idx));
-      });
-    }
-
-    async function guardarCargaCloud(planId, ejercicioIdx, sem, serie, carga) {
-      if (!usuarioActual) return;
-      const { error } = await sb.from('registros_series').upsert({
-        planificacion_id: String(planId),
-        user_id: usuarioActual.id,
-        ejercicio_index: ejercicioIdx,
-        ejercicio: nombreEj(planId, ejercicioIdx),
-        semana_num: sem,
-        serie_num: serie,
-        carga: parseFloat(carga) || null,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'planificacion_id,user_id,ejercicio_index,semana_num,serie_num' });
-
-      if (!error) mostrarToast();
-    }
-
-    async function guardarRIRCloud(planId, ejercicioIdx, sem, serie, rir) {
-      if (!usuarioActual) return;
-      const { error } = await sb.from('registros_series').upsert({
-        planificacion_id: String(planId),
-        user_id: usuarioActual.id,
-        ejercicio_index: ejercicioIdx,
-        ejercicio: nombreEj(planId, ejercicioIdx),
-        semana_num: sem,
-        serie_num: serie,
-        rir_real: parseInt(rir) || null,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'planificacion_id,user_id,ejercicio_index,semana_num,serie_num' });
-
-      if (!error) mostrarToast();
-    }
-
-    async function toggleSerieCloud(planId, ejercicioIdx, sem, serie, descanso, btnElement, targetBoxId) {
-      if (!usuarioActual) return;
-
-      const { data: actual } = await sb.from('registros_series')
-        .select('completada')
-        .eq('planificacion_id', String(planId))
-        .eq('user_id', usuarioActual.id)
-        .eq('ejercicio_index', ejercicioIdx)
-        .eq('semana_num', sem)
-        .eq('serie_num', serie)
-        .maybeSingle();
-
-      const nuevoEstado = !(actual?.completada);
-
-      const { error } = await sb.from('registros_series').upsert({
-        planificacion_id: String(planId),
-        user_id: usuarioActual.id,
-        ejercicio_index: ejercicioIdx,
-        ejercicio: nombreEj(planId, ejercicioIdx),
-        semana_num: sem,
-        serie_num: serie,
-        completada: nuevoEstado,
-        completed_at: nuevoEstado ? new Date().toISOString() : null,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'planificacion_id,user_id,ejercicio_index,semana_num,serie_num' });
-
-      if (!error) {
-        mostrarToast();
-        const box = document.getElementById(targetBoxId);
-        if (box) {
-          if (nuevoEstado) {
-            box.classList.add('serie-done-box');
-            btnElement.className = "btn-toggle-serie px-2.5 py-0.5 rounded-lg text-[11px] font-black border bg-emerald-500 text-slate-950 border-emerald-400";
-            btnElement.textContent = '✓';
-            navigator.vibrate?.(60);
-            iniciarTimerDescanso(parseSegundos(descanso));
-            calcularRachaYCalendario();
-          } else {
-            box.classList.remove('serie-done-box');
-            btnElement.className = "btn-toggle-serie px-2.5 py-0.5 rounded-lg text-[11px] font-black border bg-slate-950 text-rose-300 border-rose-500/40";
-            btnElement.textContent = '✗';
-          }
-        }
-      }
-    }
-
-    async function procesarTesteoFallo(ejercicio, itmIdx) {
-      const p = parseFloat(prompt(`Peso de la serie máxima de ${ejercicio} (kg):`));
-      const r = parseInt(prompt('Repeticiones completadas al fallo:'));
-      if (isNaN(p) || isNaN(r) || r < 1) return;
-      const rm = Math.round(p * (1 + r / 30) * 10) / 10;
-      const previo = marcasRMAlumno[ejercicio.trim().toLowerCase()] || 0;
-      const fila = { user_id: usuarioActual.id, ejercicio: ejercicio.trim(), peso_levantado: p, reps_hechas: r, rm_calculado: rm };
-      await sb.from('marcas_rm_historial').insert(fila);
-      await sb.from('marcas_rm').upsert({ ...fila, updated_at: new Date().toISOString() }, { onConflict: 'user_id,ejercicio' });
-      await cargarMarcasRM();
-      if (rm > previo) abrirModalPR(ejercicio, rm); else mostrarToast(`1RM estimado: ${rm} kg (récord: ${previo} kg)`);
-      cambiarSemana(semanaActiva);
-    }
-
-    function abrirModalPR(ejercicio, peso) {
-      document.getElementById('pr-share-ejercicio').innerText = ejercicio;
-      document.getElementById('pr-share-peso').innerText = `${peso} kg`;
-      document.getElementById('modal-pr-celebracion').classList.remove('hidden');
-    }
-
-    function cerrarModalPR() {
-      document.getElementById('modal-pr-celebracion').classList.add('hidden');
-    }
-
-    function compartirPRSocial() {
-      const ej = document.getElementById('pr-share-ejercicio').innerText;
-      const peso = document.getElementById('pr-share-peso').innerText;
-      const txt = `🔥 ¡Nuevo récord en ${ej}! Saqué ${peso} entrenando con Ramiro Abbattista.`;
-      if (navigator.share) {
-        navigator.share({ title: 'Récord Personal', text: txt }).catch(() => {});
-      } else {
-        navigator.clipboard?.writeText(txt);
-        alert("Copiado al portapapeles.");
-      }
-    }
-
-    function obtenerFechaLocalString(d = new Date()) {
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-
-    async function calcularRachaYCalendario() {
-      if (!usuarioActual) return;
-
-      const { data: registros } = await sb
-        .from('registros_series')
-        .select('completed_at')
-        .eq('user_id', usuarioActual.id)
-        .eq('completada', true);
-
-      const diasEntrenados = new Set();
-      (registros || []).forEach(r => {
-        if (r.completed_at) {
-          const loc = new Date(r.completed_at);
-          diasEntrenados.add(obtenerFechaLocalString(loc));
-        }
-      });
-
-      const cont = document.getElementById('grid-calendario-adherencia');
-      const hoy = new Date();
-      const diasEnMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
-
-      let html = '';
-      for (let d = 1; d <= diasEnMes; d++) {
-        const strDia = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        const ent = diasEntrenados.has(strDia);
-        html += `<div class="h-6 flex items-center justify-center rounded-lg ${ent ? 'bg-emerald-500 text-slate-950 font-black' : 'bg-slate-900 text-slate-600'}">${d}</div>`;
-      }
-      cont.innerHTML = html;
-
-      document.getElementById('stat-racha').innerText = `${calcularRacha(diasEntrenados)} sem`;
-    }
-
-    function iniciarModoActivo() {
-      if (rutinasActivas.length === 0) return alert("No hay entrenamientos cargados.");
-      const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) || rutinasActivas[0];
-
-      listaEjerciciosModoActivo = rutinaVisible.ejercicios_detalle || [];
-      if (listaEjerciciosModoActivo.length === 0) return alert("Esta sesión no tiene ejercicios.");
-
-      indiceEjercicioActivo = 0;
-      document.getElementById('modal-modo-activo').classList.remove('hidden');
-      renderizarEjercicioActivo(rutinaVisible.id);
-    }
-
-    function cerrarModoActivo() {
-      document.getElementById('modal-modo-activo').classList.add('hidden');
-      const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) || rutinasActivas[0];
-      activarDia(rutinaVisible.id);
-    }
-
-    function moverEjercicioActivo(delta, rId) {
-      indiceEjercicioActivo += delta;
-      if (indiceEjercicioActivo < 0) indiceEjercicioActivo = 0;
-      if (indiceEjercicioActivo >= listaEjerciciosModoActivo.length) {
-        indiceEjercicioActivo = listaEjerciciosModoActivo.length - 1;
-        alert("🎉 ¡Llegaste al final de la sesión!");
-      }
-      renderizarEjercicioActivo(rId);
-    }
-
-    async function renderizarEjercicioActivo(rId) {
-      const cont = document.getElementById('contenido-ejercicio-activo');
-      const item = listaEjerciciosModoActivo[indiceEjercicioActivo];
-      const cantSeries = parseInt(item.series) || 4;
-
-      document.getElementById('txt-indice-activo').innerText = `${indiceEjercicioActivo + 1} de ${listaEjerciciosModoActivo.length}`;
-
-      const { data: seriesCargadas } = await sb
-        .from('registros_series')
-        .select('*')
-        .eq('planificacion_id', String(rId))
-        .eq('user_id', usuarioActual.id)
-        .eq('ejercicio_index', indiceEjercicioActivo)
-        .eq('semana_num', semanaActiva);
-
-      const mapActivo = {};
-      (seriesCargadas || []).forEach(s => mapActivo[s.serie_num] = s);
-
-      cont.innerHTML = `
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div>
-              <span class="text-[10px] text-emerald-400 font-bold uppercase block">${escaparHTML(item.bloque)}</span>
-              <h3 class="text-xl font-black text-white">${escaparHTML(item.ejercicio)}</h3>
-            </div>
-            ${item.video ? `
-              <button type="button" class="btn-play-short bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-xl text-xs font-bold" data-video="${escaparHTML(item.video)}" data-title="${escaparHTML(item.ejercicio)}">
-                ▶ Short
-              </button>
-            ` : ''}
-          </div>
-
-          <div class="space-y-2 pt-2">
-            ${Array.from({ length: cantSeries }).map((_, sIdx) => {
-              const sNum = sIdx + 1;
-              const sData = mapActivo[sNum] || {};
-              const hecha = sData.completada || false;
-
-              return `
-                <div class="serie-box bg-slate-950 p-3 rounded-2xl border border-slate-800 ${hecha ? 'serie-done-box' : ''} flex items-center justify-between gap-3" id="act-box-${sNum}">
-                  <span class="font-mono font-bold text-slate-400 text-sm">S${sNum}</span>
-                  <div class="flex items-center gap-2 flex-1">
-                    <input type="number" step="0.5" placeholder="Kg" value="${sData.carga !== undefined && sData.carga !== null ? sData.carga : ''}"
-                      class="inp-carga-act w-24 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold"
-                      data-serie="${sNum}">
-                    <input type="number" placeholder="RIR" value="${sData.rir_real !== undefined && sData.rir_real !== null ? sData.rir_real : ''}"
-                      class="inp-rir-act w-16 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold"
-                      data-serie="${sNum}">
-                  </div>
-                  <button type="button" class="btn-toggle-act px-4 py-2.5 rounded-xl text-xs font-black border ${hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-900 text-rose-300 border-rose-500/40'}"
-                    data-serie="${sNum}" data-descanso="${item.descanso || '90s'}">
-                    ${hecha ? '✓' : '✗'}
-                  </button>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-
-        <div class="flex justify-between gap-3 pt-2">
-          <button type="button" id="btn-ant-act" class="bg-slate-900 border border-slate-800 px-5 py-3 rounded-2xl text-xs font-bold text-white flex-1">◀ Anterior</button>
-          <button type="button" id="btn-sig-act" class="bg-emerald-500 text-slate-950 font-black px-5 py-3 rounded-2xl text-xs flex-1">Siguiente ▶</button>
-        </div>
-      `;
-
-      cont.querySelectorAll('.inp-carga-act').forEach(i => {
-        i.onchange = () => guardarCargaCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(i.dataset.serie), i.value);
-      });
-      cont.querySelectorAll('.inp-rir-act').forEach(i => {
-        i.onchange = () => guardarRIRCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(i.dataset.serie), i.value);
-      });
-      cont.querySelectorAll('.btn-toggle-act').forEach(b => {
-        b.onclick = () => toggleSerieCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(b.dataset.serie), b.dataset.descanso, b, `act-box-${b.dataset.serie}`);
-      });
-      cont.querySelectorAll('.btn-play-short').forEach(b => {
-        b.onclick = () => abrirPlayerVideo(b.dataset.video, b.dataset.title);
-      });
-
-      document.getElementById('btn-ant-act').onclick = () => moverEjercicioActivo(-1, rId);
-      document.getElementById('btn-sig-act').onclick = () => moverEjercicioActivo(1, rId);
+      cargarRutinasAlumno();
     }
 
     async function cargarVistaCoach() {
+      if (!sb) return;
       const { data: atletas } = await sb.from('perfiles_usuarios').select('*').eq('rol', 'alumno');
-      const desde = new Date(Date.now() - 14 * 86400000).toISOString();
-      const { data: regs } = await sb.from('registros_series').select('user_id,completed_at')
-        .eq('completada', true).gte('completed_at', desde);
-      const stats = {};
-      (regs || []).forEach(r => {
-        const st = stats[r.user_id] = stats[r.user_id] || { n: 0, ult: null, dias: new Set() };
-        st.n++; st.dias.add(r.completed_at.slice(0, 10));
-        if (!st.ult || r.completed_at > st.ult) st.ult = r.completed_at;
-      });
-      document.getElementById('sel-alumno-creador').innerHTML =
-        (atletas || []).map(a => `<option value="${a.id}">${escaparHTML(a.nombre || a.email)}</option>`).join('');
-      document.getElementById('contenedor-atletas-coach').innerHTML = (atletas || []).map(a => {
-        const st = stats[a.id];
-        const dias = st ? Math.floor((Date.now() - new Date(st.ult)) / 86400000) : null;
-        const alerta = dias === null || dias >= 7;
-        return `<div class="bg-slate-950 p-4 rounded-2xl border ${alerta ? 'border-rose-500/50' : 'border-slate-800'} space-y-1 text-xs">
-          <div class="flex justify-between items-center">
-            <span class="font-bold text-white text-sm">${escaparHTML(a.nombre || a.email)}</span>
-            <span class="text-[10px] px-2 py-0.5 rounded ${alerta ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-400'}">${dias === null ? 'Sin actividad' : dias === 0 ? 'Entrenó hoy' : `Hace ${dias} d`}</span>
-          </div>
-          <div class="text-slate-400">Últimos 14 días: <strong class="text-white">${st ? st.dias.size : 0}</strong> sesiones • <strong class="text-white">${st ? st.n : 0}</strong> series</div>
-          <div class="text-slate-500">${escaparHTML(a.email)} • WhatsApp: ${escaparHTML(a.telefono || 'Sin cargar')}</div>
-        </div>`;
-      }).join('');
-    }
-
-    function exportarBaseAlumnosCSV() {
-      sb.from('perfiles_usuarios').select('*').then(({ data }) => {
-        let csv = "Nombre,Email,Telefono\n";
-        (data || []).forEach(p => {
-          const l = s => String(s || '').replace(/^[=+\-@]/, "'").replace(/"/g, '""');
-          csv += `"${l(p.nombre)}","${l(p.email)}","${l(p.telefono)}"\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `atletas_${obtenerFechaLocalString()}.csv`;
-        a.click();
-      });
-    }
-
-    function tituloCreador(t, sub, warn) {
-      document.getElementById('titulo-creador').innerText = t;
-      const e = document.getElementById('sub-creador');
-      e.innerText = sub;
-      e.className = 'text-[11px] ' + (warn ? 'text-amber-400 font-bold' : 'text-slate-400');
-    }
-
-    function nuevoPlan() {
-      planEditandoId = null; ejEditIdx = null; sesionCoachTemporal = [];
-      document.getElementById('admin-mes').value = '';
-      document.getElementById('admin-dia').value = '';
-      tituloCreador('🛠️ Nuevo plan', 'Progresión semanal ondulada y guardado directo en Supabase.', false);
-      abrirModalCreadorRapido();
-    }
-
-    function cargarPlanEnCreador(p, modo) {
-      planEditandoId = modo === 'editar' ? p.id : null;
-      ejEditIdx = null;
-      sesionCoachTemporal = JSON.parse(JSON.stringify(p.ejercicios_detalle || []));
-      document.getElementById('admin-entorno').value = p.entorno || 'ONLINE';
-      document.getElementById('sel-alumno-creador').value = p.alumno_id;
-      document.getElementById('admin-mes').value = (p.mesociclo || '') + (modo === 'duplicar' ? ' (copia)' : '');
-      document.getElementById('admin-duracion-semanas').value = String(p.duracion_semanas || 5);
-      document.getElementById('admin-dia').value = p.dia || '';
-      actualizarColumnasMatrizCoach();
-      if (modo === 'editar') tituloCreador('✏️ Editando plan', 'Si el alumno ya registró series, no cambies el orden ni borres ejercicios: los registros se guardan por posición.', true);
-      else tituloCreador('📄 Duplicando plan', 'Elegí el alumno destino y ajustá lo que quieras. Se guarda como plan nuevo.', false);
-      abrirModalCreadorRapido();
-    }
-
-    function editarEjercicioCoach(i) {
-      const e = sesionCoachTemporal[i]; if (!e) return;
-      const set = (id, v) => { document.getElementById(id).value = v ?? ''; };
-      set('inp-bloque', e.bloque); set('inp-ejercicio-nombre', e.ejercicio); set('inp-video', e.video);
-      set('inp-series', e.series); set('inp-rir', e.rir); set('inp-tempo', e.tempo); set('inp-descanso', e.descanso);
-      for (let n = 1; n <= 6; n++) {
-        const w = e.progresionSemanal?.['s' + n];
-        if (w) { set(`prog-s${n}-reps`, w.reps); set(`prog-s${n}-carga`, w.carga); }
-      }
-      ejEditIdx = i;
-      document.querySelector('[onclick="agregarFilaRutina()"]').innerText = '✔ Guardar cambios del ejercicio';
-      document.getElementById('inp-ejercicio-nombre').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    function moverEjercicioCoach(i, d) {
-      const j = i + d;
-      if (j < 0 || j >= sesionCoachTemporal.length) return;
-      [sesionCoachTemporal[i], sesionCoachTemporal[j]] = [sesionCoachTemporal[j], sesionCoachTemporal[i]];
-      ejEditIdx = null;
-      renderTablaSesionCoach();
-    }
-
-    async function cargarPlanesCoach() {
-      const cont = document.getElementById('lista-planes-coach');
+      const cont = document.getElementById('contenedor-atletas-coach');
       if (!cont) return;
-      const filtro = document.getElementById('filtro-planes-estado').value;
-      
-      let resPlanes;
-      if (filtro !== 'todos') {
-        resPlanes = await sb.from('planificaciones').select('*').eq('estado', filtro).order('created_at', { ascending: true });
-      } else {
-        resPlanes = await sb.from('planificaciones').select('*').order('created_at', { ascending: true });
-      }
 
-      const resPerfiles = await sb.from('perfiles_usuarios').select('id,nombre,email');
-      const planes = resPlanes.data || [];
-      const perfiles = resPerfiles.data || [];
-
-      const nombres = {};
-      perfiles.forEach(p => { nombres[p.id] = p.nombre || p.email; });
-      window.planesCoach = {};
-      const grupos = {};
-      planes.forEach(p => {
-        window.planesCoach[p.id] = p;
-        const k = p.alumno_id + '||' + (p.mesociclo || 'Sin mesociclo');
-        (grupos[k] = grupos[k] || []).push(p);
-      });
-
-      if (planes.length === 0) {
-        cont.innerHTML = '<div class="text-xs text-slate-500 text-center p-3">No hay planes para mostrar.</div>';
-        return;
-      }
-
-      const btn = 'px-2 py-1 rounded-lg text-[11px] font-bold border border-slate-700 bg-slate-900 text-slate-300';
-      cont.innerHTML = Object.entries(grupos).map(([k, lista]) => {
-        const i = k.indexOf('||'), alId = k.slice(0, i), mes = k.slice(i + 2);
-        const hayActivos = lista.some(p => p.estado !== 'archivada');
-        return `<div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 space-y-2">
-          <div class="flex items-center justify-between gap-2">
-            <div class="min-w-0">
-              <span class="text-sm font-black text-white block truncate">${escaparHTML(nombres[alId] || 'Alumno')}</span>
-              <span class="text-[11px] text-emerald-400 font-bold">${escaparHTML(mes)}</span>
-            </div>
-            <button type="button" class="${btn} shrink-0" data-acc="mes" data-al="${escaparHTML(alId)}" data-mes="${escaparHTML(mes)}" data-estado="${hayActivos ? 'archivada' : 'activa'}">${hayActivos ? '📦 Archivar mesociclo' : '♻ Reactivar mesociclo'}</button>
+      cont.innerHTML = (atletas || []).map(a => `
+        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1 text-xs">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-white text-sm">${a.nombre || a.email}</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">Activo</span>
           </div>
-          ${lista.map(p => `<div class="flex items-center justify-between gap-2 bg-slate-900 rounded-xl px-3 py-2 ${p.estado === 'archivada' ? 'opacity-60' : ''}">
-            <div class="min-w-0">
-              <span class="text-xs font-bold text-white block truncate">${escaparHTML(p.dia || 'Día')}</span>
-              <span class="text-[10px] text-slate-400">${(p.ejercicios_detalle || []).length} ejercicios • ${p.duracion_semanas \vert{}\vert{} 5} sem • ${p.estado === 'archivada' ? 'Archivado' : 'Activo'}</span>
-            </div>
-            <div class="flex gap-1 shrink-0">
-              <button type="button" class="${btn}" data-acc="editar" data-id="${p.id}" title="Editar">✏️</button>
-              <button type="button" class="${btn}" data-acc="duplicar" data-id="${p.id}" title="Duplicar">📄</button>
-              <button type="button" class="${btn}" data-acc="estado" data-id="${p.id}" title="${p.estado === 'archivada' ? 'Reactivar' : 'Archivar'}">${p.estado === 'archivada' ? '♻' : '📦'}</button>
-              <button type="button" class="${btn} text-rose-300" data-acc="borrar" data-id="${p.id}" title="Eliminar">🗑</button>
-            </div>
-          </div>`).join('')}
-        </div>`;
-      }).join('');
-
-      cont.onclick = async ev => {
-        const b = ev.target.closest('button[data-acc]');
-        if (!b) return;
-        const acc = b.dataset.acc, p = window.planesCoach[b.dataset.id];
-        if (acc === 'editar' && p) return cargarPlanEnCreador(p, 'editar');
-        if (acc === 'duplicar' && p) return cargarPlanEnCreador(p, 'duplicar');
-        let error;
-        if (acc === 'estado' && p) {
-          ({ error } = await sb.from('planificaciones').update({ estado: p.estado === 'archivada' ? 'activa' : 'archivada' }).eq('id', p.id));
-        } else if (acc === 'borrar' && p) {
-          if (!confirm(`¿Eliminar "${p.dia}"? Esto no se puede deshacer.`)) return;
-          ({ error } = await sb.from('planificaciones').delete().eq('id', p.id));
-        } else if (acc === 'mes') {
-          let u = sb.from('planificaciones').update({ estado: b.dataset.estado }).eq('alumno_id', b.dataset.al);
-          u = b.dataset.mes === 'Sin mesociclo' ? u.is('mesociclo', null) : u.eq('mesociclo', b.dataset.mes);
-          ({ error } = await u);
-        } else return;
-        if (error) alert('Error: ' + error.message); else { mostrarToast('✓ Actualizado'); cargarPlanesCoach(); }
-      };
+          <div class="text-slate-400">${a.email} • WhatsApp: ${a.telefono || 'Sin cargar'}</div>
+        </div>
+      `).join('');
     }
 
-    function abrirModalCreadorRapido() {
-      document.getElementById('modal-creador-rapido').classList.remove('hidden');
-      renderTablaSesionCoach();
-    }
+    async function cargarRutinasAlumno() {
+      if (!sb || !usuarioActual) return;
+      const { data: planes } = await sb.from('planificaciones').select('*')
+        .eq('alumno_id', usuarioActual.id)
+        .order('created_at', { ascending: true });
 
-    function cerrarModalCreadorRapido() {
-      document.getElementById('modal-creador-rapido').classList.add('hidden');
-    }
-
-    function actualizarColumnasMatrizCoach() {
-      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) || 5;
-      document.getElementById('col-s5-coach').classList.toggle('hidden', cant < 5);
-      document.getElementById('col-s6-coach').classList.toggle('hidden', cant < 6);
-    }
-
-    function aplicarPresetProgresionRamiro() {
-      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) || 5;
-      document.getElementById('prog-s1-reps').value = "3x8 reps";
-      document.getElementById('prog-s1-carga').value = "70%";
-      document.getElementById('prog-s2-reps').value = "4x8 reps";
-      document.getElementById('prog-s2-carga').value = "75%";
-      document.getElementById('prog-s3-reps').value = "4x6 reps";
-      document.getElementById('prog-s3-carga').value = "80%";
-      document.getElementById('prog-s4-reps').value = "4x4 reps";
-      document.getElementById('prog-s4-carga').value = "85%";
-      if (cant >= 5) {
-        document.getElementById('prog-s5-reps').value = "12-8-6-4 + 1xFallo";
-        document.getElementById('prog-s5-carga').value = "90%+";
-      }
-      if (cant >= 6) {
-        document.getElementById('prog-s6-reps').value = "12-8-6-4 + 1xFallo";
-        document.getElementById('prog-s6-carga').value = "92.5%+";
-      }
-    }
-
-    function agregarFilaRutina() {
-      const ej = document.getElementById('inp-ejercicio-nombre').value.trim();
-      if (!ej) return alert("Escribí el nombre del ejercicio.");
-      const v = id => document.getElementById(id).value;
-      const prog = {};
-      for (let n = 1; n <= 6; n++) prog['s' + n] = { reps: v(`prog-s${n}-reps`), carga: v(`prog-s${n}-carga`) };
-      const nuevo = {
-        bloque: v('inp-bloque'), ejercicio: ej, series: parseInt(v('inp-series')) || 4,
-        rir: v('inp-rir').trim(), descanso: v('inp-descanso'), tempo: v('inp-tempo').trim(),
-        video: v('inp-video').trim(), progresionSemanal: prog
-      };
-      if (ejEditIdx !== null && sesionCoachTemporal[ejEditIdx]) sesionCoachTemporal[ejEditIdx] = nuevo;
-      else sesionCoachTemporal.push(nuevo);
-      ejEditIdx = null;
-      document.querySelector('[onclick="agregarFilaRutina()"]').innerText = '＋ Agregar Ejercicio a la Planificación';
-      document.getElementById('inp-ejercicio-nombre').value = '';
-      document.getElementById('inp-video').value = '';
-      renderTablaSesionCoach();
-    }
-
-    function renderTablaSesionCoach() {
-      const tbody = document.getElementById('tabla-ejercicios-body');
-      if (sesionCoachTemporal.length === 0) {
-        tbody.innerHTML = '<tr id="fila-vacia"><td class="p-3 text-center text-slate-500">Todavía no agregaste ejercicios a la sesión.</td></tr>';
+      const cont = document.getElementById('lista-rutinas');
+      if (!planes || planes.length === 0) {
+        cont.innerHTML = '<div class="p-8 bg-slate-900 rounded-3xl text-center text-slate-500">No hay planes activos asignados por el Coach todavía.</div>';
         return;
       }
-      const b = 'px-2 py-1 text-slate-300 font-bold';
-      tbody.innerHTML = sesionCoachTemporal.map((f, i) => `
-        <tr class="flex justify-between items-center p-2 ${ejEditIdx === i ? 'bg-emerald-500/10' : ''}">
-          <td class="min-w-0"><span class="text-emerald-400 block text-[10px]">${escaparHTML(f.bloque)}</span><span class="block truncate">${i + 1}. ${escaparHTML(f.ejercicio)}</span></td>
-          <td class="flex shrink-0">
-            <button type="button" class="${b}" data-a="up" data-i="${i}">↑</button>
-            <button type="button" class="${b}" data-a="down" data-i="${i}">↓</button>
-            <button type="button" class="${b}" data-a="edit" data-i="${i}">✏️</button>
-            <button type="button" class="${b} text-rose-400" data-a="del" data-i="${i}">✕</button>
-          </td>
-        </tr>`).join('');
-      tbody.onclick = ev => {
-        const x = ev.target.closest('button[data-a]');
-        if (!x) return;
-        const i = parseInt(x.dataset.i);
-        if (x.dataset.a === 'up') moverEjercicioCoach(i, -1);
-        else if (x.dataset.a === 'down') moverEjercicioCoach(i, 1);
-        else if (x.dataset.a === 'edit') { editarEjercicioCoach(i); renderTablaSesionCoach(); }
-        else { sesionCoachTemporal.splice(i, 1); ejEditIdx = null; renderTablaSesionCoach(); }
-      };
+      cont.innerHTML = `<div class="p-4 bg-slate-900 rounded-2xl text-xs text-emerald-400 font-bold">Tienes ${planes.length} entrenamiento(s) cargado(s).</div>`;
     }
 
-    async function guardarPlanificacionCoach() {
-      const alumnoId = document.getElementById('sel-alumno-creador').value;
-      if (!alumnoId || sesionCoachTemporal.length === 0) return alert("Seleccioná un alumno y agregá ejercicios.");
-      const fila = {
-        alumno_id: alumnoId,
-        entorno: document.getElementById('admin-entorno').value,
-        mesociclo: document.getElementById('admin-mes').value.trim() || 'Mes 1',
-        duracion_semanas: parseInt(document.getElementById('admin-duracion-semanas').value) || 5,
-        dia: document.getElementById('admin-dia').value.trim() || 'Lunes',
-        ejercicios_detalle: sesionCoachTemporal
-      };
-      let error;
-      if (planEditandoId) ({ error } = await sb.from('planificaciones').update(fila).eq('id', planEditandoId));
-      else ({ error } = await sb.from('planificaciones').insert([{ ...fila, coach_id: usuarioActual.id, estado: 'activa' }]));
-      if (error) return alert("Error: " + error.message);
-      mostrarToast(planEditandoId ? '✓ Plan actualizado' : '✓ Plan asignado');
-      planEditandoId = null; ejEditIdx = null; sesionCoachTemporal = [];
-      renderTablaSesionCoach();
-      cerrarModalCreadorRapido();
-      cargarPlanesCoach();
+    async function cerrarSesion() {
+      if (sb) await sb.auth.signOut();
+      usuarioActual = null;
+      document.getElementById('seccion-auth').classList.remove('hidden');
+      document.getElementById('seccion-panel').classList.add('hidden');
+      document.getElementById('usuario-info').classList.add('hidden');
     }
 
-    function establecerPesoBarra(p, b) {
-      pesoBarraSeleccionada = p;
-      document.querySelectorAll('.btn-tipo-barra').forEach(x => x.classList.remove('btn-tipo-barra-active'));
-      b.classList.add('btn-tipo-barra-active');
-      calcularDistribucionDiscos();
-    }
-
-    function abrirModalDiscos(k) {
-      document.getElementById('modal-discos').classList.remove('hidden');
-      if (k) document.getElementById('inp-modal-kilos').value = k;
-      calcularDistribucionDiscos();
-    }
-
-    function cerrarModalDiscos() {
-      document.getElementById('modal-discos').classList.add('hidden');
-    }
-
-    function calcularDistribucionDiscos() {
-      const total = parseFloat(document.getElementById('inp-modal-kilos').value);
-      const res = document.getElementById('resultado-discos');
-      if (isNaN(total) || total <= 0) return res.innerHTML = 'Ingresá el peso objetivo.';
-
-      if (pesoBarraSeleccionada === 0) return res.innerHTML = `<strong class="text-emerald-400">Carga fija: ${total} kg</strong>`;
-      if (total < pesoBarraSeleccionada) return res.innerHTML = `<span class="text-rose-400">El peso no puede ser menor a la barra (${pesoBarraSeleccionada} kg).</span>`;
-
-      const porLado = (total - pesoBarraSeleccionada) / 2;
-      const discos = [25, 20, 15, 10, 5, 2.5, 1.25];
-      let rem = porLado;
-      let usados = [];
-
-      discos.forEach(d => {
-        while (rem >= d) {
-          usados.push(d);
-          rem = Math.round((rem - d) * 100) / 100;
+    // Comprobación de sesión al abrir
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (sb) {
+          sb.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+              usuarioActual = session.user;
+              cargarPerfilYRoles();
+            }
+          });
         }
-      });
-
-      res.innerHTML = `
-        <div class="flex justify-between pb-1 border-b border-slate-800">
-          <span>Barra: <strong>${pesoBarraSeleccionada} kg</strong></span>
-          <span class="text-emerald-400 font-bold">Por lado: ${porLado} kg</span>
-        </div>
-        <div class="flex flex-wrap gap-1 pt-1">
-          ${usados.map(d => `<span class="bg-slate-900 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded font-mono">${d}kg</span>`).join('')}
-        </div>
-      `;
-    }
-
-    function parseSegundos(txt) {
-      const n = parseInt(String(txt).replace(/\D/g, ''));
-      return isNaN(n) ? 90 : n;
-    }
-
-    function iniciarTimerDescanso(seg) {
-      if (timerInterval) clearInterval(timerInterval);
-      timerEnPausa = false; finTimer = Date.now() + seg * 1000; tiempoRestante = seg;
-      document.getElementById('timer-box').classList.remove('hidden');
-      document.getElementById('btn-timer-toggle').innerText = 'Pausa';
-      actualizarDisplayTimer();
-      timerInterval = setInterval(() => {
-        if (timerEnPausa) { finTimer = Date.now() + tiempoRestante * 1000; return; }
-        tiempoRestante = Math.max(0, Math.round((finTimer - Date.now()) / 1000));
-        actualizarDisplayTimer();
-        if (tiempoRestante <= 0) {
-          clearInterval(timerInterval);
-          navigator.vibrate?.([200, 100, 200]);
-          document.getElementById('timer-display').innerText = '¡TIEMPO!';
-        }
-      }, 500);
-    }
-
-    function actualizarDisplayTimer() {
-      const min = Math.floor(tiempoRestante / 60);
-      const seg = tiempoRestante % 60;
-      document.getElementById('timer-display').innerText = `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
-    }
-
-    function pausarReanudarTimer() {
-      timerEnPausa = !timerEnPausa;
-      document.getElementById('btn-timer-toggle').innerText = timerEnPausa ? "Reanudar" : "Pausa";
-    }
-
-    function cerrarTimer() {
-      if (timerInterval) clearInterval(timerInterval);
-      document.getElementById('timer-box').classList.add('hidden');
-    }
-
-    function extraerIdYouTube(url) {
-      if (!url) return null;
-      const m = url.match(/shorts\/([a-zA-Z0-9_-]+)/) || url.match(/v=([a-zA-Z0-9_-]+)/);
-      return m ? m[1] : null;
-    }
-
-    function abrirPlayerVideo(url, titulo) {
-      const id = extraerIdYouTube(url);
-      if (!id) return window.open(url, '_blank');
-      document.getElementById('player-video-titulo').innerText = titulo || "Demostración";
-      document.getElementById('iframe-video-player').src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=1`;
-      document.getElementById('modal-video-player').classList.remove('hidden');
-    }
-
-    function cerrarPlayerVideo() {
-      document.getElementById('iframe-video-player').src = '';
-      document.getElementById('modal-video-player').classList.add('hidden');
-    }
+      }, 300);
+    });
   </script>
 </body>
 </html>
