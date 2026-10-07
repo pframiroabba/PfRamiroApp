@@ -49,12 +49,12 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-32 antialiased">
 
-  <!-- TOAST -->
+  <!-- TOAST DE NOTIFICACIÓN -->
   <div id="toast-guardado" class="fixed top-16 right-4 bg-emerald-500 text-slate-950 text-xs font-black px-3 py-1.5 rounded-xl shadow-xl z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex items-center gap-1.5">
     <span id="toast-texto">✓ Guardado en Supabase</span>
   </div>
 
-  <!-- REPRODUCTOR DE SHORTS -->
+  <!-- REPRODUCTOR IN-APP DE SHORTS -->
   <div id="modal-video-player" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 max-w-sm w-full rounded-3xl overflow-hidden shadow-2xl flex flex-col">
       <div class="flex items-center justify-between p-3.5 border-b border-slate-800">
@@ -67,7 +67,7 @@
     </div>
   </div>
 
-  <!-- TARJETA DE PR -->
+  <!-- TARJETA SOCIAL DE RÉCORD PERSONAL (PR) -->
   <div id="modal-pr-celebracion" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500 max-w-sm w-full rounded-3xl p-6 shadow-2xl text-center space-y-4">
       <div class="text-4xl">🏆</div>
@@ -126,7 +126,7 @@
     </div>
   </div>
 
-  <!-- MODAL CREADOR DEL COACH -->
+  <!-- MODAL CREADOR COMPLETO DEL COACH -->
   <div id="modal-creador-rapido" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 md:p-6">
     <div class="bg-slate-900 border border-slate-700 max-w-3xl w-full rounded-3xl p-5 md:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -292,7 +292,7 @@
     </div>
   </div>
 
-  <!-- HEADER -->
+  <!-- ENCABEZADO -->
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 md:px-8 py-3 flex justify-between items-center sticky top-0 z-40">
     <div class="flex items-center gap-3">
       <div class="avatar-circulo text-xl">🏋️‍♂️</div>
@@ -320,8 +320,8 @@
 
     <!-- Pestañas Auth -->
     <div class="flex bg-slate-950 p-1 rounded-2xl border border-slate-800">
-      <button type="button" id="tab-auth-login" onclick="cambiarModoAuth('login')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950">Ingresar</button>
-      <button type="button" id="tab-auth-registro" onclick="cambiarModoAuth('registro')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white">Crear Cuenta</button>
+      <button type="button" id="tab-auth-login" class="w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950">Ingresar</button>
+      <button type="button" id="tab-auth-registro" class="w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white">Crear Cuenta</button>
     </div>
 
     <div class="space-y-4 text-left">
@@ -342,20 +342,20 @@
         <input type="password" id="auth-password" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="••••••••">
       </div>
 
-      <button type="button" id="btn-auth-accion" onclick="ejecutarAuth()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3 rounded-xl transition text-xs uppercase tracking-wider">
+      <button type="button" id="btn-auth-accion" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-3 rounded-xl transition text-xs uppercase tracking-wider">
         Ingresar a mi Plan
       </button>
-      <button type="button" onclick="recuperarPassword()" class="w-full text-xs text-slate-400 hover:text-emerald-400 transition pt-1">
+      <button type="button" id="btn-olvido-pass" class="w-full text-xs text-slate-400 hover:text-emerald-400 transition pt-1 text-center block">
         ¿Olvidaste tu contraseña?
       </button>
     </div>
-    <p id="auth-mensaje" class="text-xs text-emerald-400 font-semibold"></p>
+    <p id="auth-mensaje" class="text-xs text-emerald-400 font-semibold text-center"></p>
   </main>
 
   <!-- PANTALLA PRINCIPAL -->
   <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- DASHBOARD CON RACHA Y CALENDARIO -->
+    <!-- DASHBOARD -->
     <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 to-slate-950 p-5 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
@@ -374,7 +374,7 @@
         </div>
       </div>
 
-      <!-- HABIT TRACKER / CALENDARIO -->
+      <!-- CALENDARIO -->
       <div class="space-y-1.5">
         <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia (Mes Actual):</span>
         <div id="grid-calendario-adherencia" class="grid grid-cols-7 gap-1 text-center text-[10px] font-mono"></div>
@@ -451,6 +451,24 @@
     let indiceEjercicioActivo = 0;
     let listaEjerciciosModoActivo = [];
 
+    // VINCULACIÓN DE LISTENERS
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('tab-auth-login').addEventListener('click', () => cambiarModoAuth('login'));
+      document.getElementById('tab-auth-registro').addEventListener('click', () => cambiarModoAuth('registro'));
+      document.getElementById('btn-auth-accion').addEventListener('click', ejecutarAuth);
+      document.getElementById('btn-olvido-pass').addEventListener('click', recuperarPassword);
+
+      // Comprobación inicial de sesión
+      sb.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          usuarioActual = session.user;
+          cargarPerfilYRoles();
+        }
+      }).catch(err => {
+        console.warn("Sin sesión previa:", err);
+      });
+    });
+
     function nombreEj(planId, idx) {
       const r = rutinasActivas.find(x => String(x.id) === String(planId));
       return r?.ejercicios_detalle?.[idx]?.ejercicio || 'N/A';
@@ -480,9 +498,9 @@
 
     async function recuperarPassword() {
       const email = document.getElementById('auth-email').value.trim();
-      if (!email) return alert('Escribí tu correo primero.');
+      if (!email) return alert('Escribí tu correo primero en el campo correspondiente.');
       const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
-      document.getElementById('auth-mensaje').innerText = error ? error.message : 'Te enviamos un mail para restablecer la contraseña.';
+      document.getElementById('auth-mensaje').innerText = error ? error.message : 'Te enviamos un enlace por correo para restablecer la contraseña.';
     }
 
     function escaparHTML(str) {
@@ -531,7 +549,10 @@
       const msg = document.getElementById('auth-mensaje');
       msg.innerText = '';
 
-      if (!email || !password) return alert("Completá correo y contraseña.");
+      if (!email || !password) {
+        msg.innerText = "Por favor ingresá correo y contraseña.";
+        return;
+      }
 
       try {
         if (modoAuth === 'login') {
@@ -591,6 +612,7 @@
       document.getElementById('seccion-auth').classList.add('hidden');
       document.getElementById('seccion-panel').classList.remove('hidden');
       document.getElementById('usuario-info').classList.remove('hidden');
+      document.getElementById('usuario-info').classList.add('flex');
       document.getElementById('dash-alumno-nombre').innerText = `Hola, ${perfilActual.nombre || 'Atleta'}`;
       document.getElementById('tag-rol-user').innerText = perfilActual.rol.toUpperCase();
 
@@ -1471,20 +1493,6 @@
       document.getElementById('iframe-video-player').src = '';
       document.getElementById('modal-video-player').classList.add('hidden');
     }
-
-    // LISTENER AUTH SEGURO
-    sb.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-        if (session && (!usuarioActual || usuarioActual.id !== session.user.id)) {
-          usuarioActual = session.user;
-          cargarPerfilYRoles();
-        }
-      } else if (event === 'SIGNED_OUT') {
-        usuarioActual = null;
-        document.getElementById('seccion-auth').classList.remove('hidden');
-        document.getElementById('seccion-panel').classList.add('hidden');
-      }
-    });
   </script>
 </body>
 </html>
