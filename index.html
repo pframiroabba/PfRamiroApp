@@ -185,6 +185,7 @@
         </div>
       </div>
 
+      <!-- SELECTOR DE EJERCICIOS ORGANIZADO POR CATEGORÍAS -->
       <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio</span>
@@ -195,27 +196,94 @@
 
         <div class="grid grid-cols-1 md:grid-cols-6 gap-2">
           <div class="md:col-span-2">
-            <label class="text-[10px] text-slate-400 font-bold">Bloque</label>
+            <label class="text-[10px] text-slate-400 font-bold">Bloque de la Sesión</label>
             <select id="inp-bloque" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-emerald-300 font-bold mt-1">
-              <option value="BLOQUE A — MOVILIDAD & CALOR">BLOQUE A — MOVILIDAD & CALOR</option>
-              <option value="BLOQUE B — ACTIVACIÓN & CORE">BLOQUE B — ACTIVACIÓN & CORE</option>
+              <option value="BLOQUE A — MOVILIDAD ESPECÍFICA">BLOQUE A — MOVILIDAD ESPECÍFICA</option>
+              <option value="BLOQUE B — ACTIVACIÓN & ZONA MEDIA">BLOQUE B — ACTIVACIÓN & ZONA MEDIA</option>
               <option value="BLOQUE C — POTENCIA / OLÍMPICO">BLOQUE C — POTENCIA / OLÍMPICO</option>
               <option value="BLOQUE D — FUERZA PRINCIPAL" selected>BLOQUE D — FUERZA PRINCIPAL</option>
               <option value="BLOQUE E — TRACCIONES & ACCESORIOS">BLOQUE E — TRACCIONES & ACCESORIOS</option>
+              <option value="BLOQUE F — FINISHER & METABÓLICO">BLOQUE F — FINISHER & METABÓLICO</option>
             </select>
           </div>
+          
           <div class="md:col-span-2">
-            <label class="text-[10px] text-slate-400 font-bold">Ejercicio</label>
+            <label class="text-[10px] text-slate-400 font-bold">Categoría de Ejercicios</label>
+            <select id="sel-categoria-ejercicios" onchange="actualizarListaEjerciciosPorCategoria()" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white mt-1">
+              <optgroup label="Movilidad Articular">
+                <option value="mov_tobillo">Movilidad: Tobillo</option>
+                <option value="mov_cadera">Movilidad: Cadera</option>
+                <option value="mov_toracica">Movilidad: Columna Torácica</option>
+                <option value="mov_escapula_hombro">Movilidad: Hombro & Escápula</option>
+                <option value="mov_muneca">Movilidad: Muñecas</option>
+              </optgroup>
+              <optgroup label="Zona Media & Core Funcional">
+                <option value="core_antiextension">Core: Antiextensión</option>
+                <option value="core_antirrotacion">Core: Antirrotación</option>
+                <option value="core_antiflexion_lat">Core: Antiflexión Lateral</option>
+                <option value="core_dinamico">Core: Dinámico / Rotacional</option>
+              </optgroup>
+              <optgroup label="Fuerza & Rendimiento">
+                <option value="inf_rodilla" selected>Tren Inferior: Dominante Rodilla</option>
+                <option value="inf_cadera">Tren Inferior: Dominante Cadera</option>
+                <option value="sup_empuje">Tren Superior: Empujes</option>
+                <option value="sup_traccion">Tren Superior: Tracciones</option>
+                <option value="olimpicos">Levantamiento Olímpico</option>
+                <option value="potencia_pliometria">Potencia & Pliometría</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="text-[10px] text-slate-400 font-bold">Ejercicio Seleccionado</label>
+            <select id="sel-ejercicio-especifico" onchange="seleccionarEjercicioDeLista(this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-emerald-300 font-bold mt-1">
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
+          <div>
+            <label class="text-[10px] text-slate-400 font-bold">Nombre Personalizado / Alternativo</label>
             <input type="text" id="inp-ejercicio-nombre" placeholder="ej: Sentadilla Trasera con Barra" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white mt-1">
           </div>
-          <div class="md:col-span-2">
+          <div>
             <label class="text-[10px] text-slate-400 font-bold">Video Short (YouTube)</label>
             <input type="text" id="inp-video" placeholder="https://youtube.com/shorts/..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white font-mono mt-1">
           </div>
         </div>
 
+        <!-- SELECTORES TÁCTILES RÁPIDOS PARA SERIES Y REPETICIONES -->
+        <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="text-[10px] font-bold text-emerald-400 block mb-1">⚡ Selector Rápido de Repeticiones:</label>
+            <select onchange="aplicarPresetRepsRapido(this.value)" class="w-full bg-slate-950 border border-emerald-500/40 text-emerald-300 rounded-xl p-2 text-xs font-bold">
+              <option value="">▼ Elegir esquema predefinido...</option>
+              <option value="3x10">3x10 reps (Hipertrofia)</option>
+              <option value="4x8">4x8 reps (Fuerza-Hipertrofia)</option>
+              <option value="4x6">4x6 reps (Fuerza Base)</option>
+              <option value="5x5">5x5 reps (Fuerza Básica)</option>
+              <option value="4x4">4x4 reps (Fuerza Pesada)</option>
+              <option value="rampa">12-8-6-4 + 1xFallo (Rampa)</option>
+              <option value="resistencia">3x15 reps (Bombeo/Accesorios)</option>
+              <option value="core">3x30 seg / 3x12 por lado (Core/Activación)</option>
+              <option value="movilidad">2x10 por lado / 60 seg continuos (Movilidad)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-emerald-400 block mb-1">⚡ Cantidad de Series:</label>
+            <select id="inp-series" class="w-full bg-slate-950 border border-emerald-500/40 text-emerald-300 rounded-xl p-2 text-xs font-bold">
+              <option value="2">2 Series</option>
+              <option value="3">3 Series</option>
+              <option value="4" selected>4 Series</option>
+              <option value="5">5 Series</option>
+              <option value="6">6 Series</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- MATRIZ SEMANAL -->
         <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-2">
-          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">🎯 Prescripción Semanal:</span>
+          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">🎯 Prescripción Semanal de Cargas & Repeticiones:</span>
           <div id="grid-matriz-coach" class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs">
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
               <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Semana 1:</span>
@@ -250,25 +318,28 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold">Series Base</label>
-            <input type="number" id="inp-series" value="4" min="1" max="6" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white font-bold">
-          </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div>
             <label class="text-[10px] text-slate-400 font-bold">RIR Prescripto</label>
-            <input type="text" id="inp-rir" value="RIR 2" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
+            <select id="inp-rir" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
+              <option value="RIR 3">RIR 3 (Ligero)</option>
+              <option value="RIR 2" selected>RIR 2 (Objetivo estándar)</option>
+              <option value="RIR 1">RIR 1 (Muy exigente)</option>
+              <option value="RIR 0 (Fallo)">RIR 0 (Al Fallo)</option>
+            </select>
           </div>
           <div>
-            <label class="text-[10px] text-slate-400 font-bold">Tempo</label>
+            <label class="text-[10px] text-slate-400 font-bold">Tempo (Cadencia)</label>
             <input type="text" id="inp-tempo" value="3-0-1-0" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white font-mono">
           </div>
           <div>
-            <label class="text-[10px] text-slate-400 font-bold">Pausa</label>
+            <label class="text-[10px] text-slate-400 font-bold">Pausa de Descanso</label>
             <select id="inp-descanso" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
+              <option value="45s">45 seg</option>
               <option value="60s">60 seg</option>
               <option value="90s" selected>90 seg</option>
               <option value="120s">120 seg</option>
+              <option value="180s">180 seg</option>
             </select>
           </div>
         </div>
@@ -437,7 +508,7 @@
   </main>
 
   <script>
-    // 0. FUNCIONES AUXILIARES SEGURAS (EVITAN CUALQUIER ERROR DE ESCAPE)
+    // 0. FUNCIONES AUXILIARES SEGURAS
     function def(valor, porDefecto) {
       if (valor !== undefined && valor !== null && valor !== '') return valor;
       return porDefecto;
@@ -463,6 +534,127 @@
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     }
 
+    // BIBLIOTECA COMPLETA DE EJERCICIOS
+    const BIBLIOTECA_RAMIRO = {
+      // MOVILIDAD ARTICULAR
+      mov_tobillo: [
+        { nombre: "Dorsiflexión de tobillo en pared con rodilla al frente", video: "" },
+        { nombre: "Dorsiflexión de tobillo en posición de estocada con banda", video: "" },
+        { nombre: "Círculos controlados de tobillo (CARs)", video: "" }
+      ],
+      mov_cadera: [
+        { nombre: "90/90 Rotación interna y externa de cadera", video: "" },
+        { nombre: "Spiderman Lunge con rotación torácica profunda", video: "https://www.youtube.com/shorts/Xh07T2pZ0lU" },
+        { nombre: "Frog Stretch (Estiramiento de rana para aductores)", video: "" },
+        { nombre: "Deslizamiento de cadera en cuadrupedia con abducción", video: "" },
+        { nombre: "Círculos articulares controlados de cadera (CARs)", video: "" }
+      ],
+      mov_toracica: [
+        { nombre: "Rotaciones torácicas en cuadrupedia con mano en nuca", video: "" },
+        { nombre: "Extensión torácica sobre Foam Roller", video: "" },
+        { nombre: "Open Book (Aperturas de libro acostado de lado)", video: "" },
+        { nombre: "Thread the Needle (Enhebrar la aguja en cuadrupedia)", video: "" }
+      ],
+      mov_escapula_hombro: [
+        { nombre: "Flexiones escapulares en plancha (Scapular Push-ups)", video: "" },
+        { nombre: "Deslizamientos en pared para serrato anterior (Wall Slides)", video: "" },
+        { nombre: "Dislocaciones de hombro con bastón o banda elástica", video: "" },
+        { nombre: "Círculos controlados de hombro (CARs de hombro)", video: "" },
+        { nombre: "Rotación externa de hombro con banda en codo 90°", video: "" }
+      ],
+      mov_muneca: [
+        { nombre: "Cargas de peso en cuadrupedia con dedos al frente y atrás", video: "" },
+        { nombre: "Flexión y extensión de muñecas con puño cerrado en suelo", video: "" }
+      ],
+
+      // ZONA MEDIA & CORE FUNCIONAL
+      core_antiextension: [
+        { nombre: "Deadbug isométrico presionando Fitball", video: "https://www.youtube.com/shorts/g_BYB0R-4Ws" },
+        { nombre: "Plancha frontal tradicional con retroversión pélvica", video: "" },
+        { nombre: "Rollout con rueda abdominal o barra olímpica", video: "" },
+        { nombre: "Body Saw en plancha sobre sliders", video: "" }
+      ],
+      core_antirrotacion: [
+        { nombre: "Press Pallof isométrico con banda elástica", video: "https://www.youtube.com/shorts/5_8k3kK0m9o" },
+        { nombre: "Press Pallof dinámico con extensión de brazos", video: "" },
+        { nombre: "Bird Dog en cuadrupedia con pausa isométrica", video: "" },
+        { nombre: "Remo Renegado en plancha con mancuernas (Renegade Row)", video: "" }
+      ],
+      core_antiflexion_lat: [
+        { nombre: "Plancha lateral apoyando antebrazo", video: "" },
+        { nombre: "Plancha lateral con elevación de pierna superior", video: "" },
+        { nombre: "Suitcase Carry (Caminata del granjero a un brazo)", video: "" }
+      ],
+      core_dinamico: [
+        { nombre: "Hanging Knee / Leg Raises (Elevaciones de piernas colgado)", video: "" },
+        { nombre: "Lanzamientos rotacionales de Slam Ball contra pared", video: "" },
+        { nombre: "Woodchopper con polea o banda elástica", video: "" }
+      ],
+
+      // TREN INFERIOR: RODILLA
+      inf_rodilla: [
+        { nombre: "Sentadilla Trasera con Barra Olímpica (Back Squat)", video: "https://www.youtube.com/shorts/bEv6CCg2BC8" },
+        { nombre: "Sentadilla Frontal con Barra (Front Squat)", video: "https://www.youtube.com/shorts/uYumuL_G_V0" },
+        { nombre: "Sentadilla Búlgara con Mancuernas", video: "https://www.youtube.com/shorts/2C-uNgKwPLE" },
+        { nombre: "Goblet Squat con Kettlebell", video: "" },
+        { nombre: "Estocadas caminando con mancuernas (Walking Lunges)", video: "" },
+        { nombre: "Prensa de Piernas 45°", video: "" },
+        { nombre: "Sillón de Cuádriceps (Extensión de piernas)", video: "" }
+      ],
+
+      // TREN INFERIOR: CADERA
+      inf_cadera: [
+        { nombre: "Peso Muerto Convencional con Barra Olímpica", video: "https://www.youtube.com/shorts/op9kVnSso6Q" },
+        { nombre: "Peso Muerto Rumano con Barra Olímpica (RDL)", video: "https://www.youtube.com/shorts/JCXUYuzwNrM" },
+        { nombre: "Hip Thrust con Barra Olímpica", video: "https://www.youtube.com/shorts/SEdqd1n0cvg" },
+        { nombre: "Peso Muerto con Trap Bar (Barra Hexagonal)", video: "" },
+        { nombre: "Peso Muerto Rumano Unilateral con Mancuerna", video: "" },
+        { nombre: "Camilla de Isquiotibiales (Curl Femoral Acostado)", video: "" },
+        { nombre: "Good Morning (Buenos Días con barra)", video: "" },
+        { nombre: "Monster Walk con miniband en tobillos", video: "https://www.youtube.com/shorts/1F_4-P4gPq0" }
+      ],
+
+      // TREN SUPERIOR: EMPUJES
+      sup_empuje: [
+        { nombre: "Press de Banca Plano con Barra Olímpica", video: "https://www.youtube.com/shorts/rT7DgCr-3pg" },
+        { nombre: "Press Inclinado con Mancuernas", video: "https://www.youtube.com/shorts/8iPEnn-ltC8" },
+        { nombre: "Press Militar Estricto de Pie con Barra", video: "https://www.youtube.com/shorts/2yjwXTZQDDI" },
+        { nombre: "Fondos en Paralelas para Pecho/Tríceps (Dips)", video: "" },
+        { nombre: "Press de Banca con Mancuernas en Banco Plano", video: "" },
+        { nombre: "Vuelos Laterales con Mancuernas para Deltoides", video: "" },
+        { nombre: "Extensión de Tríceps en Polea Alta con Soga", video: "" }
+      ],
+
+      // TREN SUPERIOR: TRACCIONES
+      sup_traccion: [
+        { nombre: "Dominadas Pronas Estrictas (Pull-ups)", video: "https://www.youtube.com/shorts/eGo4IYlbE5g" },
+        { nombre: "Dominadas Supinas (Chin-ups)", video: "" },
+        { nombre: "Remo Pendlay con Barra Olímpica", video: "https://www.youtube.com/shorts/h4nKGfU_qG0" },
+        { nombre: "Remo Seal con Mancuernas en Banco Inclinado", video: "https://www.youtube.com/shorts/9r8zYk_lXbI" },
+        { nombre: "Jalón al Pecho en Polea con Agarre Neutro", video: "" },
+        { nombre: "Remo en Polea Baja sentado con agarre V", video: "" },
+        { nombre: "Face Pull en Polea Alta con Soga", video: "" },
+        { nombre: "Curl de Bíceps con Barra W", video: "" }
+      ],
+
+      // OLÍMPICO
+      olimpicos: [
+        { nombre: "Power Clean (Cargada de Potencia)", video: "https://www.youtube.com/shorts/mEyoH5fZuF8" },
+        { nombre: "Hang Clean (Cargada Colgante)", video: "https://www.youtube.com/shorts/V0A8Z0_n3E0" },
+        { nombre: "Snatch (Arrancada Olímpica)", video: "https://www.youtube.com/shorts/9xQp2sldyts" },
+        { nombre: "Hang Snatch (Arrancada Colgante)", video: "" },
+        { nombre: "Push Jerk con Barra Olímpica", video: "" }
+      ],
+
+      // POTENCIA & PLIOMETRÍA
+      potencia_pliometria: [
+        { nombre: "Saltos al Cajón (Box Jump con caída suave)", video: "https://www.youtube.com/shorts/52r_Ul5k03g" },
+        { nombre: "Lanzamiento de Slam Ball al Suelo (Slam Ball)", video: "https://www.youtube.com/shorts/0Lz8g8q0VbI" },
+        { nombre: "Salto en Longitud sin impulso (Broad Jump)", video: "" },
+        { nombre: "Saltos Reactivos sobre vallas bajas", video: "" }
+      ]
+    };
+
     let usuarioActual = null;
     let perfilActual = null;
     let rutinasActivas = [];
@@ -485,6 +677,138 @@
 
     let indiceEjercicioActivo = 0;
     let listaEjerciciosModoActivo = [];
+
+    function actualizarListaEjerciciosPorCategoria() {
+      const cat = document.getElementById('sel-categoria-ejercicios').value;
+      const sel = document.getElementById('sel-ejercicio-especifico');
+      const lista = def(BIBLIOTECA_RAMIRO[cat], []);
+      
+      sel.innerHTML = lista.map((e, idx) => {
+        return '<option value="' + idx + '">' + e.nombre + '</option>';
+      }).join('');
+
+      if (lista.length > 0) {
+        seleccionarEjercicioDeLista(0);
+      }
+    }
+
+    function seleccionarEjercicioDeLista(idx) {
+      const cat = document.getElementById('sel-categoria-ejercicios').value;
+      const lista = def(BIBLIOTECA_RAMIRO[cat], []);
+      const ej = lista[parseInt(idx)];
+      if (ej) {
+        document.getElementById('inp-ejercicio-nombre').value = ej.nombre;
+        document.getElementById('inp-video').value = def(ej.video, '');
+      }
+    }
+
+    function aplicarPresetRepsRapido(tipo) {
+      if (!tipo) return;
+      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) ? parseInt(document.getElementById('admin-duracion-semanas').value) : 5;
+      
+      if (tipo === '3x10') {
+        document.getElementById('inp-series').value = "3";
+        document.getElementById('prog-s1-reps').value = "3x10 reps";
+        document.getElementById('prog-s1-carga').value = "65%";
+        document.getElementById('prog-s2-reps').value = "3x10 reps";
+        document.getElementById('prog-s2-carga').value = "67.5%";
+        document.getElementById('prog-s3-reps').value = "3x10 reps";
+        document.getElementById('prog-s3-carga').value = "70%";
+        document.getElementById('prog-s4-reps').value = "3x10 reps";
+        document.getElementById('prog-s4-carga').value = "72.5%";
+        document.getElementById('prog-s5-reps').value = "3x10 reps";
+        document.getElementById('prog-s5-carga').value = "75%";
+        document.getElementById('prog-s6-reps').value = "3x10 reps";
+        document.getElementById('prog-s6-carga').value = "77.5%";
+      } else if (tipo === '4x8') {
+        document.getElementById('inp-series').value = "4";
+        document.getElementById('prog-s1-reps').value = "3x8 reps";
+        document.getElementById('prog-s1-carga').value = "70%";
+        document.getElementById('prog-s2-reps').value = "4x8 reps";
+        document.getElementById('prog-s2-carga').value = "72.5%";
+        document.getElementById('prog-s3-reps').value = "4x8 reps";
+        document.getElementById('prog-s3-carga').value = "75%";
+        document.getElementById('prog-s4-reps').value = "4x8 reps";
+        document.getElementById('prog-s4-carga').value = "77.5%";
+        document.getElementById('prog-s5-reps').value = "4x8 reps";
+        document.getElementById('prog-s5-carga').value = "80%";
+        document.getElementById('prog-s6-reps').value = "4x8 reps";
+        document.getElementById('prog-s6-carga').value = "82.5%";
+      } else if (tipo === '4x6') {
+        document.getElementById('inp-series').value = "4";
+        document.getElementById('prog-s1-reps').value = "4x6 reps";
+        document.getElementById('prog-s1-carga').value = "75%";
+        document.getElementById('prog-s2-reps').value = "4x6 reps";
+        document.getElementById('prog-s2-carga').value = "77.5%";
+        document.getElementById('prog-s3-reps').value = "4x6 reps";
+        document.getElementById('prog-s3-carga').value = "80%";
+        document.getElementById('prog-s4-reps').value = "4x6 reps";
+        document.getElementById('prog-s4-carga').value = "82.5%";
+        document.getElementById('prog-s5-reps').value = "4x6 reps";
+        document.getElementById('prog-s5-carga').value = "85%";
+        document.getElementById('prog-s6-reps').value = "4x6 reps";
+        document.getElementById('prog-s6-carga').value = "87.5%";
+      } else if (tipo === '5x5') {
+        document.getElementById('inp-series').value = "5";
+        document.getElementById('prog-s1-reps').value = "5x5 reps";
+        document.getElementById('prog-s1-carga').value = "80%";
+        document.getElementById('prog-s2-reps').value = "5x5 reps";
+        document.getElementById('prog-s2-carga').value = "82.5%";
+        document.getElementById('prog-s3-reps').value = "5x5 reps";
+        document.getElementById('prog-s3-carga').value = "85%";
+        document.getElementById('prog-s4-reps').value = "5x5 reps";
+        document.getElementById('prog-s4-carga').value = "87.5%";
+        document.getElementById('prog-s5-reps').value = "5x5 reps";
+        document.getElementById('prog-s5-carga').value = "90%";
+        document.getElementById('prog-s6-reps').value = "5x5 reps";
+        document.getElementById('prog-s6-carga').value = "92.5%";
+      } else if (tipo === 'rampa') {
+        aplicarPresetProgresionRamiro();
+      } else if (tipo === 'resistencia') {
+        document.getElementById('inp-series').value = "3";
+        document.getElementById('prog-s1-reps').value = "3x15 reps";
+        document.getElementById('prog-s1-carga').value = "60%";
+        document.getElementById('prog-s2-reps').value = "3x15 reps";
+        document.getElementById('prog-s2-carga').value = "62.5%";
+        document.getElementById('prog-s3-reps').value = "3x15 reps";
+        document.getElementById('prog-s3-carga').value = "65%";
+        document.getElementById('prog-s4-reps').value = "3x15 reps";
+        document.getElementById('prog-s4-carga').value = "67.5%";
+        document.getElementById('prog-s5-reps').value = "3x15 reps";
+        document.getElementById('prog-s5-carga').value = "70%";
+        document.getElementById('prog-s6-reps').value = "3x15 reps";
+        document.getElementById('prog-s6-carga').value = "72.5%";
+      } else if (tipo === 'core') {
+        document.getElementById('inp-series').value = "3";
+        document.getElementById('prog-s1-reps').value = "3x30 seg / 3x12";
+        document.getElementById('prog-s1-carga').value = "Peso Corporal";
+        document.getElementById('prog-s2-reps').value = "3x35 seg / 3x12";
+        document.getElementById('prog-s2-carga').value = "Peso Corporal";
+        document.getElementById('prog-s3-reps').value = "3x40 seg / 3x14";
+        document.getElementById('prog-s3-carga').value = "+2.5 kg";
+        document.getElementById('prog-s4-reps').value = "3x45 seg / 3x15";
+        document.getElementById('prog-s4-carga').value = "+2.5 kg";
+        document.getElementById('prog-s5-reps').value = "3x50 seg / 3x15";
+        document.getElementById('prog-s5-carga').value = "+5 kg";
+        document.getElementById('prog-s6-reps').value = "3x60 seg / 3x16";
+        document.getElementById('prog-s6-carga').value = "+5 kg";
+      } else if (tipo === 'movilidad') {
+        document.getElementById('inp-series').value = "2";
+        document.getElementById('prog-s1-reps').value = "2x10 por lado";
+        document.getElementById('prog-s1-carga').value = "Fluido";
+        document.getElementById('prog-s2-reps').value = "2x10 por lado";
+        document.getElementById('prog-s2-carga').value = "Fluido";
+        document.getElementById('prog-s3-reps').value = "2x12 por lado";
+        document.getElementById('prog-s3-carga').value = "Fluido";
+        document.getElementById('prog-s4-reps').value = "2x12 por lado";
+        document.getElementById('prog-s4-carga').value = "Fluido";
+        document.getElementById('prog-s5-reps').value = "2x15 por lado";
+        document.getElementById('prog-s5-carga').value = "Fluido";
+        document.getElementById('prog-s6-reps').value = "2x15 por lado";
+        document.getElementById('prog-s6-carga').value = "Fluido";
+      }
+      mostrarToast("✓ Esquema " + tipo + " cargado");
+    }
 
     function nombreEj(planId, idx) {
       const r = rutinasActivas.find(x => String(x.id) === String(planId));
@@ -1369,6 +1693,7 @@
 
     function abrirModalCreadorRapido() {
       document.getElementById('modal-creador-rapido').classList.remove('hidden');
+      actualizarListaEjerciciosPorCategoria();
       renderTablaSesionCoach();
     }
 
