@@ -437,13 +437,19 @@
   </main>
 
   <script>
+    // 0. FUNCIONES AUXILIARES SEGURAS (EVITAN CUALQUIER ERROR DE ESCAPE)
+    function def(valor, porDefecto) {
+      if (valor !== undefined && valor !== null && valor !== '') return valor;
+      return porDefecto;
+    }
+
     // 1. CAPTURA Y MUESTRA DE ERRORES DIRECTO EN PANTALLA
     window.onerror = function(msg, url, lineNo, columnNo, error) {
       const box = document.getElementById('debug-error-box');
       const txt = document.getElementById('debug-error-txt');
       if (box && txt) {
         box.classList.remove('hidden');
-        txt.innerText = `${msg} (Línea ${lineNo})`;
+        txt.innerText = msg + ' (Línea ' + lineNo + ')';
       }
       return false;
     };
@@ -482,12 +488,15 @@
 
     function nombreEj(planId, idx) {
       const r = rutinasActivas.find(x => String(x.id) === String(planId));
-      return r?.ejercicios_detalle?.[idx]?.ejercicio || 'N/A';
+      if (r && r.ejercicios_detalle && r.ejercicios_detalle[idx] && r.ejercicios_detalle[idx].ejercicio) {
+        return r.ejercicios_detalle[idx].ejercicio;
+      }
+      return 'N/A';
     }
 
     function semanaISO(d) {
       const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-      const dia = t.getUTCDay() || 7;
+      const dia = t.getUTCDay() ? t.getUTCDay() : 7;
       t.setUTCDate(t.getUTCDate() + 4 - dia);
       const ini = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
       return t.getUTCFullYear() * 100 + Math.ceil(((t - ini) / 86400000 + 1) / 7);
@@ -496,14 +505,19 @@
     function calcularRacha(diasSet) {
       const porSem = {};
       diasSet.forEach(f => {
-        const [y, m, d] = f.split('-').map(Number);
-        const k = semanaISO(new Date(y, m - 1, d));
-        (porSem[k] = porSem[k] || new Set()).add(f);
+        const parts = f.split('-').map(Number);
+        const k = semanaISO(new Date(parts[0], parts[1] - 1, parts[2]));
+        if (!porSem[k]) porSem[k] = new Set();
+        porSem[k].add(f);
       });
       let racha = 0;
       const cursor = new Date();
-      if ((porSem[semanaISO(cursor)]?.size || 0) < 2) cursor.setDate(cursor.getDate() - 7);
-      while ((porSem[semanaISO(cursor)]?.size || 0) >= 2) { racha++; cursor.setDate(cursor.getDate() - 7); }
+      const semActual = porSem[semanaISO(cursor)] ? porSem[semanaISO(cursor)].size : 0;
+      if (semActual < 2) cursor.setDate(cursor.getDate() - 7);
+      while ((porSem[semanaISO(cursor)] ? porSem[semanaISO(cursor)].size : 0) >= 2) {
+        racha++;
+        cursor.setDate(cursor.getDate() - 7);
+      }
       return racha;
     }
 
@@ -527,7 +541,7 @@
 
     function mostrarToast(txt) {
       const t = document.getElementById('toast-guardado');
-      document.getElementById('toast-texto').innerText = txt || "✓ Guardado en Supabase";
+      document.getElementById('toast-texto').innerText = def(txt, "✓ Guardado en Supabase");
       t.classList.remove('opacity-0');
       setTimeout(() => t.classList.add('opacity-0'), 1500);
     }
@@ -572,7 +586,7 @@
         return;
       }
 
-      if (!email || !password) {
+      if (!email ? true : !password) {
         msg.innerText = "Por favor ingresá correo y contraseña.";
         return;
       }
@@ -628,7 +642,7 @@
     }
 
     async function cargarPerfilYRoles() {
-      if (!usuarioActual || !sb) return;
+      if (!usuarioActual ? true : !sb) return;
 
       try {
         const { data: perfil } = await sb
@@ -637,14 +651,14 @@
           .eq('id', usuarioActual.id)
           .maybeSingle();
 
-        perfilActual = perfil || { rol: 'alumno', nombre: usuarioActual.email.split('@')[0] };
+        perfilActual = def(perfil, { rol: 'alumno', nombre: usuarioActual.email.split('@')[0] });
 
         document.getElementById('seccion-auth').classList.add('hidden');
         document.getElementById('seccion-panel').classList.remove('hidden');
         document.getElementById('usuario-info').classList.remove('hidden');
         document.getElementById('usuario-info').classList.add('flex');
-        document.getElementById('dash-alumno-nombre').innerText = `Hola, ${perfilActual.nombre || 'Atleta'}`;
-        document.getElementById('tag-rol-user').innerText = (perfilActual.rol || 'alumno').toUpperCase();
+        document.getElementById('dash-alumno-nombre').innerText = 'Hola, ' + def(perfilActual.nombre, 'Atleta');
+        document.getElementById('tag-rol-user').innerText = def(perfilActual.rol, 'alumno').toUpperCase();
 
         if (perfilActual.rol === 'coach') {
           document.getElementById('seccion-admin').classList.remove('hidden');
@@ -663,11 +677,11 @@
     }
 
     async function cargarMarcasRM() {
-      if (!usuarioActual || !sb) return;
+      if (!usuarioActual ? true : !sb) return;
       try {
         const { data } = await sb.from('marcas_rm').select('*').eq('user_id', usuarioActual.id);
         marcasRMAlumno = {};
-        (data || []).forEach(r => {
+        (data ? data : []).forEach(r => {
           marcasRMAlumno[r.ejercicio.trim().toLowerCase()] = r.rm_calculado;
         });
       } catch (e) {
@@ -677,27 +691,27 @@
 
     function resolverCargaKilos(ejercicioNombre, textoPrescripcion) {
       if (!textoPrescripcion) return { textoDisplay: 'Libre', kgCalculado: null };
-      const nombreNorm = (ejercicioNombre || '').trim().toLowerCase();
+      const nombreNorm = def(ejercicioNombre, '').trim().toLowerCase();
       const rm = marcasRMAlumno[nombreNorm];
 
       if (textoPrescripcion.includes('%') && rm && rm > 0) {
         const pct = parseFloat(textoPrescripcion.replace(/[^0-9.]/g, ''));
         if (!isNaN(pct)) {
           const kg = Math.round(rm * (pct / 100) * 10) / 10;
-          return { textoDisplay: `${pct}% (${kg} kg)`, kgCalculado: kg };
+          return { textoDisplay: pct + '% (' + kg + ' kg)', kgCalculado: kg };
         }
       }
       return { textoDisplay: textoPrescripcion, kgCalculado: null };
     }
 
     async function cargarRutinasAlumno() {
-      if (!sb || !usuarioActual) return;
+      if (!sb ? true : !usuarioActual) return;
       try {
         const { data: planes } = await sb.from('planificaciones').select('*')
-          .or(`alumno_id.eq.${usuarioActual.id},alumno_id.eq.${usuarioActual.email}`)
+          .or('alumno_id.eq.' + usuarioActual.id + ',alumno_id.eq.' + usuarioActual.email)
           .order('created_at', { ascending: true });
 
-        rutinasActivas = (planes || []).filter(p => !p.estado || p.estado === 'activa');
+        rutinasActivas = (planes ? planes : []).filter(p => !p.estado ? true : p.estado === 'activa');
         diaActivoId = null;
         renderizarSolapasYRutas();
       } catch (err) {
@@ -715,7 +729,7 @@
       }
 
       const planActual = rutinasActivas[0];
-      totalSemanas = planActual.duracion_semanas || 5;
+      totalSemanas = def(planActual.duracion_semanas, 5);
 
       document.getElementById('contenedor-tabs-dias').classList.remove('hidden');
       document.getElementById('contenedor-tabs-semanas').classList.remove('hidden');
@@ -724,9 +738,9 @@
       rutinasActivas.forEach((r, i) => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.id = `btn-dia-${r.id}`;
-        btn.className = `px-4 py-2 rounded-xl text-xs font-bold border transition whitespace-nowrap cursor-pointer ${i === 0 ? 'tab-dia-active' : 'bg-slate-900 border-slate-800 text-slate-400'}`;
-        btn.textContent = r.dia || `Día ${i + 1}`;
+        btn.id = 'btn-dia-' + r.id;
+        btn.className = 'px-4 py-2 rounded-xl text-xs font-bold border transition whitespace-nowrap cursor-pointer ' + (i === 0 ? 'tab-dia-active' : 'bg-slate-900 border-slate-800 text-slate-400');
+        btn.textContent = def(r.dia, 'Día ' + (i + 1));
         btn.dataset.id = String(r.id);
         btn.addEventListener('click', () => activarDia(r.id));
         contDias.appendChild(btn);
@@ -740,18 +754,16 @@
       const contSem = document.getElementById('barra-solapas-semanas');
       contSem.innerHTML = Array.from({ length: totalSemanas }).map((_, idx) => {
         const s = idx + 1;
-        return `
-          <button type="button" onclick="cambiarSemana(${s})" class="btn-sem px-3 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer ${s === semanaActiva ? 'tab-sem-active' : 'bg-slate-950 border-slate-700 text-slate-400'}">
-            Sem ${s} ${s === totalSemanas ? '🔥' : ''}
-          </button>
-        `;
+        const fuego = s === totalSemanas ? '🔥' : '';
+        const claseActive = s === semanaActiva ? 'tab-sem-active' : 'bg-slate-950 border-slate-700 text-slate-400';
+        return '<button type="button" onclick="cambiarSemana(' + s + ')" class="btn-sem px-3 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer ' + claseActive + '">Sem ' + s + ' ' + fuego + '</button>';
       }).join('');
     }
 
     function cambiarSemana(num) {
       semanaActiva = num;
       renderizarBotonesSemanas();
-      activarDia(diaActivoId || rutinasActivas[0].id);
+      activarDia(diaActivoId ? diaActivoId : rutinasActivas[0].id);
     }
 
     async function activarDia(rutinaId) {
@@ -759,7 +771,7 @@
       document.querySelectorAll('#barra-solapas-dias button').forEach(b => {
         b.className = "px-4 py-2 rounded-xl text-xs font-bold border transition whitespace-nowrap bg-slate-900 border-slate-800 text-slate-400 cursor-pointer";
       });
-      const btn = document.getElementById(`btn-dia-${rutinaId}`);
+      const btn = document.getElementById('btn-dia-' + rutinaId);
       if (btn) btn.className = "px-4 py-2 rounded-xl text-xs font-bold border transition whitespace-nowrap tab-dia-active cursor-pointer";
       const rutina = rutinasActivas.find(r => String(r.id) === String(rutinaId));
       if (!rutina) return;
@@ -768,102 +780,89 @@
         const res = await sb.from('registros_series').select('*')
           .eq('planificacion_id', String(rutinaId)).eq('user_id', usuarioActual.id)
           .eq('semana_num', sem);
-        return res.data || [];
+        return def(res.data, []);
       };
 
-      const [actual, previa] = await Promise.all([traer(semanaActiva), semanaActiva > 1 ? traer(semanaActiva - 1) : []]);
-      const mapa = {}, mapaPrev = {};
-      actual.forEach(x => mapa[`${x.ejercicio_index}_${x.serie_num}`] = x);
-      previa.forEach(x => mapaPrev[`${x.ejercicio_index}_${x.serie_num}`] = x);
+      const results = await Promise.all([traer(semanaActiva), semanaActiva > 1 ? traer(semanaActiva - 1) : []]);
+      const actual = results[0];
+      const previa = results[1];
+      const mapa = {};
+      const mapaPrev = {};
+      actual.forEach(x => { mapa[x.ejercicio_index + '_' + x.serie_num] = x; });
+      previa.forEach(x => { mapaPrev[x.ejercicio_index + '_' + x.serie_num] = x; });
       window.mapaPrevSemana = mapaPrev;
       renderizarTarjetaRutina(rutina, mapa);
     }
 
     function renderizarTarjetaRutina(rutina, mapaSeries) {
       const cont = document.getElementById('lista-rutinas');
-      const detalles = rutina.ejercicios_detalle || [];
+      const detalles = def(rutina.ejercicios_detalle, []);
       const esUltimaSemana = semanaActiva === totalSemanas;
 
-      cont.innerHTML = `
-        <div id="card-rutina-${rutina.id}" class="bg-slate-900 border border-slate-800 p-5 md:p-6 rounded-3xl space-y-4">
-          <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-            <div>
-              <span class="text-xs text-emerald-400 font-bold uppercase block">${escaparHTML(rutina.mesociclo || 'Mesociclo')}</span>
-              <h3 class="text-xl font-black text-white">${escaparHTML(rutina.dia)}</h3>
-            </div>
-            <div class="flex gap-2">
-              <span class="text-xs bg-slate-950 text-cyan-300 font-mono px-3 py-1 rounded-full border border-cyan-500/30">Semana ${semanaActiva} de ${totalSemanas}</span>
-            </div>
-          </div>
+      let html = '<div id="card-rutina-' + rutina.id + '" class="bg-slate-900 border border-slate-800 p-5 md:p-6 rounded-3xl space-y-4">';
+      html += '<div class="flex justify-between items-center border-b border-slate-800 pb-3">';
+      html += '<div><span class="text-xs text-emerald-400 font-bold uppercase block">' + escaparHTML(def(rutina.mesociclo, 'Mesociclo')) + '</span>';
+      html += '<h3 class="text-xl font-black text-white">' + escaparHTML(rutina.dia) + '</h3></div>';
+      html += '<div class="flex gap-2"><span class="text-xs bg-slate-950 text-cyan-300 font-mono px-3 py-1 rounded-full border border-cyan-500/30">Semana ' + semanaActiva + ' de ' + totalSemanas + '</span></div>';
+      html += '</div>';
 
-          <div class="space-y-4">
-            ${detalles.map((ej, itmIdx) => {
-              const prog = ej.progresionSemanal || {};
-              const semData = prog[`s${semanaActiva}`] || { reps: ej.reps || '3x8', carga: 'Libre' };
-              const cantSeries = (parseInt(ej.series) || 4) + ((esUltimaSemana || /fallo/i.test(semData.reps)) ? 1 : 0);
-              const cargaResuelta = resolverCargaKilos(ej.ejercicio, semData.carga);
+      html += '<div class="space-y-4">';
+      detalles.forEach((ej, itmIdx) => {
+        const prog = def(ej.progresionSemanal, {});
+        const semData = def(prog['s' + semanaActiva], { reps: def(ej.reps, '3x8'), carga: 'Libre' });
+        const esFallo = esUltimaSemana ? true : /fallo/i.test(semData.reps);
+        const cantSeries = (parseInt(ej.series) ? parseInt(ej.series) : 4) + (esFallo ? 1 : 0);
+        const cargaResuelta = resolverCargaKilos(ej.ejercicio, semData.carga);
 
-              return `
-                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 space-y-3">
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <h4 class="font-bold text-white text-base">${escaparHTML(ej.ejercicio)}</h4>
-                      <div class="text-[11px] text-slate-400 flex flex-wrap gap-2 mt-0.5">
-                        <span>${escaparHTML(ej.bloque || '')}</span>
-                        <span>• Pauta: <strong class="text-emerald-400">${escaparHTML(cargaResuelta.textoDisplay)}</strong></span>
-                        <span>• Reps: <strong>${escaparHTML(semData.reps)}</strong></span>${ej.tempo ? `<span>• Tempo: <strong class="text-cyan-300 font-mono">${escaparHTML(ej.tempo)}</strong></span>` : ''}
-                      </div>
-                    </div>
-                    ${ej.video ? `
-                      <button type="button" class="btn-play-short bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer" data-video="${escaparHTML(ej.video)}" data-title="${escaparHTML(ej.ejercicio)}">
-                        ▶ Short
-                      </button>
-                    ` : ''}
-                  </div>
+        html += '<div class="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 space-y-3">';
+        html += '<div class="flex items-center justify-between"><div>';
+        html += '<h4 class="font-bold text-white text-base">' + escaparHTML(ej.ejercicio) + '</h4>';
+        html += '<div class="text-[11px] text-slate-400 flex flex-wrap gap-2 mt-0.5">';
+        html += '<span>' + escaparHTML(def(ej.bloque, '')) + '</span>';
+        html += '<span>• Pauta: <strong class="text-emerald-400">' + escaparHTML(cargaResuelta.textoDisplay) + '</strong></span>';
+        html += '<span>• Reps: <strong>' + escaparHTML(semData.reps) + '</strong></span>';
+        if (ej.tempo) html += '<span>• Tempo: <strong class="text-cyan-300 font-mono">' + escaparHTML(ej.tempo) + '</strong></span>';
+        html += '</div></div>';
 
-                  ${esUltimaSemana ? `
-                    <div class="bg-slate-900 border border-amber-500/30 p-2.5 rounded-xl flex items-center justify-between text-xs">
-                      <span class="text-amber-400 font-bold">🔥 Testeo al Fallo Técnico: Calculá tu nuevo 1RM al terminar la serie máxima.</span>
-                      <button type="button" class="btn-calc-rm-fallo bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-1 rounded-lg font-bold cursor-pointer" data-ej="${escaparHTML(ej.ejercicio)}" data-idx="${itmIdx}">
-                        Calcular RM
-                      </button>
-                    </div>
-                  ` : ''}
+        if (ej.video) {
+          html += '<button type="button" class="btn-play-short bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer" data-video="' + escaparHTML(ej.video) + '" data-title="' + escaparHTML(ej.ejercicio) + '">▶ Short</button>';
+        }
+        html += '</div>';
 
-                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
-                    ${Array.from({ length: cantSeries }).map((_, sIdx) => {
-                      const sNum = sIdx + 1;
-                      const sData = mapaSeries[`${itmIdx}_${sNum}`] || {};
-                      const hecha = sData.completada || false;
+        if (esUltimaSemana) {
+          html += '<div class="bg-slate-900 border border-amber-500/30 p-2.5 rounded-xl flex items-center justify-between text-xs">';
+          html += '<span class="text-amber-400 font-bold">🔥 Testeo al Fallo Técnico: Calculá tu nuevo 1RM al terminar la serie máxima.</span>';
+          html += '<button type="button" class="btn-calc-rm-fallo bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-1 rounded-lg font-bold cursor-pointer" data-ej="' + escaparHTML(ej.ejercicio) + '" data-idx="' + itmIdx + '">Calcular RM</button>';
+          html += '</div>';
+        }
 
-                      return `
-                        <div class="serie-box bg-slate-900 p-2.5 rounded-xl border border-slate-800 ${hecha ? 'serie-done-box' : ''} space-y-1.5" id="box-${rutina.id}-${itmIdx}-${sNum}">
-                          <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-400 font-mono font-bold">Serie ${sNum}</span>
-                            <button type="button" class="btn-toggle-serie px-2.5 py-0.5 rounded-lg text-[11px] font-black border cursor-pointer ${hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-950 text-rose-300 border-rose-500/40'}"
-                              data-plan="${rutina.id}" data-idx="${itmIdx}" data-sem="${semanaActiva}" data-serie="${sNum}" data-descanso="${ej.descanso || '90s'}" data-target="box-${rutina.id}-${itmIdx}-${sNum}">
-                              ${hecha ? '✓' : '✗'}
-                            </button>
-                          </div>
-                          <div class="flex gap-1.5">
-                            <input type="number" step="0.5" inputmode="decimal" placeholder="${(window.mapaPrevSemana || {})[`${itmIdx}_${sNum}`]?.carga ?? 'Kg'}" value="${sData.carga !== undefined && sData.carga !== null ? sData.carga : ''}"
-                              class="inp-carga w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold"
-                              data-plan="${rutina.id}" data-idx="${itmIdx}" data-sem="${semanaActiva}" data-serie="${sNum}">
-                            <input type="number" inputmode="numeric" placeholder="${(window.mapaPrevSemana || {})[`${itmIdx}_${sNum}`]?.rir_real ?? 'RIR'}" value="${sData.rir_real !== undefined && sData.rir_real !== null ? sData.rir_real : ''}"
-                              class="inp-rir w-14 bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold"
-                              data-plan="${rutina.id}" data-idx="${itmIdx}" data-sem="${semanaActiva}" data-serie="${sNum}">
-                          </div>
-                        </div>
-                      `;
-                    }).join('')}
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-      `;
+        html += '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">';
+        for (let sIdx = 0; sIdx < cantSeries; sIdx++) {
+          const sNum = sIdx + 1;
+          const sData = def(mapaSeries[itmIdx + '_' + sNum], {});
+          const hecha = def(sData.completada, false);
+          const boxDone = hecha ? 'serie-done-box' : '';
+          const btnClass = hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-950 text-rose-300 border-rose-500/40';
+          const btnTxt = hecha ? '✓' : '✗';
+          const prevItem = (window.mapaPrevSemana && window.mapaPrevSemana[itmIdx + '_' + sNum]) ? window.mapaPrevSemana[itmIdx + '_' + sNum] : null;
+          const prevCarga = (prevItem && prevItem.carga !== undefined && prevItem.carga !== null) ? prevItem.carga : 'Kg';
+          const prevRIR = (prevItem && prevItem.rir_real !== undefined && prevItem.rir_real !== null) ? prevItem.rir_real : 'RIR';
+          const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
+          const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
 
+          html += '<div class="serie-box bg-slate-900 p-2.5 rounded-xl border border-slate-800 ' + boxDone + ' space-y-1.5" id="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">';
+          html += '<div class="flex justify-between items-center"><span class="text-[10px] text-slate-400 font-mono font-bold">Serie ' + sNum + '</span>';
+          html += '<button type="button" class="btn-toggle-serie px-2.5 py-0.5 rounded-lg text-[11px] font-black border cursor-pointer ' + btnClass + '" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '" data-descanso="' + def(ej.descanso, '90s') + '" data-target="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">' + btnTxt + '</button>';
+          html += '</div><div class="flex gap-1.5">';
+          html += '<input type="number" step="0.5" inputmode="decimal" placeholder="' + prevCarga + '" value="' + valCarga + '" class="inp-carga w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
+          html += '<input type="number" inputmode="numeric" placeholder="' + prevRIR + '" value="' + valRIR + '" class="inp-rir w-14 bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
+          html += '</div></div>';
+        }
+        html += '</div></div>';
+      });
+
+      html += '</div></div>';
+      cont.innerHTML = html;
       enlazarEventosDinamicos();
     }
 
@@ -890,7 +889,7 @@
     }
 
     async function guardarCargaCloud(planId, ejercicioIdx, sem, serie, carga) {
-      if (!usuarioActual || !sb) return;
+      if (!usuarioActual ? true : !sb) return;
       const { error } = await sb.from('registros_series').upsert({
         planificacion_id: String(planId),
         user_id: usuarioActual.id,
@@ -898,7 +897,7 @@
         ejercicio: nombreEj(planId, ejercicioIdx),
         semana_num: sem,
         serie_num: serie,
-        carga: parseFloat(carga) || null,
+        carga: parseFloat(carga) ? parseFloat(carga) : null,
         updated_at: new Date().toISOString()
       }, { onConflict: 'planificacion_id,user_id,ejercicio_index,semana_num,serie_num' });
 
@@ -906,7 +905,7 @@
     }
 
     async function guardarRIRCloud(planId, ejercicioIdx, sem, serie, rir) {
-      if (!usuarioActual || !sb) return;
+      if (!usuarioActual ? true : !sb) return;
       const { error } = await sb.from('registros_series').upsert({
         planificacion_id: String(planId),
         user_id: usuarioActual.id,
@@ -914,7 +913,7 @@
         ejercicio: nombreEj(planId, ejercicioIdx),
         semana_num: sem,
         serie_num: serie,
-        rir_real: parseInt(rir) || null,
+        rir_real: parseInt(rir) ? parseInt(rir) : null,
         updated_at: new Date().toISOString()
       }, { onConflict: 'planificacion_id,user_id,ejercicio_index,semana_num,serie_num' });
 
@@ -922,7 +921,7 @@
     }
 
     async function toggleSerieCloud(planId, ejercicioIdx, sem, serie, descanso, btnElement, targetBoxId) {
-      if (!usuarioActual || !sb) return;
+      if (!usuarioActual ? true : !sb) return;
 
       const { data: actual } = await sb.from('registros_series')
         .select('completada')
@@ -933,7 +932,7 @@
         .eq('serie_num', serie)
         .maybeSingle();
 
-      const nuevoEstado = !(actual?.completada);
+      const nuevoEstado = !(actual ? actual.completada : false);
 
       const { error } = await sb.from('registros_series').upsert({
         planificacion_id: String(planId),
@@ -955,7 +954,7 @@
             box.classList.add('serie-done-box');
             btnElement.className = "btn-toggle-serie px-2.5 py-0.5 rounded-lg text-[11px] font-black border bg-emerald-500 text-slate-950 border-emerald-400 cursor-pointer";
             btnElement.textContent = '✓';
-            navigator.vibrate?.(60);
+            if (navigator.vibrate) navigator.vibrate(60);
             iniciarTimerDescanso(parseSegundos(descanso));
             calcularRachaYCalendario();
           } else {
@@ -968,26 +967,28 @@
     }
 
     async function procesarTesteoFallo(ejercicio, itmIdx) {
-      const p = parseFloat(prompt(`Peso de la serie máxima de ${ejercicio} (kg):`));
+      const p = parseFloat(prompt('Peso de la serie máxima de ' + ejercicio + ' (kg):'));
       const r = parseInt(prompt('Repeticiones completadas al fallo:'));
-      if (isNaN(p) || isNaN(r) || r < 1) return;
+      if (isNaN(p) ? true : isNaN(r) ? true : r < 1) return;
       const rm = Math.round(p * (1 + r / 30) * 10) / 10;
-      const previo = marcasRMAlumno[ejercicio.trim().toLowerCase()] || 0;
+      const previo = def(marcasRMAlumno[ejercicio.trim().toLowerCase()], 0);
       const fila = { user_id: usuarioActual.id, ejercicio: ejercicio.trim(), peso_levantado: p, reps_hechas: r, rm_calculado: rm };
       
       try {
         await sb.from('marcas_rm_historial').insert(fila);
       } catch (e) { console.warn("Historial:", e); }
 
-      await sb.from('marcas_rm').upsert({ ...fila, updated_at: new Date().toISOString() }, { onConflict: 'user_id,ejercicio' });
+      const payloadUpsert = Object.assign({}, fila, { updated_at: new Date().toISOString() });
+      await sb.from('marcas_rm').upsert(payloadUpsert, { onConflict: 'user_id,ejercicio' });
       await cargarMarcasRM();
-      if (rm > previo) abrirModalPR(ejercicio, rm); else mostrarToast(`1RM estimado: ${rm} kg (récord: ${previo} kg)`);
+      if (rm > previo) abrirModalPR(ejercicio, rm);
+      else mostrarToast('1RM estimado: ' + rm + ' kg (récord: ' + previo + ' kg)');
       cambiarSemana(semanaActiva);
     }
 
     function abrirModalPR(ejercicio, peso) {
       document.getElementById('pr-share-ejercicio').innerText = ejercicio;
-      document.getElementById('pr-share-peso').innerText = `${peso} kg`;
+      document.getElementById('pr-share-peso').innerText = peso + ' kg';
       document.getElementById('modal-pr-celebracion').classList.remove('hidden');
     }
 
@@ -998,24 +999,25 @@
     function compartirPRSocial() {
       const ej = document.getElementById('pr-share-ejercicio').innerText;
       const peso = document.getElementById('pr-share-peso').innerText;
-      const txt = `🔥 ¡Nuevo récord en ${ej}! Saqué ${peso} entrenando con Ramiro Abbattista.`;
+      const txt = '🔥 ¡Nuevo récord en ' + ej + '! Saqué ' + peso + ' entrenando con Ramiro Abbattista.';
       if (navigator.share) {
         navigator.share({ title: 'Récord Personal', text: txt }).catch(() => {});
       } else {
-        navigator.clipboard?.writeText(txt);
+        if (navigator.clipboard) navigator.clipboard.writeText(txt);
         alert("Copiado al portapapeles.");
       }
     }
 
-    function obtenerFechaLocalString(d = new Date()) {
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
+    function obtenerFechaLocalString(d) {
+      const fecha = d ? d : new Date();
+      const year = fecha.getFullYear();
+      const month = String(fecha.getMonth() + 1).padStart(2, '0');
+      const day = String(fecha.getDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
     }
 
     async function calcularRachaYCalendario() {
-      if (!usuarioActual || !sb) return;
+      if (!usuarioActual ? true : !sb) return;
 
       const { data: registros } = await sb
         .from('registros_series')
@@ -1024,7 +1026,7 @@
         .eq('completada', true);
 
       const diasEntrenados = new Set();
-      (registros || []).forEach(r => {
+      (registros ? registros : []).forEach(r => {
         if (r.completed_at) {
           const loc = new Date(r.completed_at);
           diasEntrenados.add(obtenerFechaLocalString(loc));
@@ -1037,20 +1039,21 @@
 
       let html = '';
       for (let d = 1; d <= diasEnMes; d++) {
-        const strDia = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const strDia = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
         const ent = diasEntrenados.has(strDia);
-        html += `<div class="h-6 flex items-center justify-center rounded-lg ${ent ? 'bg-emerald-500 text-slate-950 font-black' : 'bg-slate-900 text-slate-600'}">${d}</div>`;
+        const estiloDia = ent ? 'bg-emerald-500 text-slate-950 font-black' : 'bg-slate-900 text-slate-600';
+        html += '<div class="h-6 flex items-center justify-center rounded-lg ' + estiloDia + '">' + d + '</div>';
       }
       cont.innerHTML = html;
 
-      document.getElementById('stat-racha').innerText = `${calcularRacha(diasEntrenados)} sem`;
+      document.getElementById('stat-racha').innerText = calcularRacha(diasEntrenados) + ' sem';
     }
 
     function iniciarModoActivo() {
       if (rutinasActivas.length === 0) return alert("No hay entrenamientos cargados.");
-      const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) || rutinasActivas[0];
+      const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) ? rutinasActivas.find(r => String(r.id) === String(diaActivoId)) : rutinasActivas[0];
 
-      listaEjerciciosModoActivo = rutinaVisible.ejercicios_detalle || [];
+      listaEjerciciosModoActivo = def(rutinaVisible.ejercicios_detalle, []);
       if (listaEjerciciosModoActivo.length === 0) return alert("Esta sesión no tiene ejercicios.");
 
       indiceEjercicioActivo = 0;
@@ -1060,7 +1063,7 @@
 
     function cerrarModoActivo() {
       document.getElementById('modal-modo-activo').classList.add('hidden');
-      const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) || rutinasActivas[0];
+      const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) ? rutinasActivas.find(r => String(r.id) === String(diaActivoId)) : rutinasActivas[0];
       activarDia(rutinaVisible.id);
     }
 
@@ -1077,9 +1080,9 @@
     async function renderizarEjercicioActivo(rId) {
       const cont = document.getElementById('contenido-ejercicio-activo');
       const item = listaEjerciciosModoActivo[indiceEjercicioActivo];
-      const cantSeries = parseInt(item.series) || 4;
+      const cantSeries = parseInt(item.series) ? parseInt(item.series) : 4;
 
-      document.getElementById('txt-indice-activo').innerText = `${indiceEjercicioActivo + 1} de ${listaEjerciciosModoActivo.length}`;
+      document.getElementById('txt-indice-activo').innerText = (indiceEjercicioActivo + 1) + ' de ' + listaEjerciciosModoActivo.length;
 
       const { data: seriesCargadas } = await sb
         .from('registros_series')
@@ -1090,54 +1093,46 @@
         .eq('semana_num', semanaActiva);
 
       const mapActivo = {};
-      (seriesCargadas || []).forEach(s => mapActivo[s.serie_num] = s);
+      (seriesCargadas ? seriesCargadas : []).forEach(s => { mapActivo[s.serie_num] = s; });
 
-      cont.innerHTML = `
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div>
-              <span class="text-[10px] text-emerald-400 font-bold uppercase block">${escaparHTML(item.bloque)}</span>
-              <h3 class="text-xl font-black text-white">${escaparHTML(item.ejercicio)}</h3>
-            </div>
-            ${item.video ? `
-              <button type="button" class="btn-play-short bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer" data-video="${escaparHTML(item.video)}" data-title="${escaparHTML(item.ejercicio)}">
-                ▶ Short
-              </button>
-            ` : ''}
-          </div>
+      let html = '<div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-4">';
+      html += '<div class="flex items-center justify-between border-b border-slate-800 pb-3">';
+      html += '<div><span class="text-[10px] text-emerald-400 font-bold uppercase block">' + escaparHTML(item.bloque) + '</span>';
+      html += '<h3 class="text-xl font-black text-white">' + escaparHTML(item.ejercicio) + '</h3></div>';
 
-          <div class="space-y-2 pt-2">
-            ${Array.from({ length: cantSeries }).map((_, sIdx) => {
-              const sNum = sIdx + 1;
-              const sData = mapActivo[sNum] || {};
-              const hecha = sData.completada || false;
+      if (item.video) {
+        html += '<button type="button" class="btn-play-short bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer" data-video="' + escaparHTML(item.video) + '" data-title="' + escaparHTML(item.ejercicio) + '">▶ Short</button>';
+      }
+      html += '</div>';
 
-              return `
-                <div class="serie-box bg-slate-950 p-3 rounded-2xl border border-slate-800 ${hecha ? 'serie-done-box' : ''} flex items-center justify-between gap-3" id="act-box-${sNum}">
-                  <span class="font-mono font-bold text-slate-400 text-sm">S${sNum}</span>
-                  <div class="flex items-center gap-2 flex-1">
-                    <input type="number" step="0.5" placeholder="Kg" value="${sData.carga !== undefined && sData.carga !== null ? sData.carga : ''}"
-                      class="inp-carga-act w-24 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold"
-                      data-serie="${sNum}">
-                    <input type="number" placeholder="RIR" value="${sData.rir_real !== undefined && sData.rir_real !== null ? sData.rir_real : ''}"
-                      class="inp-rir-act w-16 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold"
-                      data-serie="${sNum}">
-                  </div>
-                  <button type="button" class="btn-toggle-act px-4 py-2.5 rounded-xl text-xs font-black border cursor-pointer ${hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-900 text-rose-300 border-rose-500/40'}"
-                    data-serie="${sNum}" data-descanso="${item.descanso || '90s'}">
-                    ${hecha ? '✓' : '✗'}
-                  </button>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
+      html += '<div class="space-y-2 pt-2">';
+      for (let sIdx = 0; sIdx < cantSeries; sIdx++) {
+        const sNum = sIdx + 1;
+        const sData = def(mapActivo[sNum], {});
+        const hecha = def(sData.completada, false);
+        const boxDone = hecha ? 'serie-done-box' : '';
+        const btnClass = hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-900 text-rose-300 border-rose-500/40';
+        const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
+        const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
+        const btnTxt = hecha ? '✓' : '✗';
 
-        <div class="flex justify-between gap-3 pt-2">
-          <button type="button" id="btn-ant-act" class="bg-slate-900 border border-slate-800 px-5 py-3 rounded-2xl text-xs font-bold text-white flex-1 cursor-pointer">◀ Anterior</button>
-          <button type="button" id="btn-sig-act" class="bg-emerald-500 text-slate-950 font-black px-5 py-3 rounded-2xl text-xs flex-1 cursor-pointer">Siguiente ▶</button>
-        </div>
-      `;
+        html += '<div class="serie-box bg-slate-950 p-3 rounded-2xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-3" id="act-box-' + sNum + '">';
+        html += '<span class="font-mono font-bold text-slate-400 text-sm">S' + sNum + '</span>';
+        html += '<div class="flex items-center gap-2 flex-1">';
+        html += '<input type="number" step="0.5" placeholder="Kg" value="' + valCarga + '" class="inp-carga-act w-24 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
+        html += '<input type="number" placeholder="RIR" value="' + valRIR + '" class="inp-rir-act w-16 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
+        html += '</div>';
+        html += '<button type="button" class="btn-toggle-act px-4 py-2.5 rounded-xl text-xs font-black border cursor-pointer ' + btnClass + '" data-serie="' + sNum + '" data-descanso="' + def(item.descanso, '90s') + '">' + btnTxt + '</button>';
+        html += '</div>';
+      }
+      html += '</div></div>';
+
+      html += '<div class="flex justify-between gap-3 pt-2">';
+      html += '<button type="button" id="btn-ant-act" class="bg-slate-900 border border-slate-800 px-5 py-3 rounded-2xl text-xs font-bold text-white flex-1 cursor-pointer">◀ Anterior</button>';
+      html += '<button type="button" id="btn-sig-act" class="bg-emerald-500 text-slate-950 font-black px-5 py-3 rounded-2xl text-xs flex-1 cursor-pointer">Siguiente ▶</button>';
+      html += '</div>';
+
+      cont.innerHTML = html;
 
       cont.querySelectorAll('.inp-carga-act').forEach(i => {
         i.onchange = () => guardarCargaCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(i.dataset.serie), i.value);
@@ -1146,7 +1141,7 @@
         i.onchange = () => guardarRIRCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(i.dataset.serie), i.value);
       });
       cont.querySelectorAll('.btn-toggle-act').forEach(b => {
-        b.onclick = () => toggleSerieCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(b.dataset.serie), b.dataset.descanso, b, `act-box-${b.dataset.serie}`);
+        b.onclick = () => toggleSerieCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(b.dataset.serie), b.dataset.descanso, b, 'act-box-' + b.dataset.serie);
       });
       cont.querySelectorAll('.btn-play-short').forEach(b => {
         b.onclick = () => abrirPlayerVideo(b.dataset.video, b.dataset.title);
@@ -1163,25 +1158,32 @@
       const { data: regs } = await sb.from('registros_series').select('user_id,completed_at')
         .eq('completada', true).gte('completed_at', desde);
       const stats = {};
-      (regs || []).forEach(r => {
-        const st = stats[r.user_id] = stats[r.user_id] || { n: 0, ult: null, dias: new Set() };
-        st.n++; st.dias.add(r.completed_at.slice(0, 10));
-        if (!st.ult || r.completed_at > st.ult) st.ult = r.completed_at;
+      (regs ? regs : []).forEach(r => {
+        if (!stats[r.user_id]) stats[r.user_id] = { n: 0, ult: null, dias: new Set() };
+        const st = stats[r.user_id];
+        st.n++;
+        st.dias.add(r.completed_at.slice(0, 10));
+        if (!st.ult ? true : r.completed_at > st.ult) st.ult = r.completed_at;
       });
+
       document.getElementById('sel-alumno-creador').innerHTML =
-        (atletas || []).map(a => `<option value="${a.id}">${escaparHTML(a.nombre || a.email)}</option>`).join('');
-      document.getElementById('contenedor-atletas-coach').innerHTML = (atletas || []).map(a => {
+        (atletas ? atletas : []).map(a => '<option value="' + a.id + '">' + escaparHTML(def(a.nombre, a.email)) + '</option>').join('');
+
+      document.getElementById('contenedor-atletas-coach').innerHTML = (atletas ? atletas : []).map(a => {
         const st = stats[a.id];
         const dias = st ? Math.floor((Date.now() - new Date(st.ult)) / 86400000) : null;
-        const alerta = dias === null || dias >= 7;
-        return `<div class="bg-slate-950 p-4 rounded-2xl border ${alerta ? 'border-rose-500/50' : 'border-slate-800'} space-y-1 text-xs">
-          <div class="flex justify-between items-center">
-            <span class="font-bold text-white text-sm">${escaparHTML(a.nombre || a.email)}</span>
-            <span class="text-[10px] px-2 py-0.5 rounded ${alerta ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-400'}">${dias === null ? 'Sin actividad' : dias === 0 ? 'Entrenó hoy' : `Hace ${dias} d`}</span>
-          </div>
-          <div class="text-slate-400">Últimos 14 días: <strong class="text-white">${st ? st.dias.size : 0}</strong> sesiones • <strong class="text-white">${st ? st.n : 0}</strong> series</div>
-          <div class="text-slate-500">${escaparHTML(a.email)} • WhatsApp: ${escaparHTML(a.telefono || 'Sin cargar')}</div>
-        </div>`;
+        const alerta = dias === null ? true : dias >= 7;
+        const tagTexto = dias === null ? 'Sin actividad' : dias === 0 ? 'Entrenó hoy' : 'Hace ' + dias + ' d';
+        const tagClase = alerta ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-400';
+        const bordeClase = alerta ? 'border-rose-500/50' : 'border-slate-800';
+
+        let itemHtml = '<div class="bg-slate-950 p-4 rounded-2xl border ' + bordeClase + ' space-y-1 text-xs">';
+        itemHtml += '<div class="flex justify-between items-center"><span class="font-bold text-white text-sm">' + escaparHTML(def(a.nombre, a.email)) + '</span>';
+        itemHtml += '<span class="text-[10px] px-2 py-0.5 rounded ' + tagClase + '">' + tagTexto + '</span></div>';
+        itemHtml += '<div class="text-slate-400">Últimos 14 días: <strong class="text-white">' + (st ? st.dias.size : 0) + '</strong> sesiones • <strong class="text-white">' + (st ? st.n : 0) + '</strong> series</div>';
+        itemHtml += '<div class="text-slate-500">' + escaparHTML(a.email) + ' • WhatsApp: ' + escaparHTML(def(a.telefono, 'Sin cargar')) + '</div>';
+        itemHtml += '</div>';
+        return itemHtml;
       }).join('');
     }
 
@@ -1189,14 +1191,14 @@
       if (!sb) return;
       sb.from('perfiles_usuarios').select('*').then(({ data }) => {
         let csv = "Nombre,Email,Telefono\n";
-        (data || []).forEach(p => {
-          const l = s => String(s || '').replace(/^[=+\-@]/, "'").replace(/"/g, '""');
-          csv += `"${l(p.nombre)}","${l(p.email)}","${l(p.telefono)}"\n`;
+        (data ? data : []).forEach(p => {
+          const l = s => String(def(s, '')).replace(/^[=+\-@]/, "'").replace(/"/g, '""');
+          csv += '"' + l(p.nombre) + '","' + l(p.email) + '","' + l(p.telefono) + '"\n';
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `atletas_${obtenerFechaLocalString()}.csv`;
+        a.download = 'atletas_' + obtenerFechaLocalString() + '.csv';
         a.click();
       });
     }
@@ -1209,7 +1211,9 @@
     }
 
     function nuevoPlan() {
-      planEditandoId = null; ejEditIdx = null; sesionCoachTemporal = [];
+      planEditandoId = null;
+      ejEditIdx = null;
+      sesionCoachTemporal = [];
       document.getElementById('admin-mes').value = '';
       document.getElementById('admin-dia').value = '';
       tituloCreador('🛠️ Nuevo plan', 'Progresión semanal ondulada y guardado directo en Supabase.', false);
@@ -1219,26 +1223,35 @@
     function cargarPlanEnCreador(p, modo) {
       planEditandoId = modo === 'editar' ? p.id : null;
       ejEditIdx = null;
-      sesionCoachTemporal = JSON.parse(JSON.stringify(p.ejercicios_detalle || []));
-      document.getElementById('admin-entorno').value = p.entorno || 'ONLINE';
+      sesionCoachTemporal = JSON.parse(JSON.stringify(def(p.ejercicios_detalle, [])));
+      document.getElementById('admin-entorno').value = def(p.entorno, 'ONLINE');
       document.getElementById('sel-alumno-creador').value = p.alumno_id;
-      document.getElementById('admin-mes').value = (p.mesociclo || '') + (modo === 'duplicar' ? ' (copia)' : '');
-      document.getElementById('admin-duracion-semanas').value = String(p.duracion_semanas || 5);
-      document.getElementById('admin-dia').value = p.dia || '';
+      document.getElementById('admin-mes').value = def(p.mesociclo, '') + (modo === 'duplicar' ? ' (copia)' : '');
+      document.getElementById('admin-duracion-semanas').value = String(def(p.duracion_semanas, 5));
+      document.getElementById('admin-dia').value = def(p.dia, '');
       actualizarColumnasMatrizCoach();
-      if (modo === 'editar') tituloCreador('✏️ Editando plan', 'Si el alumno ya registró series, no cambies el orden ni borres ejercicios: los registros se guardan por posición.', true);
-      else tituloCreador('📄 Duplicando plan', 'Elegí el alumno destino y ajustá lo que quieras. Se guarda como plan nuevo.', false);
+      if (modo === 'editar') {
+        tituloCreador('✏️ Editando plan', 'Si el alumno ya registró series, no cambies el orden ni borres ejercicios: los registros se guardan por posición.', true);
+      } else {
+        tituloCreador('📄 Duplicando plan', 'Elegí el alumno destino y ajustá lo que quieras. Se guarda como plan nuevo.', false);
+      }
       abrirModalCreadorRapido();
     }
 
     function editarEjercicioCoach(i) {
-      const e = sesionCoachTemporal[i]; if (!e) return;
-      const set = (id, v) => { document.getElementById(id).value = v ?? ''; };
-      set('inp-bloque', e.bloque); set('inp-ejercicio-nombre', e.ejercicio); set('inp-video', e.video);
-      set('inp-series', e.series); set('inp-rir', e.rir); set('inp-tempo', e.tempo); set('inp-descanso', e.descanso);
+      const e = sesionCoachTemporal[i];
+      if (!e) return;
+      const set = (id, v) => { document.getElementById(id).value = (v !== undefined && v !== null) ? v : ''; };
+      set('inp-bloque', e.bloque);
+      set('inp-ejercicio-nombre', e.ejercicio);
+      set('inp-video', e.video);
+      set('inp-series', e.series);
+      set('inp-rir', e.rir);
+      set('inp-tempo', e.tempo);
+      set('inp-descanso', e.descanso);
       for (let n = 1; n <= 6; n++) {
-        const w = e.progresionSemanal?.['s' + n];
-        if (w) { set(`prog-s${n}-reps`, w.reps); set(`prog-s${n}-carga`, w.carga); }
+        const w = (e.progresionSemanal && e.progresionSemanal['s' + n]) ? e.progresionSemanal['s' + n] : null;
+        if (w) { set('prog-s' + n + '-reps', w.reps); set('prog-s' + n + '-carga', w.carga); }
       }
       ejEditIdx = i;
       document.querySelector('[onclick="agregarFilaRutina()"]').innerText = '✔ Guardar cambios del ejercicio';
@@ -1247,37 +1260,40 @@
 
     function moverEjercicioCoach(i, d) {
       const j = i + d;
-      if (j < 0 || j >= sesionCoachTemporal.length) return;
-      [sesionCoachTemporal[i], sesionCoachTemporal[j]] = [sesionCoachTemporal[j], sesionCoachTemporal[i]];
+      if (j < 0 ? true : j >= sesionCoachTemporal.length) return;
+      const temp = sesionCoachTemporal[i];
+      sesionCoachTemporal[i] = sesionCoachTemporal[j];
+      sesionCoachTemporal[j] = temp;
       ejEditIdx = null;
       renderTablaSesionCoach();
     }
 
     async function cargarPlanesCoach() {
       const cont = document.getElementById('lista-planes-coach');
-      if (!cont || !sb) return;
+      if (!cont ? true : !sb) return;
       const filtro = document.getElementById('filtro-planes-estado').value;
       
-      const [resPlanes, resPerfiles] = await Promise.all([
+      const results = await Promise.all([
         sb.from('planificaciones').select('*').order('created_at', { ascending: true }),
         sb.from('perfiles_usuarios').select('id,nombre,email')
       ]);
 
-      let planes = resPlanes.data || [];
-      const perfiles = resPerfiles.data || [];
+      let planes = def(results[0].data, []);
+      const perfiles = def(results[1].data, []);
 
       if (filtro !== 'todos') {
-        planes = planes.filter(p => (p.estado || 'activa') === filtro);
+        planes = planes.filter(p => def(p.estado, 'activa') === filtro);
       }
 
       const nombres = {};
-      perfiles.forEach(p => { nombres[p.id] = p.nombre || p.email; });
+      perfiles.forEach(p => { nombres[p.id] = def(p.nombre, p.email); });
       window.planesCoach = {};
       const grupos = {};
       planes.forEach(p => {
         window.planesCoach[p.id] = p;
-        const k = p.alumno_id + '||' + (p.mesociclo || 'Sin mesociclo');
-        (grupos[k] = grupos[k] || []).push(p);
+        const k = p.alumno_id + ':::' + def(p.mesociclo, 'Sin mesociclo');
+        if (!grupos[k]) grupos[k] = [];
+        grupos[k].push(p);
       });
 
       if (planes.length === 0) {
@@ -1287,49 +1303,67 @@
 
       const btn = 'px-2 py-1 rounded-lg text-[11px] font-bold border border-slate-700 bg-slate-900 text-slate-300 cursor-pointer';
       cont.innerHTML = Object.entries(grupos).map(([k, lista]) => {
-        const i = k.indexOf('||'), alId = k.slice(0, i), mes = k.slice(i + 2);
+        const sepIdx = k.indexOf(':::');
+        const alId = k.slice(0, sepIdx);
+        const mes = k.slice(sepIdx + 3);
         const hayActivos = lista.some(p => p.estado !== 'archivada');
-        return `<div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 space-y-2">
-          <div class="flex items-center justify-between gap-2">
-            <div class="min-w-0">
-              <span class="text-sm font-black text-white block truncate">${escaparHTML(nombres[alId] || 'Alumno')}</span>
-              <span class="text-[11px] text-emerald-400 font-bold">${escaparHTML(mes)}</span>
-            </div>
-            <button type="button" class="${btn} shrink-0" data-acc="mes" data-al="${escaparHTML(alId)}" data-mes="${escaparHTML(mes)}" data-estado="${hayActivos ? 'archivada' : 'activa'}">${hayActivos ? '📦 Archivar mesociclo' : '♻ Reactivar mesociclo'}</button>
-          </div>
-          ${lista.map(p => `<div class="flex items-center justify-between gap-2 bg-slate-900 rounded-xl px-3 py-2 ${p.estado === 'archivada' ? 'opacity-60' : ''}">
-            <div class="min-w-0">
-              <span class="text-xs font-bold text-white block truncate">${escaparHTML(p.dia || 'Día')}</span>
-              <span class="text-[10px] text-slate-400">${(p.ejercicios_detalle || []).length} ejercicios • ${p.duracion_semanas \vert{}\vert{} 5} sem • ${p.estado === 'archivada' ? 'Archivado' : 'Activo'}</span>
-            </div>
-            <div class="flex gap-1 shrink-0">
-              <button type="button" class="${btn}" data-acc="editar" data-id="${p.id}" title="Editar">✏️</button>
-              <button type="button" class="${btn}" data-acc="duplicar" data-id="${p.id}" title="Duplicar">📄</button>
-              <button type="button" class="${btn}" data-acc="estado" data-id="${p.id}" title="${p.estado === 'archivada' ? 'Reactivar' : 'Archivar'}">${p.estado === 'archivada' ? '♻' : '📦'}</button>
-              <button type="button" class="${btn} text-rose-300" data-acc="borrar" data-id="${p.id}" title="Eliminar">🗑</button>
-            </div>
-          </div>`).join('')}
-        </div>`;
+        const txtBtnMes = hayActivos ? '📦 Archivar mesociclo' : '♻ Reactivar mesociclo';
+        const stTarget = hayActivos ? 'archivada' : 'activa';
+
+        let gHtml = '<div class="bg-slate-950 border border-slate-800 rounded-2xl p-3 space-y-2">';
+        gHtml += '<div class="flex items-center justify-between gap-2"><div class="min-w-0">';
+        gHtml += '<span class="text-sm font-black text-white block truncate">' + escaparHTML(def(nombres[alId], 'Alumno')) + '</span>';
+        gHtml += '<span class="text-[11px] text-emerald-400 font-bold">' + escaparHTML(mes) + '</span></div>';
+        gHtml += '<button type="button" class="' + btn + ' shrink-0" data-acc="mes" data-al="' + escaparHTML(alId) + '" data-mes="' + escaparHTML(mes) + '" data-estado="' + stTarget + '">' + txtBtnMes + '</button>';
+        gHtml += '</div>';
+
+        gHtml += lista.map(p => {
+          const cantEj = def(p.ejercicios_detalle, []).length;
+          const durSem = def(p.duracion_semanas, 5);
+          const stTexto = p.estado === 'archivada' ? 'Archivado' : 'Activo';
+          const opacidad = p.estado === 'archivada' ? 'opacity-60' : '';
+          const icoEstado = p.estado === 'archivada' ? '♻' : '📦';
+          const titEstado = p.estado === 'archivada' ? 'Reactivar' : 'Archivar';
+
+          let row = '<div class="flex items-center justify-between gap-2 bg-slate-900 rounded-xl px-3 py-2 ' + opacidad + '">';
+          row += '<div class="min-w-0"><span class="text-xs font-bold text-white block truncate">' + escaparHTML(def(p.dia, 'Día')) + '</span>';
+          row += '<span class="text-[10px] text-slate-400">' + cantEj + ' ejercicios • ' + durSem + ' sem • ' + stTexto + '</span></div>';
+          row += '<div class="flex gap-1 shrink-0">';
+          row += '<button type="button" class="' + btn + '" data-acc="editar" data-id="' + p.id + '" title="Editar">✏️</button>';
+          row += '<button type="button" class="' + btn + '" data-acc="duplicar" data-id="' + p.id + '" title="Duplicar">📄</button>';
+          row += '<button type="button" class="' + btn + '" data-acc="estado" data-id="' + p.id + '" title="' + titEstado + '">' + icoEstado + '</button>';
+          row += '<button type="button" class="' + btn + ' text-rose-300" data-acc="borrar" data-id="' + p.id + '" title="Eliminar">🗑</button>';
+          row += '</div></div>';
+          return row;
+        }).join('');
+
+        gHtml += '</div>';
+        return gHtml;
       }).join('');
 
       cont.onclick = async ev => {
         const b = ev.target.closest('button[data-acc]');
         if (!b) return;
-        const acc = b.dataset.acc, p = window.planesCoach[b.dataset.id];
+        const acc = b.dataset.acc;
+        const p = window.planesCoach[b.dataset.id];
         if (acc === 'editar' && p) return cargarPlanEnCreador(p, 'editar');
         if (acc === 'duplicar' && p) return cargarPlanEnCreador(p, 'duplicar');
         let error;
         if (acc === 'estado' && p) {
-          ({ error } = await sb.from('planificaciones').update({ estado: p.estado === 'archivada' ? 'activa' : 'archivada' }).eq('id', p.id));
+          const res = await sb.from('planificaciones').update({ estado: p.estado === 'archivada' ? 'activa' : 'archivada' }).eq('id', p.id);
+          error = res.error;
         } else if (acc === 'borrar' && p) {
-          if (!confirm(`¿Eliminar "${p.dia}"? Esto no se puede deshacer.`)) return;
-          ({ error } = await sb.from('planificaciones').delete().eq('id', p.id));
+          if (!confirm('¿Eliminar "' + p.dia + '"? Esto no se puede deshacer.')) return;
+          const res = await sb.from('planificaciones').delete().eq('id', p.id);
+          error = res.error;
         } else if (acc === 'mes') {
           let u = sb.from('planificaciones').update({ estado: b.dataset.estado }).eq('alumno_id', b.dataset.al);
           u = b.dataset.mes === 'Sin mesociclo' ? u.is('mesociclo', null) : u.eq('mesociclo', b.dataset.mes);
-          ({ error } = await u);
+          const res = await u;
+          error = res.error;
         } else return;
-        if (error) alert('Error: ' + error.message); else { mostrarToast('✓ Actualizado'); cargarPlanesCoach(); }
+        if (error) alert('Error: ' + error.message);
+        else { mostrarToast('✓ Actualizado'); cargarPlanesCoach(); }
       };
     }
 
@@ -1343,13 +1377,13 @@
     }
 
     function actualizarColumnasMatrizCoach() {
-      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) || 5;
+      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) ? parseInt(document.getElementById('admin-duracion-semanas').value) : 5;
       document.getElementById('col-s5-coach').classList.toggle('hidden', cant < 5);
       document.getElementById('col-s6-coach').classList.toggle('hidden', cant < 6);
     }
 
     function aplicarPresetProgresionRamiro() {
-      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) || 5;
+      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) ? parseInt(document.getElementById('admin-duracion-semanas').value) : 5;
       document.getElementById('prog-s1-reps').value = "3x8 reps";
       document.getElementById('prog-s1-carga').value = "70%";
       document.getElementById('prog-s2-reps').value = "4x8 reps";
@@ -1373,11 +1407,16 @@
       if (!ej) return alert("Escribí el nombre del ejercicio.");
       const v = id => document.getElementById(id).value;
       const prog = {};
-      for (let n = 1; n <= 6; n++) prog['s' + n] = { reps: v(`prog-s${n}-reps`), carga: v(`prog-s${n}-carga`) };
+      for (let n = 1; n <= 6; n++) prog['s' + n] = { reps: v('prog-s' + n + '-reps'), carga: v('prog-s' + n + '-carga') };
       const nuevo = {
-        bloque: v('inp-bloque'), ejercicio: ej, series: parseInt(v('inp-series')) || 4,
-        rir: v('inp-rir').trim(), descanso: v('inp-descanso'), tempo: v('inp-tempo').trim(),
-        video: v('inp-video').trim(), progresionSemanal: prog
+        bloque: v('inp-bloque'),
+        ejercicio: ej,
+        series: parseInt(v('inp-series')) ? parseInt(v('inp-series')) : 4,
+        rir: v('inp-rir').trim(),
+        descanso: v('inp-descanso'),
+        tempo: v('inp-tempo').trim(),
+        video: v('inp-video').trim(),
+        progresionSemanal: prog
       };
       if (ejEditIdx !== null && sesionCoachTemporal[ejEditIdx]) sesionCoachTemporal[ejEditIdx] = nuevo;
       else sesionCoachTemporal.push(nuevo);
@@ -1395,16 +1434,18 @@
         return;
       }
       const b = 'px-2 py-1 text-slate-300 font-bold cursor-pointer';
-      tbody.innerHTML = sesionCoachTemporal.map((f, i) => `
-        <tr class="flex justify-between items-center p-2 ${ejEditIdx === i ? 'bg-emerald-500/10' : ''}">
-          <td class="min-w-0"><span class="text-emerald-400 block text-[10px]">${escaparHTML(f.bloque)}</span><span class="block truncate">${i + 1}. ${escaparHTML(f.ejercicio)}</span></td>
-          <td class="flex shrink-0">
-            <button type="button" class="${b}" data-a="up" data-i="${i}">↑</button>
-            <button type="button" class="${b}" data-a="down" data-i="${i}">↓</button>
-            <button type="button" class="${b}" data-a="edit" data-i="${i}">✏️</button>
-            <button type="button" class="${b} text-rose-400" data-a="del" data-i="${i}">✕</button>
-          </td>
-        </tr>`).join('');
+      tbody.innerHTML = sesionCoachTemporal.map((f, i) => {
+        const rowClass = ejEditIdx === i ? 'bg-emerald-500/10' : '';
+        return '<tr class="flex justify-between items-center p-2 ' + rowClass + '">' +
+          '<td class="min-w-0"><span class="text-emerald-400 block text-[10px]">' + escaparHTML(f.bloque) + '</span><span class="block truncate">' + (i + 1) + '. ' + escaparHTML(f.ejercicio) + '</span></td>' +
+          '<td class="flex shrink-0">' +
+          '<button type="button" class="' + b + '" data-a="up" data-i="' + i + '">↑</button>' +
+          '<button type="button" class="' + b + '" data-a="down" data-i="' + i + '">↓</button>' +
+          '<button type="button" class="' + b + '" data-a="edit" data-i="' + i + '">✏️</button>' +
+          '<button type="button" class="' + b + ' text-rose-400" data-a="del" data-i="' + i + '">✕</button>' +
+          '</td></tr>';
+      }).join('');
+
       tbody.onclick = ev => {
         const x = ev.target.closest('button[data-a]');
         if (!x) return;
@@ -1418,21 +1459,28 @@
 
     async function guardarPlanificacionCoach() {
       const alumnoId = document.getElementById('sel-alumno-creador').value;
-      if (!alumnoId || sesionCoachTemporal.length === 0) return alert("Seleccioná un alumno y agregá ejercicios.");
+      if (!alumnoId ? true : sesionCoachTemporal.length === 0) return alert("Seleccioná un alumno y agregá ejercicios.");
       const fila = {
         alumno_id: alumnoId,
         entorno: document.getElementById('admin-entorno').value,
-        mesociclo: document.getElementById('admin-mes').value.trim() || 'Mes 1',
-        duracion_semanas: parseInt(document.getElementById('admin-duracion-semanas').value) || 5,
-        dia: document.getElementById('admin-dia').value.trim() || 'Lunes',
+        mesociclo: def(document.getElementById('admin-mes').value.trim(), 'Mes 1'),
+        duracion_semanas: parseInt(document.getElementById('admin-duracion-semanas').value) ? parseInt(document.getElementById('admin-duracion-semanas').value) : 5,
+        dia: def(document.getElementById('admin-dia').value.trim(), 'Lunes'),
         ejercicios_detalle: sesionCoachTemporal
       };
       let error;
-      if (planEditandoId) ({ error } = await sb.from('planificaciones').update(fila).eq('id', planEditandoId));
-      else ({ error } = await sb.from('planificaciones').insert([{ ...fila, coach_id: usuarioActual.id, estado: 'activa' }]));
+      if (planEditandoId) {
+        const res = await sb.from('planificaciones').update(fila).eq('id', planEditandoId);
+        error = res.error;
+      } else {
+        const res = await sb.from('planificaciones').insert([Object.assign({}, fila, { coach_id: usuarioActual.id, estado: 'activa' })]);
+        error = res.error;
+      }
       if (error) return alert("Error: " + error.message);
       mostrarToast(planEditandoId ? '✓ Plan actualizado' : '✓ Plan asignado');
-      planEditandoId = null; ejEditIdx = null; sesionCoachTemporal = [];
+      planEditandoId = null;
+      ejEditIdx = null;
+      sesionCoachTemporal = [];
       renderTablaSesionCoach();
       cerrarModalCreadorRapido();
       cargarPlanesCoach();
@@ -1458,10 +1506,10 @@
     function calcularDistribucionDiscos() {
       const total = parseFloat(document.getElementById('inp-modal-kilos').value);
       const res = document.getElementById('resultado-discos');
-      if (isNaN(total) || total <= 0) return res.innerHTML = 'Ingresá el peso objetivo.';
+      if (isNaN(total) ? true : total <= 0) return res.innerHTML = 'Ingresá el peso objetivo.';
 
-      if (pesoBarraSeleccionada === 0) return res.innerHTML = `<strong class="text-emerald-400">Carga fija: ${total} kg</strong>`;
-      if (total < pesoBarraSeleccionada) return res.innerHTML = `<span class="text-rose-400">El peso no puede ser menor a la barra (${pesoBarraSeleccionada} kg).</span>`;
+      if (pesoBarraSeleccionada === 0) return res.innerHTML = '<strong class="text-emerald-400">Carga fija: ' + total + ' kg</strong>';
+      if (total < pesoBarraSeleccionada) return res.innerHTML = '<span class="text-rose-400">El peso no puede ser menor a la barra (' + pesoBarraSeleccionada + ' kg).</span>';
 
       const porLado = (total - pesoBarraSeleccionada) / 2;
       const discos = [25, 20, 15, 10, 5, 2.5, 1.25];
@@ -1475,15 +1523,13 @@
         }
       });
 
-      res.innerHTML = `
-        <div class="flex justify-between pb-1 border-b border-slate-800">
-          <span>Barra: <strong>${pesoBarraSeleccionada} kg</strong></span>
-          <span class="text-emerald-400 font-bold">Por lado: ${porLado} kg</span>
-        </div>
-        <div class="flex flex-wrap gap-1 pt-1">
-          ${usados.map(d => `<span class="bg-slate-900 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded font-mono">${d}kg</span>`).join('')}
-        </div>
-      `;
+      let resHtml = '<div class="flex justify-between pb-1 border-b border-slate-800">';
+      resHtml += '<span>Barra: <strong>' + pesoBarraSeleccionada + ' kg</strong></span>';
+      resHtml += '<span class="text-emerald-400 font-bold">Por lado: ' + porLado + ' kg</span></div>';
+      resHtml += '<div class="flex flex-wrap gap-1 pt-1">';
+      resHtml += usados.map(d => '<span class="bg-slate-900 border border-emerald-500/40 text-emerald-300 px-2 py-0.5 rounded font-mono">' + d + 'kg</span>').join('');
+      resHtml += '</div>';
+      res.innerHTML = resHtml;
     }
 
     function parseSegundos(txt) {
@@ -1493,7 +1539,9 @@
 
     function iniciarTimerDescanso(seg) {
       if (timerInterval) clearInterval(timerInterval);
-      timerEnPausa = false; finTimer = Date.now() + seg * 1000; tiempoRestante = seg;
+      timerEnPausa = false;
+      finTimer = Date.now() + seg * 1000;
+      tiempoRestante = seg;
       document.getElementById('timer-box').classList.remove('hidden');
       document.getElementById('btn-timer-toggle').innerText = 'Pausa';
       actualizarDisplayTimer();
@@ -1503,7 +1551,7 @@
         actualizarDisplayTimer();
         if (tiempoRestante <= 0) {
           clearInterval(timerInterval);
-          navigator.vibrate?.([200, 100, 200]);
+          if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
           document.getElementById('timer-display').innerText = '¡TIEMPO!';
         }
       }, 500);
@@ -1512,7 +1560,7 @@
     function actualizarDisplayTimer() {
       const min = Math.floor(tiempoRestante / 60);
       const seg = tiempoRestante % 60;
-      document.getElementById('timer-display').innerText = `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
+      document.getElementById('timer-display').innerText = String(min).padStart(2, '0') + ':' + String(seg).padStart(2, '0');
     }
 
     function pausarReanudarTimer() {
@@ -1527,15 +1575,18 @@
 
     function extraerIdYouTube(url) {
       if (!url) return null;
-      const m = url.match(/shorts\/([a-zA-Z0-9_-]+)/) || url.match(/v=([a-zA-Z0-9_-]+)/);
-      return m ? m[1] : null;
+      const m1 = url.match(/shorts\/([a-zA-Z0-9_-]+)/);
+      if (m1) return m1[1];
+      const m2 = url.match(/v=([a-zA-Z0-9_-]+)/);
+      if (m2) return m2[1];
+      return null;
     }
 
     function abrirPlayerVideo(url, titulo) {
       const id = extraerIdYouTube(url);
       if (!id) return window.open(url, '_blank');
-      document.getElementById('player-video-titulo').innerText = titulo || "Demostración";
-      document.getElementById('iframe-video-player').src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=1`;
+      document.getElementById('player-video-titulo').innerText = def(titulo, "Demostración");
+      document.getElementById('iframe-video-player').src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&mute=1&loop=1&playlist=' + id + '&controls=1';
       document.getElementById('modal-video-player').classList.remove('hidden');
     }
 
@@ -1544,7 +1595,7 @@
       document.getElementById('modal-video-player').classList.add('hidden');
     }
 
-    // AUTO-RECUPERACIÓN DE SESIÓN (COMPATIBLE CON MÓVIL)
+    // AUTO-RECUPERACIÓN DE SESIÓN AL INICIAR
     function iniciarApp() {
       if (sb) {
         sb.auth.getSession().then(({ data: { session } }) => {
