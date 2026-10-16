@@ -43,7 +43,7 @@
     .btn-tipo-barra-active { background-color: #10b981 !important; color: #020617 !important; font-weight: 900 !important; }
     @media print {
       header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container,
-      #modal-discos, #modal-creador-rapido, #modal-modo-activo, #modal-video-player, #modal-pr-celebracion {
+      #modal-discos, #modal-creador-rapido, #modal-modo-activo, #modal-video-player, #modal-pr-celebracion, #modal-planilla-drive {
         display: none !important;
       }
       body { background: white !important; color: black !important; }
@@ -65,6 +65,19 @@
   <!-- TOAST DE AUTOGUARDADO -->
   <div id="toast-guardado" class="fixed top-16 right-4 bg-emerald-500 text-slate-950 text-xs font-black px-3 py-1.5 rounded-xl shadow-xl z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex items-center gap-1.5">
     <span id="toast-texto">✓ Guardado en Supabase</span>
+  </div>
+
+  <!-- MODAL VISTA PLANILLA DRIVE (SÁBANA COMPLETA) -->
+  <div id="modal-planilla-drive" class="hidden fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex flex-col p-3 md:p-6">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-black text-white">📋 Vista Planilla Drive — Dylan Losada (Oct/Nov)</span>
+        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded font-mono">6 Semanas Onduladas</span>
+      </div>
+      <button type="button" onclick="cerrarVistaPlanillaDrive()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 px-3 py-1.5 rounded-xl cursor-pointer">Cerrar ✕</button>
+    </div>
+    <div id="tabla-sábana-contenedor" class="flex-1 overflow-x-auto overflow-y-auto border border-slate-800 rounded-2xl bg-slate-900/60 p-2 text-xs">
+    </div>
   </div>
 
   <!-- REPRODUCTOR MODAL NATIVO DE SHORTS -->
@@ -174,18 +187,17 @@
             <label class="text-[10px] text-slate-400 font-bold block mb-1">Duración Semanas</label>
             <select id="admin-duracion-semanas" onchange="actualizarColumnasMatrizCoach()" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-emerald-300 font-bold">
               <option value="4">4 Semanas</option>
-              <option value="5" selected>5 Semanas</option>
-              <option value="6">6 Semanas</option>
+              <option value="5">5 Semanas</option>
+              <option value="6" selected>6 Semanas (Planilla Dylan)</option>
             </select>
           </div>
           <div>
             <label class="text-[10px] text-slate-400 font-bold block mb-1">Día</label>
-            <input type="text" id="admin-dia" placeholder="Lunes (Día 1)" class="w-full bg-slate-900 border border-emerald-500/50 rounded-xl p-2 text-xs text-emerald-300 font-bold">
+            <input type="text" id="admin-dia" placeholder="Día 1 (Lun)" class="w-full bg-slate-900 border border-emerald-500/50 rounded-xl p-2 text-xs text-emerald-300 font-bold">
           </div>
         </div>
       </div>
 
-      <!-- SELECTOR DE EJERCICIOS ORGANIZADO POR CATEGORÍAS -->
       <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio</span>
@@ -198,42 +210,39 @@
           <div class="md:col-span-2">
             <label class="text-[10px] text-slate-400 font-bold">Bloque de la Sesión</label>
             <select id="inp-bloque" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-emerald-300 font-bold mt-1">
-              <option value="BLOQUE A — MOVILIDAD ESPECÍFICA">BLOQUE A — MOVILIDAD ESPECÍFICA</option>
-              <option value="BLOQUE B — ACTIVACIÓN & ZONA MEDIA">BLOQUE B — ACTIVACIÓN & ZONA MEDIA</option>
-              <option value="BLOQUE C — POTENCIA / OLÍMPICO">BLOQUE C — POTENCIA / OLÍMPICO</option>
-              <option value="BLOQUE D — FUERZA PRINCIPAL" selected>BLOQUE D — FUERZA PRINCIPAL</option>
-              <option value="BLOQUE E — TRACCIONES & ACCESORIOS">BLOQUE E — TRACCIONES & ACCESORIOS</option>
-              <option value="BLOQUE F — FINISHER & METABÓLICO">BLOQUE F — FINISHER & METABÓLICO</option>
+              <option value="⚙ CALOR & MOVILIDAD">⚙ CALOR & MOVILIDAD</option>
+              <option value="🏋 BLOQUE 1: FUERZA BÁSICA" selected>🏋 BLOQUE 1: FUERZA BÁSICA</option>
+              <option value="⚡ BLOQUE 2: ACCESORIOS & CORE">⚡ BLOQUE 2: ACCESORIOS & CORE</option>
+              <option value="🧩 DÍA MODULAR / POTENCIA">🧩 DÍA MODULAR / POTENCIA</option>
+              <option value="🏠 EXTRA MOVILIDAD CASA">🏠 EXTRA MOVILIDAD CASA</option>
             </select>
           </div>
-          
           <div class="md:col-span-2">
             <label class="text-[10px] text-slate-400 font-bold">Categoría de Ejercicios</label>
             <select id="sel-categoria-ejercicios" onchange="actualizarListaEjerciciosPorCategoria()" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white mt-1">
               <optgroup label="Movilidad Articular">
                 <option value="mov_tobillo">Movilidad: Tobillo</option>
-                <option value="mov_cadera">Movilidad: Cadera</option>
+                <option value="mov_cadera">Movilidad: Cadera (90/90, Spiderman)</option>
                 <option value="mov_toracica">Movilidad: Columna Torácica</option>
                 <option value="mov_escapula_hombro">Movilidad: Hombro & Escápula</option>
                 <option value="mov_muneca">Movilidad: Muñecas</option>
               </optgroup>
               <optgroup label="Zona Media & Core Funcional">
-                <option value="core_antiextension">Core: Antiextensión</option>
-                <option value="core_antirrotacion">Core: Antirrotación</option>
-                <option value="core_antiflexion_lat">Core: Antiflexión Lateral</option>
+                <option value="core_antiextension">Core: Antiextensión (Deadbug, Plancha)</option>
+                <option value="core_antirrotacion">Core: Antirrotación (Pallof, Bird Dog)</option>
+                <option value="core_antiflexion_lat">Core: Antiflexión Lateral (Granjero)</option>
                 <option value="core_dinamico">Core: Dinámico / Rotacional</option>
               </optgroup>
               <optgroup label="Fuerza & Rendimiento">
-                <option value="inf_rodilla" selected>Tren Inferior: Dominante Rodilla</option>
-                <option value="inf_cadera">Tren Inferior: Dominante Cadera</option>
-                <option value="sup_empuje">Tren Superior: Empujes</option>
-                <option value="sup_traccion">Tren Superior: Tracciones</option>
-                <option value="olimpicos">Levantamiento Olímpico</option>
+                <option value="inf_rodilla" selected>Tren Inferior: Sentadillas / Rodilla</option>
+                <option value="inf_cadera">Tren Inferior: Peso Muerto / Hip Thrust</option>
+                <option value="sup_empuje">Tren Superior: Press Pecho / Militar</option>
+                <option value="sup_traccion">Tren Superior: Remos / Jalones / Dominadas</option>
+                <option value="olimpicos">Levantamiento Olímpico (Clean / Snatch)</option>
                 <option value="potencia_pliometria">Potencia & Pliometría</option>
               </optgroup>
             </select>
           </div>
-
           <div class="md:col-span-2">
             <label class="text-[10px] text-slate-400 font-bold">Ejercicio Seleccionado</label>
             <select id="sel-ejercicio-especifico" onchange="seleccionarEjercicioDeLista(this.value)" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-emerald-300 font-bold mt-1">
@@ -243,8 +252,8 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
           <div>
-            <label class="text-[10px] text-slate-400 font-bold">Nombre Personalizado / Alternativo</label>
-            <input type="text" id="inp-ejercicio-nombre" placeholder="ej: Sentadilla Trasera con Barra" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white mt-1">
+            <label class="text-[10px] text-slate-400 font-bold">Nombre del Ejercicio</label>
+            <input type="text" id="inp-ejercicio-nombre" placeholder="ej: Sentadilla Trasera Barra Olímpica" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white mt-1">
           </div>
           <div>
             <label class="text-[10px] text-slate-400 font-bold">Video Short (YouTube)</label>
@@ -252,94 +261,86 @@
           </div>
         </div>
 
-        <!-- SELECTORES TÁCTILES RÁPIDOS PARA SERIES Y REPETICIONES -->
+        <div>
+          <label class="text-[10px] text-amber-400 font-bold">↳ Indicación técnica / Criterio Biomecánico (Estilo Drive):</label>
+          <input type="text" id="inp-criterio-tecnico" placeholder="ej: Barra firme sobre trapecios; rodillas alineadas con puntas de pie sin colapsar valgo." class="w-full bg-slate-900 border border-amber-500/40 rounded-xl p-2 text-xs text-amber-200 mt-1">
+        </div>
+
         <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div>
-            <label class="text-[10px] font-bold text-emerald-400 block mb-1">⚡ Selector Rápido de Repeticiones:</label>
+            <label class="text-[10px] font-bold text-emerald-400 block mb-1">⚡ Selector Rápido de Esquemas:</label>
             <select onchange="aplicarPresetRepsRapido(this.value)" class="w-full bg-slate-950 border border-emerald-500/40 text-emerald-300 rounded-xl p-2 text-xs font-bold">
               <option value="">▼ Elegir esquema predefinido...</option>
+              <option value="dylan_fuerza">🔥 Dylan Losada: Fuerza 6 Semanas (10-8-6-5-4-Test)</option>
               <option value="3x10">3x10 reps (Hipertrofia)</option>
               <option value="4x8">4x8 reps (Fuerza-Hipertrofia)</option>
               <option value="4x6">4x6 reps (Fuerza Base)</option>
               <option value="5x5">5x5 reps (Fuerza Básica)</option>
-              <option value="4x4">4x4 reps (Fuerza Pesada)</option>
-              <option value="rampa">12-8-6-4 + 1xFallo (Rampa)</option>
-              <option value="resistencia">3x15 reps (Bombeo/Accesorios)</option>
               <option value="core">3x30 seg / 3x12 por lado (Core/Activación)</option>
-              <option value="movilidad">2x10 por lado / 60 seg continuos (Movilidad)</option>
+              <option value="movilidad">2x8 por lado / Flujo (Calor & Movilidad)</option>
             </select>
           </div>
           <div>
             <label class="text-[10px] font-bold text-emerald-400 block mb-1">⚡ Cantidad de Series:</label>
             <select id="inp-series" class="w-full bg-slate-950 border border-emerald-500/40 text-emerald-300 rounded-xl p-2 text-xs font-bold">
-              <option value="2">2 Series</option>
-              <option value="3">3 Series</option>
-              <option value="4" selected>4 Series</option>
+              <option value="2">2 Series (Calor / Movilidad)</option>
+              <option value="3" selected>3 Series (Fuerza Principal Dylan)</option>
+              <option value="4">4 Series</option>
               <option value="5">5 Series</option>
-              <option value="6">6 Series</option>
             </select>
           </div>
         </div>
 
-        <!-- MATRIZ SEMANAL -->
         <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-2">
-          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">🎯 Prescripción Semanal de Cargas & Repeticiones:</span>
+          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">🎯 Prescripción Semanal de Cargas & Reps:</span>
           <div id="grid-matriz-coach" class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs">
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Semana 1:</span>
-              <input type="text" id="prog-s1-reps" value="3x8 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s1-carga" value="70%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 1 (10-12r):</span>
+              <input type="text" id="prog-s1-reps" value="3x10-12" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s1-carga" value="70.0 kg" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Semana 2:</span>
-              <input type="text" id="prog-s2-reps" value="4x8 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s2-carga" value="75%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 2 (8r):</span>
+              <input type="text" id="prog-s2-reps" value="3x8 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s2-carga" value="75.0 kg" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Semana 3:</span>
-              <input type="text" id="prog-s3-reps" value="4x6 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s3-carga" value="80%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 3 (6r):</span>
+              <input type="text" id="prog-s3-reps" value="3x6 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s3-carga" value="82.5 kg" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Semana 4:</span>
-              <input type="text" id="prog-s4-reps" value="4x4 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s4-carga" value="85%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 4 (2x6-2x4):</span>
+              <input type="text" id="prog-s4-reps" value="3x5 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s4-carga" value="87.5 kg" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div id="col-s5-coach" class="bg-slate-950 p-1.5 rounded-lg border border-emerald-500/50">
-              <span class="text-[9px] font-bold text-emerald-400 block mb-0.5">Semana 5 (Fallo):</span>
-              <input type="text" id="prog-s5-reps" value="12-8-6-4 + 1xFallo" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s5-carga" value="90%+" class="w-full bg-slate-900 border border-emerald-500 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <span class="text-[9px] font-bold text-emerald-400 block mb-0.5">Sem 5 (4x4r):</span>
+              <input type="text" id="prog-s5-reps" value="3x4 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s5-carga" value="92.5 kg" class="w-full bg-slate-900 border border-emerald-500 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
-            <div id="col-s6-coach" class="hidden bg-slate-950 p-1.5 rounded-lg border border-cyan-500/50">
-              <span class="text-[9px] font-bold text-cyan-400 block mb-0.5">Semana 6:</span>
-              <input type="text" id="prog-s6-reps" value="12-8-6-4 + 1xFallo" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s6-carga" value="92.5%" class="w-full bg-slate-900 border border-cyan-500 rounded p-1 text-cyan-300 font-mono font-bold text-[11px]">
+            <div id="col-s6-coach" class="bg-slate-950 p-1.5 rounded-lg border border-cyan-500/50">
+              <span class="text-[9px] font-bold text-cyan-400 block mb-0.5">Sem 6 (Test RM):</span>
+              <input type="text" id="prog-s6-reps" value="3x3-RM" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s6-carga" value="100.0 kg" class="w-full bg-slate-900 border border-cyan-500 rounded p-1 text-cyan-300 font-mono font-bold text-[11px]">
             </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div>
-            <label class="text-[10px] text-slate-400 font-bold">RIR Prescripto</label>
-            <select id="inp-rir" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
-              <option value="RIR 3">RIR 3 (Ligero)</option>
-              <option value="RIR 2" selected>RIR 2 (Objetivo estándar)</option>
-              <option value="RIR 1">RIR 1 (Muy exigente)</option>
-              <option value="RIR 0 (Fallo)">RIR 0 (Al Fallo)</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold">Tempo (Cadencia)</label>
-            <input type="text" id="inp-tempo" value="3-0-1-0" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white font-mono">
+            <label class="text-[10px] text-slate-400 font-bold">Reps / RIR Objetivo Base</label>
+            <input type="text" id="inp-rir" value="Prog. Semanal (3 series)" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
           </div>
           <div>
             <label class="text-[10px] text-slate-400 font-bold">Pausa de Descanso</label>
             <select id="inp-descanso" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
-              <option value="45s">45 seg</option>
-              <option value="60s">60 seg</option>
-              <option value="90s" selected>90 seg</option>
-              <option value="120s">120 seg</option>
-              <option value="180s">180 seg</option>
+              <option value="30''">30 seg (Calor / Movilidad)</option>
+              <option value="45''">45 seg (Accesorios / Core)</option>
+              <option value="60''">60 seg</option>
+              <option value="90''">90 seg (Remo unilateral)</option>
+              <option value="2'">2 min (Banca / Hip Thrust)</option>
+              <option value="2'30''" selected>2 min 30 seg (Sentadilla / Hex Bar)</option>
             </select>
           </div>
         </div>
@@ -387,6 +388,7 @@
     </div>
     
     <div class="flex items-center gap-2">
+      <button type="button" onclick="abrirVistaPlanillaDrive()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 text-xs px-2.5 py-1.5 rounded-lg font-bold transition cursor-pointer">📋 Vista Planilla</button>
       <button type="button" onclick="abrirModalDiscos(0)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs px-2.5 py-1.5 rounded-lg font-bold transition cursor-pointer">⚖️ Cargas</button>
       <div id="usuario-info" class="hidden items-center gap-2">
         <span id="tag-rol-user" class="text-[10px] font-black uppercase px-2 py-0.5 rounded border border-emerald-500/40 text-emerald-400">Alumno</span>
@@ -411,7 +413,7 @@
     <div class="space-y-4 text-left">
       <div id="campo-registro-nombre" class="hidden">
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Nombre Completo</label>
-        <input type="text" id="reg-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="ej: Imanol Gómez">
+        <input type="text" id="reg-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="ej: Dylan Losada">
       </div>
       <div id="campo-registro-telefono" class="hidden">
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">WhatsApp</label>
@@ -439,12 +441,15 @@
   <!-- PANTALLA PRINCIPAL -->
   <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- DASHBOARD CON RACHA Y CALENDARIO -->
+    <!-- PORTAL INDIVIDUAL DEL ALUMNO (ESTILO HARBIZ) -->
     <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 to-slate-950 p-5 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
-          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block">Atleta Conectado</span>
-          <h3 class="text-xl font-black text-white" id="dash-alumno-nombre">Bienvenido</h3>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block">Atleta Conectado</span>
+            <span class="text-[9px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded font-bold border border-cyan-500/30">Coach: Ramiro Abbattista</span>
+          </div>
+          <h3 class="text-xl font-black text-white mt-0.5" id="dash-alumno-nombre">Bienvenido</h3>
         </div>
         <div class="flex items-center gap-3">
           <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
@@ -458,6 +463,57 @@
         </div>
       </div>
 
+      <!-- TABLA RESUMEN 1RM ESTILO DRIVE -->
+      <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">📊 Resumen de Control 1RM & Porcentajes:</span>
+          <span class="text-[10px] text-slate-500 font-mono">Dylan Losada (Oct/Nov)</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-[11px] font-mono">
+            <thead class="text-slate-400 border-b border-slate-800 text-[10px]">
+              <tr>
+                <th class="pb-1">Ejercicio Clave</th>
+                <th class="pb-1 text-center">Test (kg)</th>
+                <th class="pb-1 text-center">Reps</th>
+                <th class="pb-1 text-center text-emerald-400 font-bold">1RM Est.</th>
+                <th class="pb-1 text-center">70%</th>
+                <th class="pb-1 text-center">75%</th>
+                <th class="pb-1 text-center">80%</th>
+                <th class="pb-1 text-center">85%</th>
+                <th class="pb-1 text-center text-cyan-300 font-bold">90%+</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-control-rm-body" class="divide-y divide-slate-800/60 text-slate-300">
+              <tr>
+                <td class="py-1 text-white font-bold">Sentadilla Trasera (Rack)</td>
+                <td class="text-center">80.0</td><td class="text-center">8</td>
+                <td class="text-center text-emerald-400 font-bold">101.3 kg</td>
+                <td class="text-center">70.9</td><td class="text-center">76.0</td><td class="text-center">81.0</td><td class="text-center">86.1</td><td class="text-center text-cyan-300 font-bold">91.2</td>
+              </tr>
+              <tr>
+                <td class="py-1 text-white font-bold">Barra Hexagonal (Potencia)</td>
+                <td class="text-center">90.0</td><td class="text-center">8</td>
+                <td class="text-center text-emerald-400 font-bold">114.0 kg</td>
+                <td class="text-center">79.8</td><td class="text-center">85.5</td><td class="text-center">91.2</td><td class="text-center">96.9</td><td class="text-center text-cyan-300 font-bold">102.6</td>
+              </tr>
+              <tr>
+                <td class="py-1 text-white font-bold">Press Pecho Plano Barra</td>
+                <td class="text-center">60.0</td><td class="text-center">8</td>
+                <td class="text-center text-emerald-400 font-bold">76.0 kg</td>
+                <td class="text-center">53.2</td><td class="text-center">57.0</td><td class="text-center">60.8</td><td class="text-center">64.6</td><td class="text-center text-cyan-300 font-bold">68.4</td>
+              </tr>
+              <tr>
+                <td class="py-1 text-white font-bold">Hip Thrust c/ Barra Olímpica</td>
+                <td class="text-center">80.0</td><td class="text-center">8</td>
+                <td class="text-center text-emerald-400 font-bold">101.3 kg</td>
+                <td class="text-center">70.9</td><td class="text-center">76.0</td><td class="text-center">81.0</td><td class="text-center">86.1</td><td class="text-center text-cyan-300 font-bold">91.2</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- HABIT TRACKER / CALENDARIO -->
       <div class="space-y-1.5">
         <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia (Mes Actual):</span>
@@ -465,12 +521,12 @@
       </div>
     </div>
 
-    <!-- PANEL EXCLUSIVO DEL COACH -->
+    <!-- PANEL EXCLUSIVO DEL COACH (DIRECTORIO ESTILO HARBIZ) -->
     <div id="seccion-admin" class="hidden space-y-4 bg-slate-900 border border-blue-500/40 p-5 rounded-3xl">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div>
-          <h3 class="text-base font-black text-blue-400 flex items-center gap-2">🛡️ Panel del Coach</h3>
-          <p class="text-xs text-slate-400">Supervisión en tiempo real de atletas y asignación de mesociclos.</p>
+          <h3 class="text-base font-black text-blue-400 flex items-center gap-2">🛡️ Panel del Coach — Harbiz Suite</h3>
+          <p class="text-xs text-slate-400">Directorio de atletas, monitoreo de racha y asignación de mesociclos.</p>
         </div>
         <div class="flex gap-2">
           <button type="button" onclick="nuevoPlan()" class="bg-blue-600 hover:bg-blue-500 text-white font-black px-3 py-1.5 rounded-xl text-xs cursor-pointer">＋ Planificar Día</button>
@@ -479,9 +535,10 @@
       </div>
 
       <div id="contenedor-atletas-coach" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-80 overflow-y-auto"></div>
+      
       <div class="border-t border-slate-800 pt-4 space-y-2">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-black text-blue-300 uppercase tracking-wider">📋 Planes asignados</span>
+          <span class="text-xs font-black text-blue-300 uppercase tracking-wider">📋 Planes y Mesociclos Asignados</span>
           <select id="filtro-planes-estado" onchange="cargarPlanesCoach()" class="bg-slate-950 border border-slate-700 text-slate-300 rounded-lg p-1.5 text-xs font-bold">
             <option value="activa">Activos</option><option value="archivada">Archivados</option><option value="todos">Todos</option>
           </select>
@@ -490,7 +547,7 @@
       </div>
     </div>
 
-    <!-- PESTAÑAS DEL ALUMNO -->
+    <!-- PESTAÑAS DE RUTINAS DEL ATLETA -->
     <div class="space-y-4">
       <div id="contenedor-tabs-dias" class="tabs-dias-container hidden overflow-x-auto pb-1">
         <div class="flex items-center gap-2" id="barra-solapas-dias"></div>
@@ -534,131 +591,97 @@
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     }
 
-    // BIBLIOTECA COMPLETA DE EJERCICIOS
+    // BIBLIOTECA COMPLETA DE EJERCICIOS CON VIDEOS Y CRITERIOS BIOMECÁNICOS
     const BIBLIOTECA_RAMIRO = {
-      // MOVILIDAD ARTICULAR
       mov_tobillo: [
-        { nombre: "Dorsiflexión de tobillo en pared con rodilla al frente", video: "" },
-        { nombre: "Dorsiflexión de tobillo en posición de estocada con banda", video: "" },
-        { nombre: "Círculos controlados de tobillo (CARs)", video: "" }
+        { nombre: "Dorsiflexión de tobillo en pared con rodilla al frente", criterio: "Talón bien apoyado sin despegar; empujar rodilla superando la punta del pie.", video: "" },
+        { nombre: "Dorsiflexión de tobillo en estocada con banda", criterio: "Tracción constante en astrágalo para liberar movilidad.", video: "" },
+        { nombre: "Círculos controlados de tobillo (CARs)", criterio: "Máxima amplitud articular sin mover tibia.", video: "" }
       ],
       mov_cadera: [
-        { nombre: "90/90 Rotación interna y externa de cadera", video: "" },
-        { nombre: "Spiderman Lunge con rotación torácica profunda", video: "https://www.youtube.com/shorts/Xh07T2pZ0lU" },
-        { nombre: "Frog Stretch (Estiramiento de rana para aductores)", video: "" },
-        { nombre: "Deslizamiento de cadera en cuadrupedia con abducción", video: "" },
-        { nombre: "Círculos articulares controlados de cadera (CARs)", video: "" }
+        { nombre: "Flujo 90/90 dinámico en suelo con inclinación anterior de torso", criterio: "Apertura coxofemoral rápida sin redondear lumbares; lubrica cadera para sentadilla profunda.", video: "" },
+        { nombre: "Spiderman Lunge con rotación torácica profunda", criterio: "Zancada amplia abriendo cadera y acompañando con mirada hacia la mano.", video: "https://www.youtube.com/shorts/Xh07T2pZ0lU" },
+        { nombre: "Puente glúteo bipodal con pausa isométrica de 2s arriba", criterio: "Bloqueo neto de glúteos en el tope sin arquear columna lumbar.", video: "" },
+        { nombre: "Frog Stretch dinámico para aductores", criterio: "Caderas hacia atrás manteniendo columna neutra.", video: "" }
       ],
       mov_toracica: [
-        { nombre: "Rotaciones torácicas en cuadrupedia con mano en nuca", video: "" },
-        { nombre: "Extensión torácica sobre Foam Roller", video: "" },
-        { nombre: "Open Book (Aperturas de libro acostado de lado)", video: "" },
-        { nombre: "Thread the Needle (Enhebrar la aguja en cuadrupedia)", video: "" }
+        { nombre: "Rotaciones torácicas en cuadrupedia + Dislocaciones con bastón", criterio: "Desbloqueo dorsal escapular activo sin compensación lumbar; paso limpio con bastón.", video: "" },
+        { nombre: "Extensión torácica sobre Foam Roller", criterio: "Foco en apertura de pecho sin hiperextender cuello.", video: "" },
+        { nombre: "Open Book (Aperturas en suelo de lado)", criterio: "Acompañar con la cabeza la apertura del brazo.", video: "" }
       ],
       mov_escapula_hombro: [
-        { nombre: "Flexiones escapulares en plancha (Scapular Push-ups)", video: "" },
-        { nombre: "Deslizamientos en pared para serrato anterior (Wall Slides)", video: "" },
-        { nombre: "Dislocaciones de hombro con bastón o banda elástica", video: "" },
-        { nombre: "Círculos controlados de hombro (CARs de hombro)", video: "" },
-        { nombre: "Rotación externa de hombro con banda en codo 90°", video: "" }
+        { nombre: "Flexiones escapulares en plancha (Scapular Push-ups)", criterio: "Retracción y protracción escapular pura con brazos estirados.", video: "" },
+        { nombre: "Deslizamientos en pared (Wall Slides para serrato)", criterio: "Mantener lumbares y antebrazos en contacto con pared.", video: "" },
+        { nombre: "Dislocaciones con bastón de madera o toalla", criterio: "Paso controlado a dos manos sin flexionar codos.", video: "" }
       ],
       mov_muneca: [
-        { nombre: "Cargas de peso en cuadrupedia con dedos al frente y atrás", video: "" },
-        { nombre: "Flexión y extensión de muñecas con puño cerrado en suelo", video: "" }
+        { nombre: "Cargas de peso en cuadrupedia con dedos al frente y atrás", criterio: "Presión progresiva en talón de la mano preparando rack de sentadilla frontal.", video: "" }
       ],
-
-      // ZONA MEDIA & CORE FUNCIONAL
       core_antiextension: [
-        { nombre: "Deadbug isométrico presionando Fitball", video: "https://www.youtube.com/shorts/g_BYB0R-4Ws" },
-        { nombre: "Plancha frontal tradicional con retroversión pélvica", video: "" },
-        { nombre: "Rollout con rueda abdominal o barra olímpica", video: "" },
-        { nombre: "Body Saw en plancha sobre sliders", video: "" }
+        { nombre: "Plancha frontal isométrica en colchoneta con braceo activo", criterio: "Co-contracción máxima: glúteos apretados y ombligo adentro; pelvis neutra.", video: "" },
+        { nombre: "Deadbug isométrico presionando Fitball", criterio: "Empuje constante manteniendo zona lumbar pegada al suelo.", video: "https://www.youtube.com/shorts/g_BYB0R-4Ws" },
+        { nombre: "Rollout con rueda abdominal o barra", criterio: "Extensión hasta el punto de control sin arquear lumbares.", video: "" }
       ],
       core_antirrotacion: [
-        { nombre: "Press Pallof isométrico con banda elástica", video: "https://www.youtube.com/shorts/5_8k3kK0m9o" },
-        { nombre: "Press Pallof dinámico con extensión de brazos", video: "" },
-        { nombre: "Bird Dog en cuadrupedia con pausa isométrica", video: "" },
-        { nombre: "Remo Renegado en plancha con mancuernas (Renegade Row)", video: "" }
+        { nombre: "Press Pallof en Polea Multifunción (Pausa 2s)", criterio: "Altura al esternón; resistir rotación fijando cadera al frente.", video: "https://www.youtube.com/shorts/5_8k3kK0m9o" },
+        { nombre: "Bird Dog en cuadrupedia con pausa isométrica", criterio: "Extender brazo y pierna opuesta sin rotar pelvis.", video: "" },
+        { nombre: "Remo Renegado en plancha con mancuernas", criterio: "Tracción firme sin balancear la cadera de lado.", video: "" }
       ],
       core_antiflexion_lat: [
-        { nombre: "Plancha lateral apoyando antebrazo", video: "" },
-        { nombre: "Plancha lateral con elevación de pierna superior", video: "" },
-        { nombre: "Suitcase Carry (Caminata del granjero a un brazo)", video: "" }
+        { nombre: "Caminata de Granjero pesada con mancuernas (Farmer Walk)", criterio: "Pasos firmes, pecho erguido y hombros abajo; torso totalmente vertical.", video: "" },
+        { nombre: "Plancha lateral apoyando antebrazo", criterio: "Línea recta de tobillos a hombros sin caer cadera.", video: "" },
+        { nombre: "Suitcase Carry (Paseo del granjero unilateral)", criterio: "Resistir la inclinación hacia el lado del peso.", video: "" }
       ],
       core_dinamico: [
-        { nombre: "Hanging Knee / Leg Raises (Elevaciones de piernas colgado)", video: "" },
-        { nombre: "Lanzamientos rotacionales de Slam Ball contra pared", video: "" },
-        { nombre: "Woodchopper con polea o banda elástica", video: "" }
+        { nombre: "Hanging Knee / Leg Raises colgado", criterio: "Flexión de cadera con retroversión sin balanceo por inercia.", video: "" },
+        { nombre: "Lanzamientos rotacionales Med Ball contra pared", criterio: "Transferencia de fuerza desde cadera hacia las manos.", video: "" }
       ],
-
-      // TREN INFERIOR: RODILLA
       inf_rodilla: [
-        { nombre: "Sentadilla Trasera con Barra Olímpica (Back Squat)", video: "https://www.youtube.com/shorts/bEv6CCg2BC8" },
-        { nombre: "Sentadilla Frontal con Barra (Front Squat)", video: "https://www.youtube.com/shorts/uYumuL_G_V0" },
-        { nombre: "Sentadilla Búlgara con Mancuernas", video: "https://www.youtube.com/shorts/2C-uNgKwPLE" },
-        { nombre: "Goblet Squat con Kettlebell", video: "" },
-        { nombre: "Estocadas caminando con mancuernas (Walking Lunges)", video: "" },
-        { nombre: "Prensa de Piernas 45°", video: "" },
-        { nombre: "Sillón de Cuádriceps (Extensión de piernas)", video: "" }
+        { nombre: "Sentadilla Trasera con Barra Olímpica (Rack Koena)", criterio: "Barra firme sobre trapecios; empuje de suelo distribuyendo peso; romper paralelo.", video: "https://www.youtube.com/shorts/bEv6CCg2BC8" },
+        { nombre: "Sentadilla Frontal con Barra (Front Squat)", criterio: "Codos altos, torso vertical y descenso controlado.", video: "https://www.youtube.com/shorts/uYumuL_G_V0" },
+        { nombre: "Sentadilla Búlgara con Mancuernas", criterio: "Rodilla delantera estable sin colapso en valgo.", video: "https://www.youtube.com/shorts/2C-uNgKwPLE" },
+        { nombre: "Estocadas Reversas con Mancuernas", criterio: "Paso atrás para frenado sin impacto rotuliano ni cizalla.", video: "" },
+        { nombre: "Goblet Squat con Kettlebell", criterio: "Codos pegados y descenso vertical profundo.", video: "" }
       ],
-
-      // TREN INFERIOR: CADERA
       inf_cadera: [
-        { nombre: "Peso Muerto Convencional con Barra Olímpica", video: "https://www.youtube.com/shorts/op9kVnSso6Q" },
-        { nombre: "Peso Muerto Rumano con Barra Olímpica (RDL)", video: "https://www.youtube.com/shorts/JCXUYuzwNrM" },
-        { nombre: "Hip Thrust con Barra Olímpica", video: "https://www.youtube.com/shorts/SEdqd1n0cvg" },
-        { nombre: "Peso Muerto con Trap Bar (Barra Hexagonal)", video: "" },
-        { nombre: "Peso Muerto Rumano Unilateral con Mancuerna", video: "" },
-        { nombre: "Camilla de Isquiotibiales (Curl Femoral Acostado)", video: "" },
-        { nombre: "Good Morning (Buenos Días con barra)", video: "" },
-        { nombre: "Monster Walk con miniband en tobillos", video: "https://www.youtube.com/shorts/1F_4-P4gPq0" }
+        { nombre: "Barra Hexagonal (Potencia / Eje Lumbar Neutro)", criterio: "Empuje de suelo con eje lumbar neutro ideal para atletas; extensión neta de cadera.", video: "" },
+        { nombre: "Peso Muerto Convencional con Barra Olímpica", criterio: "Barra rozando tibias, bloqueo firme de dorsales.", video: "https://www.youtube.com/shorts/op9kVnSso6Q" },
+        { nombre: "Peso Muerto Rumano c/ Mancuernas (RDL)", criterio: "Bisagra de cadera hacia atrás sintiendo tensión isquiosural.", video: "https://www.youtube.com/shorts/JCXUYuzwNrM" },
+        { nombre: "Hip Thrust en Banco c/ Barra Olímpica y almohadilla", criterio: "Espinillas estrictamente verticales a 90° arriba; bloqueo neto de glúteos en el tope.", video: "https://www.youtube.com/shorts/SEdqd1n0cvg" },
+        { nombre: "Good Morning (Buenos Días con barra)", criterio: "Flexión de cadera con espalda rígida en todo momento.", video: "" }
       ],
-
-      // TREN SUPERIOR: EMPUJES
       sup_empuje: [
-        { nombre: "Press de Banca Plano con Barra Olímpica", video: "https://www.youtube.com/shorts/rT7DgCr-3pg" },
-        { nombre: "Press Inclinado con Mancuernas", video: "https://www.youtube.com/shorts/8iPEnn-ltC8" },
-        { nombre: "Press Militar Estricto de Pie con Barra", video: "https://www.youtube.com/shorts/2yjwXTZQDDI" },
-        { nombre: "Fondos en Paralelas para Pecho/Tríceps (Dips)", video: "" },
-        { nombre: "Press de Banca con Mancuernas en Banco Plano", video: "" },
-        { nombre: "Vuelos Laterales con Mancuernas para Deltoides", video: "" },
-        { nombre: "Extensión de Tríceps en Polea Alta con Soga", video: "" }
+        { nombre: "Press Pecho Plano con Barra Olímpica (Rack Koena)", criterio: "Escápulas clavadas en banco; trayectoria diagonal al esternón con codos a 45°.", video: "https://www.youtube.com/shorts/rT7DgCr-3pg" },
+        { nombre: "Press Inclinado con Mancuernas (30°)", criterio: "Pectoral superior con codos a 45°; empuje fluido.", video: "https://www.youtube.com/shorts/8iPEnn-ltC8" },
+        { nombre: "Press Militar Sentado c/ Mancuernas (80°)", criterio: "Apoyo en respaldo, protección lumbar; bloqueo overhead.", video: "https://www.youtube.com/shorts/2yjwXTZQDDI" },
+        { nombre: "Extensiones de Tríceps en Polea c/ Soga", criterio: "Codos pegados al cuerpo; apertura al final del recorrido.", video: "" }
       ],
-
-      // TREN SUPERIOR: TRACCIONES
       sup_traccion: [
-        { nombre: "Dominadas Pronas Estrictas (Pull-ups)", video: "https://www.youtube.com/shorts/eGo4IYlbE5g" },
-        { nombre: "Dominadas Supinas (Chin-ups)", video: "" },
-        { nombre: "Remo Pendlay con Barra Olímpica", video: "https://www.youtube.com/shorts/h4nKGfU_qG0" },
-        { nombre: "Remo Seal con Mancuernas en Banco Inclinado", video: "https://www.youtube.com/shorts/9r8zYk_lXbI" },
-        { nombre: "Jalón al Pecho en Polea con Agarre Neutro", video: "" },
-        { nombre: "Remo en Polea Baja sentado con agarre V", video: "" },
-        { nombre: "Face Pull en Polea Alta con Soga", video: "" },
-        { nombre: "Curl de Bíceps con Barra W", video: "" }
+        { nombre: "Remo Unilateral c/ Mancuerna pesada apoyando rodilla en banco", criterio: "Apoyo trípode firme; tracción hacia el bolsillo sin rotar torso.", video: "" },
+        { nombre: "Jalón Dorsal en Polea Koena (Barra Larga)", criterio: "Depresión escapular estricta al pecho sin balanceo.", video: "" },
+        { nombre: "Remo en TRX c/ Pausa Arriba (Suspensión)", criterio: "Cuerpo como una tabla; retracción escapular con 1s de pausa.", video: "" },
+        { nombre: "Facepull en Polea Multifunción c/ Soga Koena", criterio: "Traccionar hacia la frente separando soga; salud escapular y manguito rotador.", video: "" },
+        { nombre: "Dominadas Pronas Estrictas (Pull-ups)", criterio: "Rango completo desde bloqueo articular hasta barbilla sobre barra.", video: "https://www.youtube.com/shorts/eGo4IYlbE5g" }
       ],
-
-      // OLÍMPICO
       olimpicos: [
-        { nombre: "Power Clean (Cargada de Potencia)", video: "https://www.youtube.com/shorts/mEyoH5fZuF8" },
-        { nombre: "Hang Clean (Cargada Colgante)", video: "https://www.youtube.com/shorts/V0A8Z0_n3E0" },
-        { nombre: "Snatch (Arrancada Olímpica)", video: "https://www.youtube.com/shorts/9xQp2sldyts" },
-        { nombre: "Hang Snatch (Arrancada Colgante)", video: "" },
-        { nombre: "Push Jerk con Barra Olímpica", video: "" }
+        { nombre: "Power Clean (Cargada de Potencia)", criterio: "Triple extensión explosiva recibiendo en cuarto de sentadilla.", video: "https://www.youtube.com/shorts/mEyoH5fZuF8" },
+        { nombre: "Hang Clean (Cargada Colgante)", criterio: "Impulso desde posición colgada con aceleración máxima.", video: "https://www.youtube.com/shorts/V0A8Z0_n3E0" }
       ],
-
-      // POTENCIA & PLIOMETRÍA
       potencia_pliometria: [
-        { nombre: "Saltos al Cajón (Box Jump con caída suave)", video: "https://www.youtube.com/shorts/52r_Ul5k03g" },
-        { nombre: "Lanzamiento de Slam Ball al Suelo (Slam Ball)", video: "https://www.youtube.com/shorts/0Lz8g8q0VbI" },
-        { nombre: "Salto en Longitud sin impulso (Broad Jump)", video: "" },
-        { nombre: "Saltos Reactivos sobre vallas bajas", video: "" }
+        { nombre: "Lanzamientos Med Ball / Slam Ball (6 a 8kg)", criterio: "Aceleración balística explosiva sin frenar el movimiento.", video: "https://www.youtube.com/shorts/0Lz8g8q0VbI" },
+        { nombre: "Saltos al Cajón (Box Jump)", criterio: "Recepción amortiguada en media sentadilla silenciosa.", video: "https://www.youtube.com/shorts/52r_Ul5k03g" }
       ]
     };
 
     let usuarioActual = null;
     let perfilActual = null;
     let rutinasActivas = [];
-    let marcasRMAlumno = {};
+    let marcasRMAlumno = {
+      "sentadilla trasera con barra olímpica (rack)": 101.3,
+      "barra hexagonal (potencia / eje lumbar neutro)": 114.0,
+      "press pecho plano con barra olímpica": 76.0,
+      "hip thrust en banco c/ barra olímpica": 101.3
+    };
     let semanaActiva = 1;
     let diaActivoId = null;
     let planEditandoId = null;
@@ -666,10 +689,11 @@
     window.planesCoach = {};
     let finTimer = 0;
     window.mapaPrevSemana = {};
-    let totalSemanas = 5;
+    let totalSemanas = 6;
     let sesionCoachTemporal = [];
     let pesoBarraSeleccionada = 20;
     let modoAuth = 'login';
+    let bloquesPlegados = {};
 
     let timerInterval = null;
     let tiempoRestante = 90;
@@ -677,6 +701,12 @@
 
     let indiceEjercicioActivo = 0;
     let listaEjerciciosModoActivo = [];
+
+    function togglePlegarBloque(bloqueKey) {
+      bloquesPlegados[bloqueKey] = !bloquesPlegados[bloqueKey];
+      const rutina = rutinasActivas.find(r => String(r.id) === String(diaActivoId));
+      if (rutina) activarDia(rutina.id);
+    }
 
     function actualizarListaEjerciciosPorCategoria() {
       const cat = document.getElementById('sel-categoria-ejercicios').value;
@@ -698,116 +728,61 @@
       const ej = lista[parseInt(idx)];
       if (ej) {
         document.getElementById('inp-ejercicio-nombre').value = ej.nombre;
+        document.getElementById('inp-criterio-tecnico').value = def(ej.criterio, '');
         document.getElementById('inp-video').value = def(ej.video, '');
       }
     }
 
     function aplicarPresetRepsRapido(tipo) {
       if (!tipo) return;
-      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) ? parseInt(document.getElementById('admin-duracion-semanas').value) : 5;
-      
-      if (tipo === '3x10') {
+      if (tipo === 'dylan_fuerza') {
         document.getElementById('inp-series').value = "3";
-        document.getElementById('prog-s1-reps').value = "3x10 reps";
-        document.getElementById('prog-s1-carga').value = "65%";
-        document.getElementById('prog-s2-reps').value = "3x10 reps";
-        document.getElementById('prog-s2-carga').value = "67.5%";
-        document.getElementById('prog-s3-reps').value = "3x10 reps";
-        document.getElementById('prog-s3-carga').value = "70%";
-        document.getElementById('prog-s4-reps').value = "3x10 reps";
-        document.getElementById('prog-s4-carga').value = "72.5%";
-        document.getElementById('prog-s5-reps').value = "3x10 reps";
-        document.getElementById('prog-s5-carga').value = "75%";
-        document.getElementById('prog-s6-reps').value = "3x10 reps";
-        document.getElementById('prog-s6-carga').value = "77.5%";
+        document.getElementById('prog-s1-reps').value = "3x10-12";
+        document.getElementById('prog-s1-carga').value = "70.0 kg";
+        document.getElementById('prog-s2-reps').value = "3x8 reps";
+        document.getElementById('prog-s2-carga').value = "75.0 kg";
+        document.getElementById('prog-s3-reps').value = "3x6 reps";
+        document.getElementById('prog-s3-carga').value = "82.5 kg";
+        document.getElementById('prog-s4-reps').value = "3x5 reps";
+        document.getElementById('prog-s4-carga').value = "87.5 kg";
+        document.getElementById('prog-s5-reps').value = "3x4 reps";
+        document.getElementById('prog-s5-carga').value = "92.5 kg";
+        document.getElementById('prog-s6-reps').value = "3x3-RM";
+        document.getElementById('prog-s6-carga').value = "100.0 kg";
+      } else if (tipo === '3x10') {
+        document.getElementById('inp-series').value = "3";
+        for (let i = 1; i <= 6; i++) {
+          document.getElementById('prog-s' + i + '-reps').value = "3x10 reps";
+        }
       } else if (tipo === '4x8') {
         document.getElementById('inp-series').value = "4";
-        document.getElementById('prog-s1-reps').value = "3x8 reps";
-        document.getElementById('prog-s1-carga').value = "70%";
-        document.getElementById('prog-s2-reps').value = "4x8 reps";
-        document.getElementById('prog-s2-carga').value = "72.5%";
-        document.getElementById('prog-s3-reps').value = "4x8 reps";
-        document.getElementById('prog-s3-carga').value = "75%";
-        document.getElementById('prog-s4-reps').value = "4x8 reps";
-        document.getElementById('prog-s4-carga').value = "77.5%";
-        document.getElementById('prog-s5-reps').value = "4x8 reps";
-        document.getElementById('prog-s5-carga').value = "80%";
-        document.getElementById('prog-s6-reps').value = "4x8 reps";
-        document.getElementById('prog-s6-carga').value = "82.5%";
+        for (let i = 1; i <= 6; i++) {
+          document.getElementById('prog-s' + i + '-reps').value = "4x8 reps";
+        }
       } else if (tipo === '4x6') {
         document.getElementById('inp-series').value = "4";
-        document.getElementById('prog-s1-reps').value = "4x6 reps";
-        document.getElementById('prog-s1-carga').value = "75%";
-        document.getElementById('prog-s2-reps').value = "4x6 reps";
-        document.getElementById('prog-s2-carga').value = "77.5%";
-        document.getElementById('prog-s3-reps').value = "4x6 reps";
-        document.getElementById('prog-s3-carga').value = "80%";
-        document.getElementById('prog-s4-reps').value = "4x6 reps";
-        document.getElementById('prog-s4-carga').value = "82.5%";
-        document.getElementById('prog-s5-reps').value = "4x6 reps";
-        document.getElementById('prog-s5-carga').value = "85%";
-        document.getElementById('prog-s6-reps').value = "4x6 reps";
-        document.getElementById('prog-s6-carga').value = "87.5%";
+        for (let i = 1; i <= 6; i++) {
+          document.getElementById('prog-s' + i + '-reps').value = "4x6 reps";
+        }
       } else if (tipo === '5x5') {
         document.getElementById('inp-series').value = "5";
-        document.getElementById('prog-s1-reps').value = "5x5 reps";
-        document.getElementById('prog-s1-carga').value = "80%";
-        document.getElementById('prog-s2-reps').value = "5x5 reps";
-        document.getElementById('prog-s2-carga').value = "82.5%";
-        document.getElementById('prog-s3-reps').value = "5x5 reps";
-        document.getElementById('prog-s3-carga').value = "85%";
-        document.getElementById('prog-s4-reps').value = "5x5 reps";
-        document.getElementById('prog-s4-carga').value = "87.5%";
-        document.getElementById('prog-s5-reps').value = "5x5 reps";
-        document.getElementById('prog-s5-carga').value = "90%";
-        document.getElementById('prog-s6-reps').value = "5x5 reps";
-        document.getElementById('prog-s6-carga').value = "92.5%";
-      } else if (tipo === 'rampa') {
-        aplicarPresetProgresionRamiro();
-      } else if (tipo === 'resistencia') {
-        document.getElementById('inp-series').value = "3";
-        document.getElementById('prog-s1-reps').value = "3x15 reps";
-        document.getElementById('prog-s1-carga').value = "60%";
-        document.getElementById('prog-s2-reps').value = "3x15 reps";
-        document.getElementById('prog-s2-carga').value = "62.5%";
-        document.getElementById('prog-s3-reps').value = "3x15 reps";
-        document.getElementById('prog-s3-carga').value = "65%";
-        document.getElementById('prog-s4-reps').value = "3x15 reps";
-        document.getElementById('prog-s4-carga').value = "67.5%";
-        document.getElementById('prog-s5-reps').value = "3x15 reps";
-        document.getElementById('prog-s5-carga').value = "70%";
-        document.getElementById('prog-s6-reps').value = "3x15 reps";
-        document.getElementById('prog-s6-carga').value = "72.5%";
+        for (let i = 1; i <= 6; i++) {
+          document.getElementById('prog-s' + i + '-reps').value = "5x5 reps";
+        }
       } else if (tipo === 'core') {
         document.getElementById('inp-series').value = "3";
-        document.getElementById('prog-s1-reps').value = "3x30 seg / 3x12";
-        document.getElementById('prog-s1-carga').value = "Peso Corporal";
-        document.getElementById('prog-s2-reps').value = "3x35 seg / 3x12";
-        document.getElementById('prog-s2-carga').value = "Peso Corporal";
-        document.getElementById('prog-s3-reps').value = "3x40 seg / 3x14";
-        document.getElementById('prog-s3-carga').value = "+2.5 kg";
-        document.getElementById('prog-s4-reps').value = "3x45 seg / 3x15";
-        document.getElementById('prog-s4-carga').value = "+2.5 kg";
-        document.getElementById('prog-s5-reps').value = "3x50 seg / 3x15";
-        document.getElementById('prog-s5-carga').value = "+5 kg";
-        document.getElementById('prog-s6-reps').value = "3x60 seg / 3x16";
-        document.getElementById('prog-s6-carga').value = "+5 kg";
+        for (let i = 1; i <= 6; i++) {
+          document.getElementById('prog-s' + i + '-reps').value = "3x30'' / 3x12";
+          document.getElementById('prog-s' + i + '-carga').value = "Corporal";
+        }
       } else if (tipo === 'movilidad') {
         document.getElementById('inp-series').value = "2";
-        document.getElementById('prog-s1-reps').value = "2x10 por lado";
-        document.getElementById('prog-s1-carga').value = "Fluido";
-        document.getElementById('prog-s2-reps').value = "2x10 por lado";
-        document.getElementById('prog-s2-carga').value = "Fluido";
-        document.getElementById('prog-s3-reps').value = "2x12 por lado";
-        document.getElementById('prog-s3-carga').value = "Fluido";
-        document.getElementById('prog-s4-reps').value = "2x12 por lado";
-        document.getElementById('prog-s4-carga').value = "Fluido";
-        document.getElementById('prog-s5-reps').value = "2x15 por lado";
-        document.getElementById('prog-s5-carga').value = "Fluido";
-        document.getElementById('prog-s6-reps').value = "2x15 por lado";
-        document.getElementById('prog-s6-carga').value = "Fluido";
+        for (let i = 1; i <= 6; i++) {
+          document.getElementById('prog-s' + i + '-reps').value = "2x8 por lado";
+          document.getElementById('prog-s' + i + '-carga').value = "Banda/BW";
+        }
       }
-      mostrarToast("✓ Esquema " + tipo + " cargado");
+      mostrarToast("✓ Esquema " + tipo + " aplicado");
     }
 
     function nombreEj(planId, idx) {
@@ -847,10 +822,10 @@
 
     async function recuperarPassword() {
       const email = document.getElementById('auth-email').value.trim();
-      if (!email) return alert('Escribí tu correo primero en el campo correspondiente.');
-      if (!sb) return alert('Conectando a la base de datos... intentá en un segundo.');
+      if (!email) return alert('Escribí tu correo primero.');
+      if (!sb) return alert('Conectando... intentá en un segundo.');
       const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
-      document.getElementById('auth-mensaje').innerText = error ? error.message : 'Te enviamos un enlace por correo para restablecer la contraseña.';
+      document.getElementById('auth-mensaje').innerText = error ? error.message : 'Te enviamos un enlace para restablecer contraseña.';
     }
 
     function escaparHTML(str) {
@@ -965,21 +940,21 @@
       document.getElementById('usuario-info').classList.add('hidden');
     }
 
-    // CARGA DE PERFILES Y ROLES OPTIMIZADA
+    // CARGA DE PERFILES Y ROLES OPTIMIZADA (INMEDIATA)
     async function cargarPerfilYRoles() {
       if (!usuarioActual ? true : !sb) return;
 
       try {
-        // 1. Mostrar inmediatamente la app para evitar pantallas trabadas
+        // 1. Mostrar pantalla de inmediato
         document.getElementById('seccion-auth').classList.add('hidden');
         document.getElementById('seccion-panel').classList.remove('hidden');
         document.getElementById('usuario-info').classList.remove('hidden');
         document.getElementById('usuario-info').classList.add('flex');
         
-        const fallbackNombre = usuarioActual.email ? usuarioActual.email.split('@')[0] : 'Atleta';
+        const fallbackNombre = usuarioActual.email ? usuarioActual.email.split('@')[0] : 'Dylan Losada';
         document.getElementById('dash-alumno-nombre').innerText = 'Hola, ' + fallbackNombre;
 
-        // 2. Traer perfil y rol de forma segura
+        // 2. Traer perfil
         const { data: perfil } = await sb
           .from('perfiles_usuarios')
           .select('*')
@@ -1000,7 +975,7 @@
           document.getElementById('seccion-admin').classList.add('hidden');
         }
 
-        // 3. Cargar datos en paralelo sin bloquear la interfaz
+        // 3. Cargar datos en segundo plano
         cargarMarcasRM();
         cargarRutinasAlumno();
         calcularRachaYCalendario();
@@ -1013,7 +988,6 @@
       if (!usuarioActual ? true : !sb) return;
       try {
         const { data } = await sb.from('marcas_rm').select('*').eq('user_id', usuarioActual.id);
-        marcasRMAlumno = {};
         (data ? data : []).forEach(r => {
           marcasRMAlumno[r.ejercicio.trim().toLowerCase()] = r.rm_calculado;
         });
@@ -1023,7 +997,7 @@
     }
 
     function resolverCargaKilos(ejercicioNombre, textoPrescripcion) {
-      if (!textoPrescripcion) return { textoDisplay: 'Libre', kgCalculado: null };
+      if (!textoPrescripcion) return { textoDisplay: 'Sugerida', kgCalculado: null };
       const nombreNorm = def(ejercicioNombre, '').trim().toLowerCase();
       const rm = marcasRMAlumno[nombreNorm];
 
@@ -1037,7 +1011,7 @@
       return { textoDisplay: textoPrescripcion, kgCalculado: null };
     }
 
-    // CARGA DE RUTINAS CON COMPATIBILIDAD LIMPIA DE UUID
+    // CARGA DE RUTINAS CON PARSEO COMPATIBLE
     async function cargarRutinasAlumno() {
       if (!sb ? true : !usuarioActual) return;
       try {
@@ -1046,7 +1020,7 @@
           .eq('alumno_id', usuarioActual.id)
           .order('created_at', { ascending: true });
 
-        if (error) console.warn("Error trayendo planes:", error.message);
+        if (error) console.warn("Error planes:", error.message);
 
         rutinasActivas = (planes ? planes : []).filter(p => !p.estado ? true : p.estado === 'activa');
         diaActivoId = null;
@@ -1066,7 +1040,7 @@
       }
 
       const planActual = rutinasActivas[0];
-      totalSemanas = def(planActual.duracion_semanas, 5);
+      totalSemanas = def(planActual.duracion_semanas, 6);
 
       document.getElementById('contenedor-tabs-dias').classList.remove('hidden');
       document.getElementById('contenedor-tabs-semanas').classList.remove('hidden');
@@ -1089,11 +1063,13 @@
 
     function renderizarBotonesSemanas() {
       const contSem = document.getElementById('barra-solapas-semanas');
+      const nombresSemDylan = ["1 (10-12r)", "2 (8r)", "3 (6r)", "4 (2x6)", "5 (4x4)", "6 (Test RM 🔥)"];
+      
       contSem.innerHTML = Array.from({ length: totalSemanas }).map((_, idx) => {
         const s = idx + 1;
-        const fuego = s === totalSemanas ? '🔥' : '';
+        const textoSem = (idx < nombresSemDylan.length) ? nombresSemDylan[idx] : String(s);
         const claseActive = s === semanaActiva ? 'tab-sem-active' : 'bg-slate-950 border-slate-700 text-slate-400';
-        return '<button type="button" onclick="cambiarSemana(' + s + ')" class="btn-sem px-3 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer ' + claseActive + '">Sem ' + s + ' ' + fuego + '</button>';
+        return '<button type="button" onclick="cambiarSemana(' + s + ')" class="btn-sem px-3 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer ' + claseActive + '">Sem ' + textoSem + '</button>';
       }).join('');
     }
 
@@ -1131,74 +1107,125 @@
       renderizarTarjetaRutina(rutina, mapa);
     }
 
+    // RENDERIZADO ESTILO DRIVE CON BLOQUES PLEGABLES (ACORDEÓN)
     function renderizarTarjetaRutina(rutina, mapaSeries) {
       const cont = document.getElementById('lista-rutinas');
       const detalles = def(rutina.ejercicios_detalle, []);
       const esUltimaSemana = semanaActiva === totalSemanas;
 
-      let html = '<div id="card-rutina-' + rutina.id + '" class="bg-slate-900 border border-slate-800 p-5 md:p-6 rounded-3xl space-y-4">';
-      html += '<div class="flex justify-between items-center border-b border-slate-800 pb-3">';
-      html += '<div><span class="text-xs text-emerald-400 font-bold uppercase block">' + escaparHTML(def(rutina.mesociclo, 'Mesociclo')) + '</span>';
+      // Agrupamos por bloques estilo Drive
+      const bloques = {};
+      detalles.forEach((ej, itmIdx) => {
+        const bNom = def(ej.bloque, 'GENERAL');
+        if (!bloques[bNom]) bloques[bNom] = [];
+        bloques[bNom].push({ ej, itmIdx });
+      });
+
+      let html = '<div id="card-rutina-' + rutina.id + '" class="space-y-4">';
+      
+      // Cabecera de la sesión
+      html += '<div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl flex justify-between items-center">';
+      html += '<div><span class="text-xs text-emerald-400 font-bold uppercase block">' + escaparHTML(def(rutina.mesociclo, 'Mesociclo Oct/Nov')) + '</span>';
       html += '<h3 class="text-xl font-black text-white">' + escaparHTML(rutina.dia) + '</h3></div>';
-      html += '<div class="flex gap-2"><span class="text-xs bg-slate-950 text-cyan-300 font-mono px-3 py-1 rounded-full border border-cyan-500/30">Semana ' + semanaActiva + ' de ' + totalSemanas + '</span></div>';
+      html += '<div class="text-xs bg-slate-950 text-cyan-300 font-mono px-3 py-1.5 rounded-full border border-cyan-500/30 font-bold">Semana ' + semanaActiva + ' de ' + totalSemanas + '</div>';
       html += '</div>';
 
-      html += '<div class="space-y-4">';
-      detalles.forEach((ej, itmIdx) => {
-        const prog = def(ej.progresionSemanal, {});
-        const semData = def(prog['s' + semanaActiva], { reps: def(ej.reps, '3x8'), carga: 'Libre' });
-        const esFallo = esUltimaSemana ? true : /fallo/i.test(semData.reps);
-        const cantSeries = (parseInt(ej.series) ? parseInt(ej.series) : 4) + (esFallo ? 1 : 0);
-        const cargaResuelta = resolverCargaKilos(ej.ejercicio, semData.carga);
-
-        html += '<div class="bg-slate-950 p-4 rounded-2xl border border-slate-800/80 space-y-3">';
-        html += '<div class="flex items-center justify-between"><div>';
-        html += '<h4 class="font-bold text-white text-base">' + escaparHTML(ej.ejercicio) + '</h4>';
-        html += '<div class="text-[11px] text-slate-400 flex flex-wrap gap-2 mt-0.5">';
-        html += '<span>' + escaparHTML(def(ej.bloque, '')) + '</span>';
-        html += '<span>• Pauta: <strong class="text-emerald-400">' + escaparHTML(cargaResuelta.textoDisplay) + '</strong></span>';
-        html += '<span>• Reps: <strong>' + escaparHTML(semData.reps) + '</strong></span>';
-        if (ej.tempo) html += '<span>• Tempo: <strong class="text-cyan-300 font-mono">' + escaparHTML(ej.tempo) + '</strong></span>';
-        html += '</div></div>';
-
-        if (ej.video) {
-          html += '<button type="button" class="btn-play-short bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer" data-video="' + escaparHTML(ej.video) + '" data-title="' + escaparHTML(ej.ejercicio) + '">▶ Short</button>';
+      // Iteración de bloques en acordeón
+      Object.keys(bloques).forEach(bNom => {
+        const listaItems = bloques[bNom];
+        const estaPlegado = def(bloquesPlegados[bNom], false);
+        const iconoPlegar = estaPlegado ? '▼' : '▲';
+        
+        // Color por bloque estilo Drive
+        let colorBorde = 'border-slate-800';
+        let colorTag = 'text-slate-400 bg-slate-800';
+        if (bNom.includes('CALOR') ? true : bNom.includes('MOVILIDAD')) {
+          colorBorde = 'border-amber-500/40';
+          colorTag = 'text-amber-300 bg-amber-500/10 border-amber-500/30';
+        } else if (bNom.includes('BLOQUE 1') ? true : bNom.includes('FUERZA')) {
+          colorBorde = 'border-emerald-500/40';
+          colorTag = 'text-emerald-300 bg-emerald-500/10 border-emerald-500/30';
+        } else if (bNom.includes('BLOQUE 2') ? true : bNom.includes('ACCESORIOS')) {
+          colorBorde = 'border-cyan-500/40';
+          colorTag = 'text-cyan-300 bg-cyan-500/10 border-cyan-500/30';
         }
+
+        html += '<div class="bg-slate-900 border ' + colorBorde + ' rounded-3xl overflow-hidden shadow-xl">';
+        
+        // Cabecera clickeable para plegar/desplegar
+        html += '<div onclick="togglePlegarBloque(\'' + bNom + '\')" class="p-4 bg-slate-950/80 flex justify-between items-center cursor-pointer border-b border-slate-800/80 hover:bg-slate-950 transition">';
+        html += '<div class="flex items-center gap-2">';
+        html += '<span class="text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border ' + colorTag + '">' + escaparHTML(bNom) + '</span>';
+        html += '<span class="text-[11px] text-slate-400">(' + listaItems.length + ' ejercicios)</span>';
+        html += '</div>';
+        html += '<span class="text-xs text-slate-400 font-mono font-bold">' + iconoPlegar + '</span>';
         html += '</div>';
 
-        if (esUltimaSemana) {
-          html += '<div class="bg-slate-900 border border-amber-500/30 p-2.5 rounded-xl flex items-center justify-between text-xs">';
-          html += '<span class="text-amber-400 font-bold">🔥 Testeo al Fallo Técnico: Calculá tu nuevo 1RM al terminar la serie máxima.</span>';
-          html += '<button type="button" class="btn-calc-rm-fallo bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-1 rounded-lg font-bold cursor-pointer" data-ej="' + escaparHTML(ej.ejercicio) + '" data-idx="' + itmIdx + '">Calcular RM</button>';
+        // Contenido del bloque (ejercicios)
+        if (!estaPlegado) {
+          html += '<div class="p-4 space-y-4 divide-y divide-slate-800/60">';
+          listaItems.forEach(item => {
+            const ej = item.ej;
+            const itmIdx = item.itmIdx;
+            const prog = def(ej.progresionSemanal, {});
+            const semData = def(prog['s' + semanaActiva], { reps: def(ej.reps, '3x10-12'), carga: 'Sugerida' });
+            const esFallo = esUltimaSemana ? true : /fallo/i.test(semData.reps);
+            const cantSeries = (parseInt(ej.series) ? parseInt(ej.series) : 3) + (esFallo ? 1 : 0);
+            const cargaResuelta = resolverCargaKilos(ej.ejercicio, semData.carga);
+            const desc = def(ej.descanso, "90''");
+
+            html += '<div class="pt-3 first:pt-0 space-y-2.5">';
+            html += '<div class="flex items-start justify-between gap-2">';
+            html += '<div class="space-y-0.5">';
+            html += '<h4 class="font-bold text-white text-sm md:text-base leading-tight">' + escaparHTML(ej.ejercicio) + '</h4>';
+            
+            // Indicación técnica de Drive
+            if (ej.criterio ? true : ej.indicacion) {
+              const txtCriterio = def(ej.criterio, ej.indicacion);
+              html += '<p class="text-[11px] text-amber-300/90 font-medium leading-relaxed italic">↳ Indicación técnica: ' + escaparHTML(txtCriterio) + '</p>';
+            }
+
+            html += '<div class="text-[11px] text-slate-400 flex flex-wrap items-center gap-2 pt-0.5">';
+            html += '<span>🎯 Pauta: <strong class="text-emerald-400 font-mono">' + escaparHTML(cargaResuelta.textoDisplay) + '</strong></span>';
+            html += '<span>• Reps Obj: <strong class="text-white">' + escaparHTML(semData.reps) + '</strong></span>';
+            html += '<span>• Pausa: <strong class="text-cyan-300 font-mono">' + desc + '</strong></span>';
+            html += '</div></div>';
+
+            if (ej.video) {
+              html += '<button type="button" class="btn-play-short shrink-0 bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer" data-video="' + escaparHTML(ej.video) + '" data-title="' + escaparHTML(ej.ejercicio) + '">▶ Short</button>';
+            }
+            html += '</div>';
+
+            // Series táctiles compactas (Kg real / Reps reales)
+            html += '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pt-1">';
+            for (let sIdx = 0; sIdx < cantSeries; sIdx++) {
+              const sNum = sIdx + 1;
+              const sData = def(mapaSeries[itmIdx + '_' + sNum], {});
+              const hecha = def(sData.completada, false);
+              const boxDone = hecha ? 'serie-done-box' : '';
+              const btnClass = hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-950 text-rose-300 border-rose-500/40';
+              const btnTxt = hecha ? '✓' : '✗';
+              const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
+              const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
+
+              html += '<div class="serie-box bg-slate-950 p-2.5 rounded-xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-2" id="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">';
+              html += '<span class="text-[11px] text-slate-400 font-mono font-bold w-7">S' + sNum + '</span>';
+              html += '<div class="flex items-center gap-1.5 flex-1">';
+              html += '<input type="number" step="0.5" inputmode="decimal" placeholder="Carga (Kg)" value="' + valCarga + '" class="inp-carga w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
+              html += '<input type="number" inputmode="numeric" placeholder="Reps" value="' + valRIR + '" class="inp-rir w-16 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
+              html += '</div>';
+              html += '<button type="button" class="btn-toggle-serie px-2.5 py-1 rounded-lg text-xs font-black border cursor-pointer ' + btnClass + '" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '" data-descanso="' + desc + '" data-target="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">' + btnTxt + '</button>';
+              html += '</div>';
+            }
+            html += '</div></div>';
+          });
           html += '</div>';
         }
 
-        html += '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">';
-        for (let sIdx = 0; sIdx < cantSeries; sIdx++) {
-          const sNum = sIdx + 1;
-          const sData = def(mapaSeries[itmIdx + '_' + sNum], {});
-          const hecha = def(sData.completada, false);
-          const boxDone = hecha ? 'serie-done-box' : '';
-          const btnClass = hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-950 text-rose-300 border-rose-500/40';
-          const btnTxt = hecha ? '✓' : '✗';
-          const prevItem = (window.mapaPrevSemana && window.mapaPrevSemana[itmIdx + '_' + sNum]) ? window.mapaPrevSemana[itmIdx + '_' + sNum] : null;
-          const prevCarga = (prevItem && prevItem.carga !== undefined && prevItem.carga !== null) ? prevItem.carga : 'Kg';
-          const prevRIR = (prevItem && prevItem.rir_real !== undefined && prevItem.rir_real !== null) ? prevItem.rir_real : 'RIR';
-          const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
-          const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
-
-          html += '<div class="serie-box bg-slate-900 p-2.5 rounded-xl border border-slate-800 ' + boxDone + ' space-y-1.5" id="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">';
-          html += '<div class="flex justify-between items-center"><span class="text-[10px] text-slate-400 font-mono font-bold">Serie ' + sNum + '</span>';
-          html += '<button type="button" class="btn-toggle-serie px-2.5 py-0.5 rounded-lg text-[11px] font-black border cursor-pointer ' + btnClass + '" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '" data-descanso="' + def(ej.descanso, '90s') + '" data-target="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">' + btnTxt + '</button>';
-          html += '</div><div class="flex gap-1.5">';
-          html += '<input type="number" step="0.5" inputmode="decimal" placeholder="' + prevCarga + '" value="' + valCarga + '" class="inp-carga w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
-          html += '<input type="number" inputmode="numeric" placeholder="' + prevRIR + '" value="' + valRIR + '" class="inp-rir w-14 bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
-          html += '</div></div>';
-        }
-        html += '</div></div>';
+        html += '</div>';
       });
 
-      html += '</div></div>';
+      html += '</div>';
       cont.innerHTML = html;
       enlazarEventosDinamicos();
     }
@@ -1218,10 +1245,6 @@
 
       document.querySelectorAll('.inp-rir').forEach(inp => {
         inp.onchange = () => guardarRIRCloud(inp.dataset.plan, parseInt(inp.dataset.idx), parseInt(inp.dataset.sem), parseInt(inp.dataset.serie), inp.value);
-      });
-
-      document.querySelectorAll('.btn-calc-rm-fallo').forEach(btn => {
-        btn.onclick = () => procesarTesteoFallo(btn.dataset.ej, parseInt(btn.dataset.idx));
       });
     }
 
@@ -1289,59 +1312,17 @@
         if (box) {
           if (nuevoEstado) {
             box.classList.add('serie-done-box');
-            btnElement.className = "btn-toggle-serie px-2.5 py-0.5 rounded-lg text-[11px] font-black border bg-emerald-500 text-slate-950 border-emerald-400 cursor-pointer";
+            btnElement.className = "btn-toggle-serie px-2.5 py-1 rounded-lg text-xs font-black border bg-emerald-500 text-slate-950 border-emerald-400 cursor-pointer";
             btnElement.textContent = '✓';
             if (navigator.vibrate) navigator.vibrate(60);
             iniciarTimerDescanso(parseSegundos(descanso));
             calcularRachaYCalendario();
           } else {
             box.classList.remove('serie-done-box');
-            btnElement.className = "btn-toggle-serie px-2.5 py-0.5 rounded-lg text-[11px] font-black border bg-slate-950 text-rose-300 border-rose-500/40 cursor-pointer";
+            btnElement.className = "btn-toggle-serie px-2.5 py-1 rounded-lg text-xs font-black border bg-slate-950 text-rose-300 border-rose-500/40 cursor-pointer";
             btnElement.textContent = '✗';
           }
         }
-      }
-    }
-
-    async function procesarTesteoFallo(ejercicio, itmIdx) {
-      const p = parseFloat(prompt('Peso de la serie máxima de ' + ejercicio + ' (kg):'));
-      const r = parseInt(prompt('Repeticiones completadas al fallo:'));
-      if (isNaN(p) ? true : isNaN(r) ? true : r < 1) return;
-      const rm = Math.round(p * (1 + r / 30) * 10) / 10;
-      const previo = def(marcasRMAlumno[ejercicio.trim().toLowerCase()], 0);
-      const fila = { user_id: usuarioActual.id, ejercicio: ejercicio.trim(), peso_levantado: p, reps_hechas: r, rm_calculado: rm };
-      
-      try {
-        await sb.from('marcas_rm_historial').insert(fila);
-      } catch (e) { console.warn("Historial:", e); }
-
-      const payloadUpsert = Object.assign({}, fila, { updated_at: new Date().toISOString() });
-      await sb.from('marcas_rm').upsert(payloadUpsert, { onConflict: 'user_id,ejercicio' });
-      await cargarMarcasRM();
-      if (rm > previo) abrirModalPR(ejercicio, rm);
-      else mostrarToast('1RM estimado: ' + rm + ' kg (récord: ' + previo + ' kg)');
-      cambiarSemana(semanaActiva);
-    }
-
-    function abrirModalPR(ejercicio, peso) {
-      document.getElementById('pr-share-ejercicio').innerText = ejercicio;
-      document.getElementById('pr-share-peso').innerText = peso + ' kg';
-      document.getElementById('modal-pr-celebracion').classList.remove('hidden');
-    }
-
-    function cerrarModalPR() {
-      document.getElementById('modal-pr-celebracion').classList.add('hidden');
-    }
-
-    function compartirPRSocial() {
-      const ej = document.getElementById('pr-share-ejercicio').innerText;
-      const peso = document.getElementById('pr-share-peso').innerText;
-      const txt = '🔥 ¡Nuevo récord en ' + ej + '! Saqué ' + peso + ' entrenando con Ramiro Abbattista.';
-      if (navigator.share) {
-        navigator.share({ title: 'Récord Personal', text: txt }).catch(() => {});
-      } else {
-        if (navigator.clipboard) navigator.clipboard.writeText(txt);
-        alert("Copiado al portapapeles.");
       }
     }
 
@@ -1386,108 +1367,57 @@
       document.getElementById('stat-racha').innerText = calcularRacha(diasEntrenados) + ' sem';
     }
 
-    function iniciarModoActivo() {
-      if (rutinasActivas.length === 0) return alert("No hay entrenamientos cargados.");
-      const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) ? rutinasActivas.find(r => String(r.id) === String(diaActivoId)) : rutinasActivas[0];
+    // VISTA COMPLETA SÁBANA ESTILO DRIVE
+    function abrirVistaPlanillaDrive() {
+      const modal = document.getElementById('modal-planilla-drive');
+      const contenedor = document.getElementById('tabla-sábana-contenedor');
+      modal.classList.remove('hidden');
 
-      listaEjerciciosModoActivo = def(rutinaVisible.ejercicios_detalle, []);
-      if (listaEjerciciosModoActivo.length === 0) return alert("Esta sesión no tiene ejercicios.");
-
-      indiceEjercicioActivo = 0;
-      document.getElementById('modal-modo-activo').classList.remove('hidden');
-      renderizarEjercicioActivo(rutinaVisible.id);
-    }
-
-    function cerrarModoActivo() {
-      document.getElementById('modal-modo-activo').classList.add('hidden');
-      const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) ? rutinasActivas.find(r => String(r.id) === String(diaActivoId)) : rutinasActivas[0];
-      activarDia(rutinaVisible.id);
-    }
-
-    function moverEjercicioActivo(delta, rId) {
-      indiceEjercicioActivo += delta;
-      if (indiceEjercicioActivo < 0) indiceEjercicioActivo = 0;
-      if (indiceEjercicioActivo >= listaEjerciciosModoActivo.length) {
-        indiceEjercicioActivo = listaEjerciciosModoActivo.length - 1;
-        alert("🎉 ¡Llegaste al final de la sesión!");
+      const rutina = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) ? rutinasActivas.find(r => String(r.id) === String(diaActivoId)) : rutinasActivas[0];
+      if (!rutina) {
+        contenedor.innerHTML = '<div class="text-center p-6 text-slate-500">No hay planificación activa para mostrar.</div>';
+        return;
       }
-      renderizarEjercicioActivo(rId);
+
+      const detalles = def(rutina.ejercicios_detalle, []);
+      let tableHtml = '<table class="w-full text-left font-mono border-collapse border border-slate-800 text-[11px] whitespace-nowrap">';
+      tableHtml += '<thead class="bg-slate-950 text-slate-400 border-b border-slate-800">';
+      tableHtml += '<tr>';
+      tableHtml += '<th class="p-2 border border-slate-800">Bloque / Ejercicio</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center">Series</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center">Pausa</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 1 (10-12r)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 2 (8r)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 3 (6r)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 4 (2x6)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 5 (4x4)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-cyan-300">SEM 6 (Test RM)</th>';
+      tableHtml += '</tr></thead>';
+
+      tableHtml += '<tbody class="divide-y divide-slate-800 text-slate-300">';
+      detalles.forEach(ej => {
+        const prog = def(ej.progresionSemanal, {});
+        tableHtml += '<tr class="hover:bg-slate-800/40">';
+        tableHtml += '<td class="p-2 border border-slate-800"><div class="font-bold text-white">' + escaparHTML(ej.ejercicio) + '</div><div class="text-[9px] text-amber-300">' + escaparHTML(def(ej.bloque, '')) + '</div></td>';
+        tableHtml += '<td class="p-2 border border-slate-800 text-center">' + def(ej.series, 3) + '</td>';
+        tableHtml += '<td class="p-2 border border-slate-800 text-center">' + def(ej.descanso, "90''") + '</td>';
+        
+        for (let s = 1; s <= 6; s++) {
+          const w = def(prog['s' + s], { carga: '-', reps: '-' });
+          tableHtml += '<td class="p-2 border border-slate-800 text-center font-bold text-emerald-300">' + w.carga + ' <span class="text-slate-400 font-normal">(' + w.reps + ')</span></td>';
+        }
+        tableHtml += '</tr>';
+      });
+      tableHtml += '</tbody></table>';
+
+      contenedor.innerHTML = tableHtml;
     }
 
-    async function renderizarEjercicioActivo(rId) {
-      const cont = document.getElementById('contenido-ejercicio-activo');
-      const item = listaEjerciciosModoActivo[indiceEjercicioActivo];
-      const cantSeries = parseInt(item.series) ? parseInt(item.series) : 4;
-
-      document.getElementById('txt-indice-activo').innerText = (indiceEjercicioActivo + 1) + ' de ' + listaEjerciciosModoActivo.length;
-
-      const { data: seriesCargadas } = await sb
-        .from('registros_series')
-        .select('*')
-        .eq('planificacion_id', String(rId))
-        .eq('user_id', usuarioActual.id)
-        .eq('ejercicio_index', indiceEjercicioActivo)
-        .eq('semana_num', semanaActiva);
-
-      const mapActivo = {};
-      (seriesCargadas ? seriesCargadas : []).forEach(s => { mapActivo[s.serie_num] = s; });
-
-      let html = '<div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-4">';
-      html += '<div class="flex items-center justify-between border-b border-slate-800 pb-3">';
-      html += '<div><span class="text-[10px] text-emerald-400 font-bold uppercase block">' + escaparHTML(item.bloque) + '</span>';
-      html += '<h3 class="text-xl font-black text-white">' + escaparHTML(item.ejercicio) + '</h3></div>';
-
-      if (item.video) {
-        html += '<button type="button" class="btn-play-short bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer" data-video="' + escaparHTML(item.video) + '" data-title="' + escaparHTML(item.ejercicio) + '">▶ Short</button>';
-      }
-      html += '</div>';
-
-      html += '<div class="space-y-2 pt-2">';
-      for (let sIdx = 0; sIdx < cantSeries; sIdx++) {
-        const sNum = sIdx + 1;
-        const sData = def(mapActivo[sNum], {});
-        const hecha = def(sData.completada, false);
-        const boxDone = hecha ? 'serie-done-box' : '';
-        const btnClass = hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-900 text-rose-300 border-rose-500/40';
-        const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
-        const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
-        const btnTxt = hecha ? '✓' : '✗';
-
-        html += '<div class="serie-box bg-slate-950 p-3 rounded-2xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-3" id="act-box-' + sNum + '">';
-        html += '<span class="font-mono font-bold text-slate-400 text-sm">S' + sNum + '</span>';
-        html += '<div class="flex items-center gap-2 flex-1">';
-        html += '<input type="number" step="0.5" placeholder="Kg" value="' + valCarga + '" class="inp-carga-act w-24 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
-        html += '<input type="number" placeholder="RIR" value="' + valRIR + '" class="inp-rir-act w-16 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
-        html += '</div>';
-        html += '<button type="button" class="btn-toggle-act px-4 py-2.5 rounded-xl text-xs font-black border cursor-pointer ' + btnClass + '" data-serie="' + sNum + '" data-descanso="' + def(item.descanso, '90s') + '">' + btnTxt + '</button>';
-        html += '</div>';
-      }
-      html += '</div></div>';
-
-      html += '<div class="flex justify-between gap-3 pt-2">';
-      html += '<button type="button" id="btn-ant-act" class="bg-slate-900 border border-slate-800 px-5 py-3 rounded-2xl text-xs font-bold text-white flex-1 cursor-pointer">◀ Anterior</button>';
-      html += '<button type="button" id="btn-sig-act" class="bg-emerald-500 text-slate-950 font-black px-5 py-3 rounded-2xl text-xs flex-1 cursor-pointer">Siguiente ▶</button>';
-      html += '</div>';
-
-      cont.innerHTML = html;
-
-      cont.querySelectorAll('.inp-carga-act').forEach(i => {
-        i.onchange = () => guardarCargaCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(i.dataset.serie), i.value);
-      });
-      cont.querySelectorAll('.inp-rir-act').forEach(i => {
-        i.onchange = () => guardarRIRCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(i.dataset.serie), i.value);
-      });
-      cont.querySelectorAll('.btn-toggle-act').forEach(b => {
-        b.onclick = () => toggleSerieCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(b.dataset.serie), b.dataset.descanso, b, 'act-box-' + b.dataset.serie);
-      });
-      cont.querySelectorAll('.btn-play-short').forEach(b => {
-        b.onclick = () => abrirPlayerVideo(b.dataset.video, b.dataset.title);
-      });
-
-      document.getElementById('btn-ant-act').onclick = () => moverEjercicioActivo(-1, rId);
-      document.getElementById('btn-sig-act').onclick = () => moverEjercicioActivo(1, rId);
+    function cerrarVistaPlanillaDrive() {
+      document.getElementById('modal-planilla-drive').classList.add('hidden');
     }
 
+    // PANEL DEL COACH (DIRECTORIO HARBIZ)
     async function cargarVistaCoach() {
       if (!sb) return;
       const { data: atletas } = await sb.from('perfiles_usuarios').select('*').eq('rol', 'alumno');
@@ -1514,14 +1444,37 @@
         const tagClase = alerta ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-400';
         const bordeClase = alerta ? 'border-rose-500/50' : 'border-slate-800';
 
-        let itemHtml = '<div class="bg-slate-950 p-4 rounded-2xl border ' + bordeClase + ' space-y-1 text-xs">';
-        itemHtml += '<div class="flex justify-between items-center"><span class="font-bold text-white text-sm">' + escaparHTML(def(a.nombre, a.email)) + '</span>';
-        itemHtml += '<span class="text-[10px] px-2 py-0.5 rounded ' + tagClase + '">' + tagTexto + '</span></div>';
+        let itemHtml = '<div class="bg-slate-950 p-4 rounded-2xl border ' + bordeClase + ' space-y-2 text-xs">';
+        itemHtml += '<div class="flex justify-between items-center"><div class="flex items-center gap-2">';
+        itemHtml += '<div class="w-8 h-8 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center font-bold text-white text-xs">' + def(a.nombre, 'A').charAt(0).toUpperCase() + '</div>';
+        itemHtml += '<div><span class="font-bold text-white text-sm block leading-tight">' + escaparHTML(def(a.nombre, a.email)) + '</span>';
+        itemHtml += '<span class="text-[10px] text-slate-400">Atleta Asignado</span></div></div>';
+        itemHtml += '<span class="text-[10px] px-2 py-0.5 rounded font-bold ' + tagClase + '">' + tagTexto + '</span></div>';
         itemHtml += '<div class="text-slate-400">Últimos 14 días: <strong class="text-white">' + (st ? st.dias.size : 0) + '</strong> sesiones • <strong class="text-white">' + (st ? st.n : 0) + '</strong> series</div>';
-        itemHtml += '<div class="text-slate-500">' + escaparHTML(a.email) + ' • WhatsApp: ' + escaparHTML(def(a.telefono, 'Sin cargar')) + '</div>';
-        itemHtml += '</div>';
+        itemHtml += '<div class="text-slate-500 flex justify-between items-center pt-1 border-t border-slate-900">';
+        itemHtml += '<span>WhatsApp: ' + escaparHTML(def(a.telefono, 'Sin cargar')) + '</span>';
+        itemHtml += '<button type="button" onclick="entrarPortalAlumno(\'' + a.id + '\', \'' + escaparHTML(def(a.nombre, a.email)) + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] cursor-pointer">Ver Ficha ➔</button>';
+        itemHtml += '</div></div>';
         return itemHtml;
       }).join('');
+    }
+
+    function entrarPortalAlumno(alId, alNombre) {
+      document.getElementById('dash-alumno-nombre').innerText = 'Ficha: ' + alNombre;
+      cargarRutinasAlumnoPorId(alId);
+      mostrarToast("Accediendo a ficha de " + alNombre);
+    }
+
+    async function cargarRutinasAlumnoPorId(alId) {
+      if (!sb) return;
+      const { data: planes } = await sb.from('planificaciones')
+        .select('*')
+        .eq('alumno_id', alId)
+        .order('created_at', { ascending: true });
+
+      rutinasActivas = (planes ? planes : []).filter(p => !p.estado ? true : p.estado === 'activa');
+      diaActivoId = null;
+      renderizarSolapasYRutas();
     }
 
     function exportarBaseAlumnosCSV() {
@@ -1551,9 +1504,9 @@
       planEditandoId = null;
       ejEditIdx = null;
       sesionCoachTemporal = [];
-      document.getElementById('admin-mes').value = '';
-      document.getElementById('admin-dia').value = '';
-      tituloCreador('🛠️ Nuevo plan', 'Progresión semanal ondulada y guardado directo en Supabase.', false);
+      document.getElementById('admin-mes').value = 'Mesociclo Dylan Losada (Oct/Nov)';
+      document.getElementById('admin-dia').value = 'Día 1 (Lun)';
+      tituloCreador('🛠️ Nuevo plan', 'Progresión semanal ondulada de 6 semanas y guardado directo.', false);
       abrirModalCreadorRapido();
     }
 
@@ -1564,7 +1517,7 @@
       document.getElementById('admin-entorno').value = def(p.entorno, 'ONLINE');
       document.getElementById('sel-alumno-creador').value = p.alumno_id;
       document.getElementById('admin-mes').value = def(p.mesociclo, '') + (modo === 'duplicar' ? ' (copia)' : '');
-      document.getElementById('admin-duracion-semanas').value = String(def(p.duracion_semanas, 5));
+      document.getElementById('admin-duracion-semanas').value = String(def(p.duracion_semanas, 6));
       document.getElementById('admin-dia').value = def(p.dia, '');
       actualizarColumnasMatrizCoach();
       if (modo === 'editar') {
@@ -1581,10 +1534,10 @@
       const set = (id, v) => { document.getElementById(id).value = (v !== undefined && v !== null) ? v : ''; };
       set('inp-bloque', e.bloque);
       set('inp-ejercicio-nombre', e.ejercicio);
+      set('inp-criterio-tecnico', def(e.criterio, e.indicacion));
       set('inp-video', e.video);
       set('inp-series', e.series);
       set('inp-rir', e.rir);
-      set('inp-tempo', e.tempo);
       set('inp-descanso', e.descanso);
       for (let n = 1; n <= 6; n++) {
         const w = (e.progresionSemanal && e.progresionSemanal['s' + n]) ? e.progresionSemanal['s' + n] : null;
@@ -1656,7 +1609,7 @@
 
         gHtml += lista.map(p => {
           const cantEj = def(p.ejercicios_detalle, []).length;
-          const durSem = def(p.duracion_semanas, 5);
+          const durSem = def(p.duracion_semanas, 6);
           const stTexto = p.estado === 'archivada' ? 'Archivado' : 'Activo';
           const opacidad = p.estado === 'archivada' ? 'opacity-60' : '';
           const icoEstado = p.estado === 'archivada' ? '♻' : '📦';
@@ -1715,29 +1668,13 @@
     }
 
     function actualizarColumnasMatrizCoach() {
-      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) ? parseInt(document.getElementById('admin-duracion-semanas').value) : 5;
+      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) ? parseInt(document.getElementById('admin-duracion-semanas').value) : 6;
       document.getElementById('col-s5-coach').classList.toggle('hidden', cant < 5);
       document.getElementById('col-s6-coach').classList.toggle('hidden', cant < 6);
     }
 
     function aplicarPresetProgresionRamiro() {
-      const cant = parseInt(document.getElementById('admin-duracion-semanas').value) ? parseInt(document.getElementById('admin-duracion-semanas').value) : 5;
-      document.getElementById('prog-s1-reps').value = "3x8 reps";
-      document.getElementById('prog-s1-carga').value = "70%";
-      document.getElementById('prog-s2-reps').value = "4x8 reps";
-      document.getElementById('prog-s2-carga').value = "75%";
-      document.getElementById('prog-s3-reps').value = "4x6 reps";
-      document.getElementById('prog-s3-carga').value = "80%";
-      document.getElementById('prog-s4-reps').value = "4x4 reps";
-      document.getElementById('prog-s4-carga').value = "85%";
-      if (cant >= 5) {
-        document.getElementById('prog-s5-reps').value = "12-8-6-4 + 1xFallo";
-        document.getElementById('prog-s5-carga').value = "90%+";
-      }
-      if (cant >= 6) {
-        document.getElementById('prog-s6-reps').value = "12-8-6-4 + 1xFallo";
-        document.getElementById('prog-s6-carga').value = "92.5%+";
-      }
+      aplicarPresetRepsRapido('dylan_fuerza');
     }
 
     function agregarFilaRutina() {
@@ -1749,10 +1686,10 @@
       const nuevo = {
         bloque: v('inp-bloque'),
         ejercicio: ej,
-        series: parseInt(v('inp-series')) ? parseInt(v('inp-series')) : 4,
+        criterio: v('inp-criterio-tecnico').trim(),
+        series: parseInt(v('inp-series')) ? parseInt(v('inp-series')) : 3,
         rir: v('inp-rir').trim(),
         descanso: v('inp-descanso'),
-        tempo: v('inp-tempo').trim(),
         video: v('inp-video').trim(),
         progresionSemanal: prog
       };
@@ -1761,6 +1698,7 @@
       ejEditIdx = null;
       document.querySelector('[onclick="agregarFilaRutina()"]').innerText = '＋ Agregar Ejercicio a la Planificación';
       document.getElementById('inp-ejercicio-nombre').value = '';
+      document.getElementById('inp-criterio-tecnico').value = '';
       document.getElementById('inp-video').value = '';
       renderTablaSesionCoach();
     }
@@ -1775,7 +1713,7 @@
       tbody.innerHTML = sesionCoachTemporal.map((f, i) => {
         const rowClass = ejEditIdx === i ? 'bg-emerald-500/10' : '';
         return '<tr class="flex justify-between items-center p-2 ' + rowClass + '">' +
-          '<td class="min-w-0"><span class="text-emerald-400 block text-[10px]">' + escaparHTML(f.bloque) + '</span><span class="block truncate">' + (i + 1) + '. ' + escaparHTML(f.ejercicio) + '</span></td>' +
+          '<td class="min-w-0"><span class="text-emerald-400 block text-[10px]">' + escaparHTML(f.bloque) + '</span><span class="block truncate font-bold text-white">' + (i + 1) + '. ' + escaparHTML(f.ejercicio) + '</span><span class="block text-[10px] text-amber-300 truncate">' + escaparHTML(def(f.criterio, '')) + '</span></td>' +
           '<td class="flex shrink-0">' +
           '<button type="button" class="' + b + '" data-a="up" data-i="' + i + '">↑</button>' +
           '<button type="button" class="' + b + '" data-a="down" data-i="' + i + '">↓</button>' +
@@ -1802,8 +1740,8 @@
         alumno_id: alumnoId,
         entorno: document.getElementById('admin-entorno').value,
         mesociclo: def(document.getElementById('admin-mes').value.trim(), 'Mes 1'),
-        duracion_semanas: parseInt(document.getElementById('admin-duracion-semanas').value) ? parseInt(document.getElementById('admin-duracion-semanas').value) : 5,
-        dia: def(document.getElementById('admin-dia').value.trim(), 'Lunes'),
+        duracion_semanas: parseInt(document.getElementById('admin-duracion-semanas').value) ? parseInt(document.getElementById('admin-duracion-semanas').value) : 6,
+        dia: def(document.getElementById('admin-dia').value.trim(), 'Día 1'),
         ejercicios_detalle: sesionCoachTemporal
       };
       let error;
@@ -1931,6 +1869,112 @@
     function cerrarPlayerVideo() {
       document.getElementById('iframe-video-player').src = '';
       document.getElementById('modal-video-player').classList.add('hidden');
+    }
+
+    function iniciarModoActivo() {
+      if (rutinasActivas.length === 0) return alert("No hay entrenamientos cargados.");
+      const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) ? rutinasActivas.find(r => String(r.id) === String(diaActivoId)) : rutinasActivas[0];
+
+      listaEjerciciosModoActivo = def(rutinaVisible.ejercicios_detalle, []);
+      if (listaEjerciciosModoActivo.length === 0) return alert("Esta sesión no tiene ejercicios.");
+
+      indiceEjercicioActivo = 0;
+      document.getElementById('modal-modo-activo').classList.remove('hidden');
+      renderizarEjercicioActivo(rutinaVisible.id);
+    }
+
+    function cerrarModoActivo() {
+      document.getElementById('modal-modo-activo').classList.add('hidden');
+      const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) ? rutinasActivas.find(r => String(r.id) === String(diaActivoId)) : rutinasActivas[0];
+      activarDia(rutinaVisible.id);
+    }
+
+    function moverEjercicioActivo(delta, rId) {
+      indiceEjercicioActivo += delta;
+      if (indiceEjercicioActivo < 0) indiceEjercicioActivo = 0;
+      if (indiceEjercicioActivo >= listaEjerciciosModoActivo.length) {
+        indiceEjercicioActivo = listaEjerciciosModoActivo.length - 1;
+        alert("🎉 ¡Llegaste al final de la sesión!");
+      }
+      renderizarEjercicioActivo(rId);
+    }
+
+    async function renderizarEjercicioActivo(rId) {
+      const cont = document.getElementById('contenido-ejercicio-activo');
+      const item = listaEjerciciosModoActivo[indiceEjercicioActivo];
+      const cantSeries = parseInt(item.series) ? parseInt(item.series) : 3;
+
+      document.getElementById('txt-indice-activo').innerText = (indiceEjercicioActivo + 1) + ' de ' + listaEjerciciosModoActivo.length;
+
+      const { data: seriesCargadas } = await sb
+        .from('registros_series')
+        .select('*')
+        .eq('planificacion_id', String(rId))
+        .eq('user_id', usuarioActual.id)
+        .eq('ejercicio_index', indiceEjercicioActivo)
+        .eq('semana_num', semanaActiva);
+
+      const mapActivo = {};
+      (seriesCargadas ? seriesCargadas : []).forEach(s => { mapActivo[s.serie_num] = s; });
+
+      let html = '<div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-4">';
+      html += '<div class="flex items-center justify-between border-b border-slate-800 pb-3">';
+      html += '<div><span class="text-[10px] text-emerald-400 font-bold uppercase block">' + escaparHTML(item.bloque) + '</span>';
+      html += '<h3 class="text-xl font-black text-white">' + escaparHTML(item.ejercicio) + '</h3>';
+      if (item.criterio ? true : item.indicacion) {
+        html += '<p class="text-[11px] text-amber-300 italic">↳ ' + escaparHTML(def(item.criterio, item.indicacion)) + '</p>';
+      }
+      html += '</div>';
+
+      if (item.video) {
+        html += '<button type="button" class="btn-play-short bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer" data-video="' + escaparHTML(item.video) + '" data-title="' + escaparHTML(item.ejercicio) + '">▶ Short</button>';
+      }
+      html += '</div>';
+
+      html += '<div class="space-y-2 pt-2">';
+      for (let sIdx = 0; sIdx < cantSeries; sIdx++) {
+        const sNum = sIdx + 1;
+        const sData = def(mapActivo[sNum], {});
+        const hecha = def(sData.completada, false);
+        const boxDone = hecha ? 'serie-done-box' : '';
+        const btnClass = hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-900 text-rose-300 border-rose-500/40';
+        const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
+        const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
+        const btnTxt = hecha ? '✓' : '✗';
+
+        html += '<div class="serie-box bg-slate-950 p-3 rounded-2xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-3" id="act-box-' + sNum + '">';
+        html += '<span class="font-mono font-bold text-slate-400 text-sm">S' + sNum + '</span>';
+        html += '<div class="flex items-center gap-2 flex-1">';
+        html += '<input type="number" step="0.5" placeholder="Kg" value="' + valCarga + '" class="inp-carga-act w-24 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
+        html += '<input type="number" placeholder="Reps" value="' + valRIR + '" class="inp-rir-act w-16 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
+        html += '</div>';
+        html += '<button type="button" class="btn-toggle-act px-4 py-2.5 rounded-xl text-xs font-black border cursor-pointer ' + btnClass + '" data-serie="' + sNum + '" data-descanso="' + def(item.descanso, "90''") + '">' + btnTxt + '</button>';
+        html += '</div>';
+      }
+      html += '</div></div>';
+
+      html += '<div class="flex justify-between gap-3 pt-2">';
+      html += '<button type="button" id="btn-ant-act" class="bg-slate-900 border border-slate-800 px-5 py-3 rounded-2xl text-xs font-bold text-white flex-1 cursor-pointer">◀ Anterior</button>';
+      html += '<button type="button" id="btn-sig-act" class="bg-emerald-500 text-slate-950 font-black px-5 py-3 rounded-2xl text-xs flex-1 cursor-pointer">Siguiente ▶</button>';
+      html += '</div>';
+
+      cont.innerHTML = html;
+
+      cont.querySelectorAll('.inp-carga-act').forEach(i => {
+        i.onchange = () => guardarCargaCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(i.dataset.serie), i.value);
+      });
+      cont.querySelectorAll('.inp-rir-act').forEach(i => {
+        i.onchange = () => guardarRIRCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(i.dataset.serie), i.value);
+      });
+      cont.querySelectorAll('.btn-toggle-act').forEach(b => {
+        b.onclick = () => toggleSerieCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(b.dataset.serie), b.dataset.descanso, b, 'act-box-' + b.dataset.serie);
+      });
+      cont.querySelectorAll('.btn-play-short').forEach(b => {
+        b.onclick = () => abrirPlayerVideo(b.dataset.video, b.dataset.title);
+      });
+
+      document.getElementById('btn-ant-act').onclick = () => moverEjercicioActivo(-1, rId);
+      document.getElementById('btn-sig-act').onclick = () => moverEjercicioActivo(1, rId);
     }
 
     // AUTO-RECUPERACIÓN DE SESIÓN AL INICIAR
