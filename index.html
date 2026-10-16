@@ -965,36 +965,45 @@
       document.getElementById('usuario-info').classList.add('hidden');
     }
 
+    // CARGA DE PERFILES Y ROLES OPTIMIZADA
     async function cargarPerfilYRoles() {
       if (!usuarioActual ? true : !sb) return;
 
       try {
+        // 1. Mostrar inmediatamente la app para evitar pantallas trabadas
+        document.getElementById('seccion-auth').classList.add('hidden');
+        document.getElementById('seccion-panel').classList.remove('hidden');
+        document.getElementById('usuario-info').classList.remove('hidden');
+        document.getElementById('usuario-info').classList.add('flex');
+        
+        const fallbackNombre = usuarioActual.email ? usuarioActual.email.split('@')[0] : 'Atleta';
+        document.getElementById('dash-alumno-nombre').innerText = 'Hola, ' + fallbackNombre;
+
+        // 2. Traer perfil y rol de forma segura
         const { data: perfil } = await sb
           .from('perfiles_usuarios')
           .select('*')
           .eq('id', usuarioActual.id)
           .maybeSingle();
 
-        perfilActual = def(perfil, { rol: 'alumno', nombre: usuarioActual.email.split('@')[0] });
-
-        document.getElementById('seccion-auth').classList.add('hidden');
-        document.getElementById('seccion-panel').classList.remove('hidden');
-        document.getElementById('usuario-info').classList.remove('hidden');
-        document.getElementById('usuario-info').classList.add('flex');
-        document.getElementById('dash-alumno-nombre').innerText = 'Hola, ' + def(perfilActual.nombre, 'Atleta');
+        perfilActual = def(perfil, { rol: 'alumno', nombre: fallbackNombre });
+        if (perfilActual.nombre) {
+          document.getElementById('dash-alumno-nombre').innerText = 'Hola, ' + perfilActual.nombre;
+        }
         document.getElementById('tag-rol-user').innerText = def(perfilActual.rol, 'alumno').toUpperCase();
 
         if (perfilActual.rol === 'coach') {
           document.getElementById('seccion-admin').classList.remove('hidden');
-          await cargarVistaCoach();
-          await cargarPlanesCoach();
+          cargarVistaCoach();
+          cargarPlanesCoach();
         } else {
           document.getElementById('seccion-admin').classList.add('hidden');
         }
 
-        await cargarMarcasRM();
-        await cargarRutinasAlumno();
-        await calcularRachaYCalendario();
+        // 3. Cargar datos en paralelo sin bloquear la interfaz
+        cargarMarcasRM();
+        cargarRutinasAlumno();
+        calcularRachaYCalendario();
       } catch (err) {
         console.error("Error al cargar perfil:", err);
       }
@@ -1028,12 +1037,16 @@
       return { textoDisplay: textoPrescripcion, kgCalculado: null };
     }
 
+    // CARGA DE RUTINAS CON COMPATIBILIDAD LIMPIA DE UUID
     async function cargarRutinasAlumno() {
       if (!sb ? true : !usuarioActual) return;
       try {
-        const { data: planes } = await sb.from('planificaciones').select('*')
-          .or('alumno_id.eq.' + usuarioActual.id + ',alumno_id.eq.' + usuarioActual.email)
+        const { data: planes, error } = await sb.from('planificaciones')
+          .select('*')
+          .eq('alumno_id', usuarioActual.id)
           .order('created_at', { ascending: true });
+
+        if (error) console.warn("Error trayendo planes:", error.message);
 
         rutinasActivas = (planes ? planes : []).filter(p => !p.estado ? true : p.estado === 'activa');
         diaActivoId = null;
