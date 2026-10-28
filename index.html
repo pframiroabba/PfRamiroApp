@@ -384,252 +384,15 @@
     </div>
   </div>
 
-  <!-- CRONÓMETRO FLOTANTE -->
-  <div id="timer-box" class="hidden fixed bottom-4 right-4 bg-slate-900 border-2 border-emerald-500 shadow-2xl rounded-2xl p-4 z-50 flex items-center gap-4">
-    <div>
-      <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Descanso</span>
-      <span id="timer-display" class="text-3xl font-black text-emerald-400 font-mono">01:30</span>
-    </div>
-    <div class="flex gap-1.5">
-      <button type="button" id="btn-timer-toggle" onclick="pausarReanudarTimer()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white cursor-pointer">Pausa</button>
-      <button type="button" onclick="cerrarTimer()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-2.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer">✕</button>
-    </div>
-  </div>
-
-  <!-- ENCABEZADO CON TU LOGO OFICIAL -->
-  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 md:px-8 py-3 flex justify-between items-center sticky top-0 z-40">
-    <div class="flex items-center gap-3">
-      <img src="logo-icono.webp" alt="PF Ramiro" class="avatar-circulo object-cover" onerror="this.onerror=null; this.src=''; this.innerHTML='🏋️‍♂️';">
-      <div>
-        <h1 class="text-base font-black tracking-wide text-white leading-tight">PF RAMIRO ABBATTISTA</h1>
-        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Rendimiento & Fuerza</span>
-      </div>
-    </div>
-    
-    <div class="flex items-center gap-2">
-      <button type="button" onclick="abrirVistaPlanillaDrive()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 text-xs px-2.5 py-1.5 rounded-lg font-bold transition cursor-pointer">📋 Planilla</button>
-      <button type="button" onclick="abrirModalDiscos(0)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs px-2.5 py-1.5 rounded-lg font-bold transition cursor-pointer">⚖️ Cargas</button>
-      <div id="usuario-info" class="hidden items-center gap-2">
-        <span id="tag-rol-user" class="text-[10px] font-black uppercase px-2 py-0.5 rounded border border-emerald-500/40 text-emerald-400">Alumno</span>
-        <button type="button" onclick="cerrarSesion()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer">Salir</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- PANTALLA AUTH -->
-  <main id="seccion-auth" class="max-w-md mx-auto mt-10 p-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl text-center space-y-6">
-    <div>
-      <h2 class="text-2xl font-black text-white tracking-wide">Acceso al Sistema</h2>
-      <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma Cloud Blindada</p>
-    </div>
-
-    <div class="flex bg-slate-950 p-1 rounded-2xl border border-slate-800">
-      <button type="button" id="tab-auth-login" onclick="cambiarModoAuth('login')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950 cursor-pointer">Ingresar</button>
-      <button type="button" id="tab-auth-registro" onclick="cambiarModoAuth('registro')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white cursor-pointer">Crear Cuenta</button>
-    </div>
-
-    <div class="space-y-4 text-left">
-      <div id="campo-registro-nombre" class="hidden">
-        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Nombre Completo</label>
-        <input type="text" id="reg-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="ej: Dylan Losada">
-      </div>
-      <div id="campo-registro-telefono" class="hidden">
-        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">WhatsApp</label>
-        <input type="tel" id="reg-telefono" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm font-mono" placeholder="ej: 11 2345-6789">
-      </div>
-      <div id="campo-registro-entorno" class="hidden">
-        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Modalidad de Entrenamiento</label>
-        <select id="reg-entorno" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-emerald-400 focus:outline-none text-sm font-bold">
-          <option value="KOENA">Koena (Presencial Banfield/Lomas)</option>
-          <option value="ONLINE">Personalizado Online</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Correo Electrónico</label>
-        <input type="email" id="auth-email" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="tu@email.com" value="pf.ramiroabba@gmail.com">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Contraseña</label>
-        <input type="password" id="auth-password" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="••••••••">
-      </div>
-
-      <button type="button" id="btn-auth-accion" onclick="ejecutarAuth()" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-950 font-black py-3 rounded-xl transition text-xs uppercase tracking-wider shadow-lg cursor-pointer">
-        Ingresar a mi Plan
-      </button>
-    </div>
-    <p id="auth-mensaje" class="text-xs text-emerald-400 font-semibold text-center min-h-[1.25rem]"></p>
-  </main>
-
-  <!-- PANTALLA PRINCIPAL -->
-  <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
-
-    <!-- PORTAL INDIVIDUAL DEL ALUMNO -->
-    <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 to-slate-950 p-5 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block">Atleta Conectado</span>
-            <span class="text-[9px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded font-bold border border-cyan-500/30">Coach: Ramiro Abbattista</span>
-          </div>
-          <h3 class="text-xl font-black text-white mt-0.5" id="dash-alumno-nombre">Bienvenido</h3>
-          <span id="badge-modalidad-alumno" class="inline-block mt-1 text-[10px] bg-slate-800 text-emerald-400 px-2.5 py-0.5 rounded-md font-mono font-bold">MODALIDAD: KOENA PRESENCIAL</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
-            <span class="text-base">🔥</span>
-            <div>
-              <span class="text-[9px] text-slate-400 uppercase font-bold block">Racha Semanal</span>
-              <span id="stat-racha" class="text-xs font-black text-emerald-400">0 sem</span>
-            </div>
-          </div>
-          <button type="button" onclick="iniciarModoActivo()" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-950 font-black px-4 py-2 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">⚡ Entreno Activo</button>
-        </div>
-      </div>
-
-      <!-- MÓDULO: GESTIÓN DE TURNOS (KOENA VS ONLINE) -->
-      <div id="modulo-gestion-turnos" class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-        <!-- RUTA KOENA -->
-        <div id="vista-turno-koena" class="space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-              📍 Asistencia Koena (Lunes, Miércoles y Viernes)
-            </span>
-            <span class="text-[10px] text-slate-400 font-mono">15:00 a 21:00 hs</span>
-          </div>
-          <p class="text-[11px] text-slate-400">Confirmá tu turno de entrenamiento para asegurar rack, barras y materiales en el salón.</p>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-            <input type="date" id="koena-fecha-turno" class="bg-slate-900 border border-slate-800 text-white rounded-xl p-2 text-xs font-mono font-bold">
-            <select id="koena-hora-turno" class="bg-slate-900 border border-slate-800 text-white rounded-xl p-2 text-xs font-bold">
-              <option value="15:00">Turno 15:00 a 16:00 hs</option>
-              <option value="16:00">Turno 16:00 a 17:00 hs</option>
-              <option value="17:00">Turno 17:00 a 18:00 hs</option>
-              <option value="18:00">Turno 18:00 a 19:00 hs</option>
-              <option value="19:00">Turno 19:00 a 20:00 hs</option>
-              <option value="20:00">Turno 20:00 a 21:00 hs</option>
-            </select>
-            <div class="flex gap-1.5">
-              <button type="button" onclick="confirmarTurnoKoena(true)" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-xl text-xs py-2 transition cursor-pointer">✓ Voy</button>
-              <button type="button" onclick="confirmarTurnoKoena(false)" class="bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold rounded-xl text-xs px-3 py-2 transition cursor-pointer">✕ Cancelo</button>
-            </div>
-          </div>
-          <div id="estado-turno-koena-txt" class="text-[11px] font-mono text-slate-400"></div>
-        </div>
-
-        <!-- RUTA ONLINE -->
-        <div id="vista-turno-online" class="hidden space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-black text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
-              🌐 Personalizado Online — Coordinación Directa
-            </span>
-            <span class="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-mono font-bold">Sesiones de 30'</span>
-          </div>
-          <p class="text-[11px] text-slate-400">Agendá una llamada rápida de ajuste técnico de 30 minutos o coordiná tu devolución mensual de fin de mes por WhatsApp con Rama.</p>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-            <select id="online-tipo-llamada" class="bg-slate-900 border border-slate-800 text-white rounded-xl p-2 text-xs font-bold">
-              <option value="Ajuste de Cargas Semanal">📞 Ajuste de Cargas (30 min)</option>
-              <option value="Devolución Mensual de Fin de Mes">📊 Devolución Mensual (Fin de Mes)</option>
-            </select>
-            <input type="date" id="online-fecha-turno" class="bg-slate-900 border border-slate-800 text-white rounded-xl p-2 text-xs font-mono font-bold">
-            <button type="button" onclick="agendarLlamadaWhatsAppOnline()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black rounded-xl text-xs py-2 transition cursor-pointer flex items-center justify-center gap-1.5">
-              <span>📲 Agendar por WhatsApp</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- TABLA RESUMEN 1RM INTERACTIVA -->
-      <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-          <div>
-            <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">📊 Control de 1RM & Cargas Dinámicas:</span>
-            <span class="text-[10px] text-slate-400">Modificá el test y se recalculan automáticamente las 6 semanas.</span>
-          </div>
-          <span class="text-[10px] text-slate-500 font-mono">Fórmula Epley</span>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-[11px] font-mono">
-            <thead class="text-slate-400 border-b border-slate-800 text-[10px]">
-              <tr>
-                <th class="pb-1.5">Ejercicio Clave</th>
-                <th class="pb-1.5 text-center">Test (kg)</th>
-                <th class="pb-1.5 text-center">Reps</th>
-                <th class="pb-1.5 text-center text-emerald-400 font-bold">1RM Est.</th>
-                <th class="pb-1.5 text-center">68%</th>
-                <th class="pb-1.5 text-center">75%</th>
-                <th class="pb-1.5 text-center">80%</th>
-                <th class="pb-1.5 text-center">84%</th>
-                <th class="pb-1.5 text-center">88%</th>
-                <th class="pb-1.5 text-center text-cyan-300 font-bold">95%+</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-control-rm-body" class="divide-y divide-slate-800/60 text-slate-300">
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- HABIT TRACKER / CALENDARIO CON DÍA ACTUAL DESTACADO -->
-      <div class="space-y-1.5">
-        <div class="flex items-center justify-between">
-          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia (Mes Actual):</span>
-          <span class="text-[9px] text-emerald-400 font-mono font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-emerald-400"></span> Día de hoy resaltado</span>
-        </div>
-        <div id="grid-calendario-adherencia" class="grid grid-cols-7 gap-1 text-center text-[10px] font-mono"></div>
-      </div>
-    </div>
-
-    <!-- PANEL EXCLUSIVO DEL COACH -->
-    <div id="seccion-admin" class="hidden space-y-4 bg-slate-900 border border-blue-500/40 p-5 rounded-3xl">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <div>
-          <h3 class="text-base font-black text-blue-400 flex items-center gap-2">🛡️ Panel del Coach — Harbiz Suite</h3>
-          <p class="text-xs text-slate-400">Directorio de atletas, control de cuotas y asignación de mesociclos.</p>
-        </div>
-        <div class="flex gap-2">
-          <button type="button" onclick="nuevoPlan()" class="bg-blue-600 hover:bg-blue-500 text-white font-black px-3 py-1.5 rounded-xl text-xs cursor-pointer">＋ Planificar Día</button>
-          <button type="button" onclick="exportarBaseAlumnosCSV()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold px-3 py-1.5 rounded-xl text-xs cursor-pointer">📥 Exportar CSV</button>
-        </div>
-      </div>
-
-      <div id="contenedor-atletas-coach" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-80 overflow-y-auto"></div>
-      
-      <div class="border-t border-slate-800 pt-4 space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-black text-blue-300 uppercase tracking-wider">📋 Planes y Mesociclos Asignados</span>
-          <select id="filtro-planes-estado" onchange="cargarPlanesCoach()" class="bg-slate-950 border border-slate-700 text-slate-300 rounded-lg p-1.5 text-xs font-bold">
-            <option value="activa">Activos</option><option value="archivada">Archivados</option><option value="todos">Todos</option>
-          </select>
-        </div>
-        <div id="lista-planes-coach" class="space-y-3 max-h-96 overflow-y-auto"></div>
-      </div>
-    </div>
-
-    <!-- PESTAÑAS DE RUTINAS DEL ATLETA -->
-    <div class="space-y-4">
-      <div id="contenedor-tabs-dias" class="tabs-dias-container hidden overflow-x-auto pb-1">
-        <div class="flex items-center gap-2" id="barra-solapas-dias"></div>
-      </div>
-
-      <div id="contenedor-tabs-semanas" class="hidden bg-slate-900/90 p-2 rounded-2xl border border-slate-800 overflow-x-auto">
-        <div class="flex items-center gap-2">
-          <span class="text-[11px] font-black uppercase text-emerald-400 px-2">Semana:</span>
-          <div class="flex items-center gap-1.5" id="barra-solapas-semanas"></div>
-        </div>
-      </div>
-
-      <div id="lista-rutinas" class="space-y-6"></div>
-    </div>
-  </main>
-
   <script>
-    // 0. FUNCIONES AUXILIARES
+    // 0. FUNCIONES AUXILIARES SEGURAS
     function def(valor, porDefecto) {
       if (valor !== undefined && valor !== null && valor !== '') return valor;
       return porDefecto;
     }
 
     // 1. CAPTURA Y MUESTRA DE ERRORES DIRECTO EN PANTALLA
-    window.onerror = function(msg, url, lineNo) {
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
       const box = document.getElementById('debug-error-box');
       const txt = document.getElementById('debug-error-txt');
       if (box && txt) {
@@ -648,7 +411,7 @@
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     }
 
-    // 3. BIBLIOTECA COMPLETA DE EJERCICIOS CON VIDEOS Y CRITERIOS BIOMECÁNICOS
+    // 3. BIBLIOTECA COMPLETA DE EJERCICIOS
     const BIBLIOTECA_RAMIRO = {
       inf_rodilla: [
         { nombre: "Sentadilla Trasera con Barra", criterio: "Sentadilla profunda con recorrido completo sin colapsar rodillas.", video: "https://www.youtube.com/shorts/bEv6CCg2BC8" },
@@ -752,24 +515,18 @@
         const c88 = (item.rm * 0.88).toFixed(1);
         const c95 = (item.rm * 0.95).toFixed(1);
 
-        return `
-          <tr>
-            <td class="py-1.5 text-white font-bold">${item.nombre}</td>
-            <td class="text-center">
-              <input type="number" step="0.5" value="${item.pesoTest}" onchange="actualizarTestRM(${idx}, this.value, null)" class="w-14 bg-slate-900 border border-slate-800 rounded p-1 text-center font-bold text-white">
-            </td>
-            <td class="text-center">
-              <input type="number" min="1" max="20" value="${item.repsTest}" onchange="actualizarTestRM(${idx}, null, this.value)" class="w-10 bg-slate-900 border border-slate-800 rounded p-1 text-center font-bold text-white">
-            </td>
-            <td class="text-center text-emerald-400 font-black">${item.rm} kg</td>
-            <td class="text-center text-slate-300 font-mono">${c68}</td>
-            <td class="text-center text-slate-300 font-mono">${c75}</td>
-            <td class="text-center text-slate-300 font-mono">${c80}</td>
-            <td class="text-center text-slate-300 font-mono">${c84}</td>
-            <td class="text-center text-slate-300 font-mono">${c88}</td>
-            <td class="text-center text-cyan-300 font-bold font-mono">${c95}</td>
-          </tr>
-        `;
+        return '<tr>' +
+          '<td class="py-1.5 text-white font-bold">' + item.nombre + '</td>' +
+          '<td class="text-center"><input type="number" step="0.5" value="' + item.pesoTest + '" onchange="actualizarTestRM(' + idx + ', this.value, null)" class="w-14 bg-slate-900 border border-slate-800 rounded p-1 text-center font-bold text-white"></td>' +
+          '<td class="text-center"><input type="number" min="1" max="20" value="' + item.repsTest + '" onchange="actualizarTestRM(' + idx + ', null, this.value)" class="w-10 bg-slate-900 border border-slate-800 rounded p-1 text-center font-bold text-white"></td>' +
+          '<td class="text-center text-emerald-400 font-black">' + item.rm + ' kg</td>' +
+          '<td class="text-center text-slate-300 font-mono">' + c68 + '</td>' +
+          '<td class="text-center text-slate-300 font-mono">' + c75 + '</td>' +
+          '<td class="text-center text-slate-300 font-mono">' + c80 + '</td>' +
+          '<td class="text-center text-slate-300 font-mono">' + c84 + '</td>' +
+          '<td class="text-center text-slate-300 font-mono">' + c88 + '</td>' +
+          '<td class="text-center text-cyan-300 font-bold font-mono">' + c95 + '</td>' +
+          '</tr>';
       }).join('');
     }
 
@@ -794,7 +551,7 @@
 
       const rutina = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) || rutinasActivas[0];
       if (rutina) activarDia(rutina.id);
-      mostrarToast(`✓ 1RM actualizado a ${item.rm} kg`);
+      mostrarToast('✓ 1RM actualizado a ' + item.rm + ' kg');
     }
 
     // 5. MOTOR INTELIGENTE DE CÁLCULO DE CARGAS SUGERIDAS (1RM -> SEMANA)
@@ -833,13 +590,13 @@
         const p = m ? parseFloat(m[1]) / 100 : pctObj;
         if (rmEncontrado) {
           const kg = (Math.round((rmEncontrado * p) / 2.5) * 2.5).toFixed(1);
-          return { textoDisplay: `${kg} kg (${Math.round(p * 100)}%)`, kgSugeridoNum: parseFloat(kg) };
+          return { textoDisplay: kg + ' kg (' + Math.round(p * 100) + '%)', kgSugeridoNum: parseFloat(kg) };
         }
       }
 
       if (rmEncontrado) {
         const kg = (Math.round((rmEncontrado * pctObj) / 2.5) * 2.5).toFixed(1);
-        return { textoDisplay: `${kg} kg (${Math.round(pctObj * 100)}%)`, kgSugeridoNum: parseFloat(kg) };
+        return { textoDisplay: kg + ' kg (' + Math.round(pctObj * 100) + '%)', kgSugeridoNum: parseFloat(kg) };
       }
 
       const sugeridoNum = parseFloat(textoPrescripcion) || null;
@@ -1164,7 +921,7 @@
         const boxDone = hecha ? 'serie-done-box' : '';
         const btnClass = hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-black' : 'bg-slate-900 text-slate-400 border-slate-700 font-bold';
         const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
-        const placeholderCarga = cResActivo.kgSugeridoNum ? `${cResActivo.kgSugeridoNum} kg` : 'Kg Real';
+        const placeholderCarga = cResActivo.kgSugeridoNum ? cResActivo.kgSugeridoNum + ' kg' : 'Kg Real';
         const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
 
         html += '<div class="serie-box bg-slate-950 p-3 rounded-2xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-3" id="act-box-' + sNum + '">';
@@ -1358,9 +1115,9 @@
       const txt = document.getElementById('estado-turno-koena-txt');
       if (data) {
         const estadoClase = data.estado === 'confirmado' ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
-        txt.innerHTML = `Próximo turno: <strong>${data.fecha} a las ${data.hora} hs</strong> — Estado: <span class="${estadoClase}">${data.estado.toUpperCase()}</span>`;
+        txt.innerHTML = 'Próximo turno: <strong>' + data.fecha + ' a las ' + data.hora + ' hs</strong> — Estado: <span class="' + estadoClase + '">' + data.estado.toUpperCase() + '</span>';
       } else {
-        txt.innerHTML = `No tenés turnos confirmados para esta semana todavía.`;
+        txt.innerHTML = 'No tenés turnos confirmados para esta semana todavía.';
       }
     }
 
@@ -1369,14 +1126,14 @@
       const fecha = document.getElementById('online-fecha-turno').value;
       const alumnoNom = perfilActual ? perfilActual.nombre : 'Alumno';
 
-      const texto = encodeURIComponent(`Hola Rama! Soy ${alumnoNom}. Te escribo para coordinar la llamada de 30 minutos de mi plan personalizado online:\n📌 Motivo: ${tipo}\n📅 Fecha propuesta: ${fecha}\nAvisame en qué horario te queda más cómodo hablar. Abrazo!`);
-      const url = `https://wa.me/5491141906766?text=${texto}`;
+      const texto = encodeURIComponent('Hola Rama! Soy ' + alumnoNom + '. Te escribo para coordinar la llamada de 30 minutos de mi plan personalizado online:\n📌 Motivo: ' + tipo + '\n📅 Fecha propuesta: ' + fecha + '\nAvisame en qué horario te queda más cómodo hablar. Abrazo!');
+      const url = 'https://wa.me/5491141906766?text=' + texto;
       window.open(url, '_blank');
     }
 
     // 10. CARGAS Y SERIES
     function descartarCargaSugerida(planId, itmIdx, btnCruz) {
-      const clave = `${planId}_${itmIdx}_${semanaActiva}`;
+      const clave = planId + '_' + itmIdx + '_' + semanaActiva;
       cargasDescartadas[clave] = !cargasDescartadas[clave];
 
       const descartada = cargasDescartadas[clave];
@@ -1387,7 +1144,7 @@
         btnCruz.className = "btn-descartar-sug text-xs font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 hover:text-white cursor-pointer";
       }
 
-      const primerInp = document.getElementById(`inp-c-${planId}-${itmIdx}-1`);
+      const primerInp = document.getElementById('inp-c-' + planId + '-' + itmIdx + '-1');
       if (primerInp && descartada) primerInp.focus();
     }
 
@@ -1459,7 +1216,7 @@
             
             const cargaResuelta = resolverCargaKilos(ej.ejercicio, semData.carga);
             const desc = def(ej.descanso, "90''");
-            const claveDescarte = `${rutina.id}_${itmIdx}_${semanaActiva}`;
+            const claveDescarte = rutina.id + '_' + itmIdx + '_' + semanaActiva;
             const descartada = def(cargasDescartadas[claveDescarte], false);
             const claseCruz = descartada 
               ? 'btn-descartar-sug text-xs font-bold px-2 py-0.5 rounded-md bg-rose-600 text-white border border-rose-500 shadow-md cursor-pointer'
@@ -1475,6 +1232,7 @@
               html += '<p class="text-[11px] text-amber-300/90 font-medium leading-relaxed italic">↳ Indicación técnica / Criterio: ' + escaparHTML(txtCriterio) + '</p>';
             }
 
+            // TARJETA DE CARGA SUGERIDA CON CRUZ PARA DESCARTAR
             html += '<div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/90 flex flex-wrap items-center gap-3 text-xs">';
             html += '<div class="flex items-center gap-2">';
             html += '<div><span class="text-[10px] text-slate-400 font-bold uppercase block">Carga Sugerida (Sem ' + semanaActiva + '):</span>';
@@ -1507,7 +1265,7 @@
                 : 'bg-slate-900 text-slate-400 border-slate-700 hover:border-emerald-500 font-bold';
               
               const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
-              const placeholderCarga = (!descartada && cargaResuelta.kgSugeridoNum) ? `${cargaResuelta.kgSugeridoNum} kg` : 'Kg Real';
+              const placeholderCarga = (!descartada && cargaResuelta.kgSugeridoNum) ? cargaResuelta.kgSugeridoNum + ' kg' : 'Kg Real';
               const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
 
               html += '<div class="serie-box bg-slate-950 p-2 rounded-xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-1.5" id="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">';
@@ -1547,7 +1305,7 @@
           const sug = b.dataset.sug;
           const target = b.dataset.target;
 
-          const claveDescarte = `${plan}_${idx}_${sem}`;
+          const claveDescarte = plan + '_' + idx + '_' + sem;
           const estaDescartada = def(cargasDescartadas[claveDescarte], false);
 
           const inpC = document.getElementById('inp-c-' + plan + '-' + idx + '-' + serie);
@@ -1652,6 +1410,7 @@
       return year + '-' + month + '-' + day;
     }
 
+    // CALENDARIO CON DÍA ACTUAL DESTACADO
     async function calcularRachaYCalendario() {
       if (!usuarioActual || !sb) return;
 
@@ -1687,12 +1446,10 @@
         
         let bordeHoy = esHoy ? 'border-2 border-emerald-400 ring-2 ring-emerald-400/30 font-black text-white relative' : '';
 
-        html += `
-          <div class="h-7 flex flex-col items-center justify-center rounded-lg ${estiloDia} ${bordeHoy}">
-            <span>${d}</span>
-            ${esHoy ? '<span class="w-1 h-1 bg-emerald-400 rounded-full mt-0.5"></span>' : ''}
-          </div>
-        `;
+        html += '<div class="h-7 flex flex-col items-center justify-center rounded-lg ' + estiloDia + ' ' + bordeHoy + '">' +
+          '<span>' + d + '</span>' +
+          (esHoy ? '<span class="w-1 h-1 bg-emerald-400 rounded-full mt-0.5"></span>' : '') +
+          '</div>';
       }
       cont.innerHTML = html;
 
@@ -1802,7 +1559,7 @@
         let csv = "Nombre,Email,Telefono,Modalidad,EstadoPago,Vencimiento\n";
         (data || []).forEach(p => {
           const l = s => String(def(s, '')).replace(/^[=+\-@]/, "'").replace(/"/g, '""');
-          csv += `"${l(p.nombre)}","${l(p.email)}","${l(p.telefono)}","${l(p.entorno)}","${l(p.estado_pago)}","${l(p.vencimiento_cuota)}"\n`;
+          csv += '"' + l(p.nombre) + '","' + l(p.email) + '","' + l(p.telefono) + '","' + l(p.entorno) + '","' + l(p.estado_pago) + '","' + l(p.vencimiento_cuota) + '"\n';
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const a = document.createElement('a');
@@ -1878,7 +1635,7 @@
       }).join('');
     }
 
-    // 12. EXPOSICIÓN GLOBAL DE FUNCIONES A WINDOW (PREVENCIÓN DE REFERENCEERROR)
+    // 12. EXPOSICIÓN GLOBAL DE FUNCIONES A WINDOW (PREVENCIÓN TOTAL DE REFERENCEERROR)
     window.ejecutarAuth = ejecutarAuth;
     window.cambiarModoAuth = cambiarModoAuth;
     window.cerrarSesion = cerrarSesion;
