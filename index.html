@@ -136,27 +136,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE PR SOCIAL -->
-  <div id="modal-pr-celebracion" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-emerald-500 max-w-sm w-full rounded-3xl p-6 shadow-2xl text-center space-y-4">
-      <div class="text-4xl">🏆</div>
-      <div>
-        <span class="text-[10px] font-black uppercase text-emerald-400 tracking-widest block">Nuevo Récord Personal</span>
-        <h3 id="pr-share-ejercicio" class="text-xl font-black text-white mt-1">Ejercicio</h3>
-      </div>
-      <div class="bg-slate-950/80 border border-emerald-500/40 p-4 rounded-2xl">
-        <span id="pr-share-peso" class="text-4xl font-black text-emerald-400 font-mono">0 kg</span>
-        <span class="text-[11px] text-slate-400 block mt-1">1RM Estimado (Fórmula Epley)</span>
-      </div>
-      <div class="text-xs text-slate-400 font-medium">PF Ramiro Abbattista • Rendimiento & Fuerza</div>
-      <div class="grid grid-cols-2 gap-2 pt-2">
-        <button type="button" onclick="compartirPRSocial()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">📲 Compartir</button>
-        <button type="button" onclick="cerrarModalPR()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs uppercase transition cursor-pointer">Cerrar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL ACTIVE WORKOUT (MODO ENTRENO ACTIVO) -->
+  <!-- MODAL ACTIVE WORKOUT -->
   <div id="modal-modo-activo" class="hidden fixed inset-0 bg-slate-950 z-50 flex flex-col p-4 overflow-y-auto">
     <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
       <div class="flex items-center gap-2">
@@ -823,19 +803,26 @@
       
       let rmEncontrado = null;
       if (nom.includes('sentadilla') && !nom.includes('búlgara') && !nom.includes('sumo')) {
-        rmEncontrado = listaControlRM.find(x => x.patron === 'sentadilla')?.rm;
+        const item = listaControlRM.find(x => x.patron === 'sentadilla');
+        rmEncontrado = item ? item.rm : null;
       } else if (nom.includes('muerto') || nom.includes('deadlift')) {
-        rmEncontrado = listaControlRM.find(x => x.patron === 'muerto')?.rm;
+        const item = listaControlRM.find(x => x.patron === 'muerto');
+        rmEncontrado = item ? item.rm : null;
       } else if (nom.includes('banca') || nom.includes('pecho plano') || nom.includes('militar')) {
-        rmEncontrado = listaControlRM.find(x => x.patron === 'banca')?.rm;
+        const item = listaControlRM.find(x => x.patron === 'banca');
+        rmEncontrado = item ? item.rm : null;
       } else if (nom.includes('remo') && nom.includes('barra')) {
-        rmEncontrado = listaControlRM.find(x => x.patron === 'remo')?.rm;
+        const item = listaControlRM.find(x => x.patron === 'remo');
+        rmEncontrado = item ? item.rm : null;
       } else if (nom.includes('cargada') || nom.includes('power clean')) {
-        rmEncontrado = listaControlRM.find(x => x.patron === 'cargada')?.rm;
+        const item = listaControlRM.find(x => x.patron === 'cargada');
+        rmEncontrado = item ? item.rm : null;
       } else if (nom.includes('hexagonal') || nom.includes('hex bar')) {
-        rmEncontrado = listaControlRM.find(x => x.patron === 'hex')?.rm;
+        const item = listaControlRM.find(x => x.patron === 'hex');
+        rmEncontrado = item ? item.rm : null;
       } else if (nom.includes('hip thrust')) {
-        rmEncontrado = listaControlRM.find(x => x.patron === 'hip')?.rm;
+        const item = listaControlRM.find(x => x.patron === 'hip');
+        rmEncontrado = item ? item.rm : null;
       }
 
       const pctSemanas = { 1: 0.68, 2: 0.75, 3: 0.80, 4: 0.84, 5: 0.88, 6: 0.95 };
@@ -1224,7 +1211,7 @@
       document.getElementById('btn-sig-act').onclick = () => moverEjercicioActivo(1, rId);
     }
 
-    // 8. FUNCIONES DE DISCOS, SHORTS Y TIMER
+    // 8. DISCOS, TIMER Y UTILS
     function establecerPesoBarra(p, b) {
       pesoBarraSeleccionada = p;
       document.querySelectorAll('.btn-tipo-barra').forEach(x => x.classList.remove('btn-tipo-barra-active'));
@@ -1335,7 +1322,7 @@
       document.getElementById('modal-video-player').classList.add('hidden');
     }
 
-    // 9. GESTIÓN DE TURNOS KOENA Y ONLINE
+    // 9. TURNOS KOENA Y ONLINE
     async function confirmarTurnoKoena(asiste) {
       if (!usuarioActual || !sb) return;
       const fecha = document.getElementById('koena-fecha-turno').value;
@@ -1387,7 +1374,7 @@
       window.open(url, '_blank');
     }
 
-    // 10. RENDERING DE LA RUTINA Y EVENTOS DE INTERACCIÓN
+    // 10. CARGAS Y SERIES
     function descartarCargaSugerida(planId, itmIdx, btnCruz) {
       const clave = `${planId}_${itmIdx}_${semanaActiva}`;
       cargasDescartadas[clave] = !cargasDescartadas[clave];
@@ -1488,7 +1475,6 @@
               html += '<p class="text-[11px] text-amber-300/90 font-medium leading-relaxed italic">↳ Indicación técnica / Criterio: ' + escaparHTML(txtCriterio) + '</p>';
             }
 
-            // TARJETA DE CARGA SUGERIDA CON CRUZ PARA DESCARTAR SI NO SE USÓ
             html += '<div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/90 flex flex-wrap items-center gap-3 text-xs">';
             html += '<div class="flex items-center gap-2">';
             html += '<div><span class="text-[10px] text-slate-400 font-bold uppercase block">Carga Sugerida (Sem ' + semanaActiva + '):</span>';
@@ -1666,7 +1652,6 @@
       return year + '-' + month + '-' + day;
     }
 
-    // CALENDARIO CON DÍA ACTUAL DESTACADO
     async function calcularRachaYCalendario() {
       if (!usuarioActual || !sb) return;
 
@@ -1714,57 +1699,7 @@
       document.getElementById('stat-racha').innerText = calcularRacha(diasEntrenados) + ' sem';
     }
 
-    // VISTA COMPLETA SÁBANA ESTILO EXCEL
-    function abrirVistaPlanillaDrive() {
-      const modal = document.getElementById('modal-planilla-drive');
-      const contenedor = document.getElementById('tabla-sábana-contenedor');
-      modal.classList.remove('hidden');
-
-      const rutina = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) || rutinasActivas[0];
-      if (!rutina) {
-        contenedor.innerHTML = '<div class="text-center p-6 text-slate-500">No hay planificación activa para mostrar.</div>';
-        return;
-      }
-
-      const detalles = def(rutina.ejercicios_detalle, []);
-      let tableHtml = '<table class="w-full text-left font-mono border-collapse border border-slate-800 text-[11px] whitespace-nowrap">';
-      tableHtml += '<thead class="bg-slate-950 text-slate-400 border-b border-slate-800">';
-      tableHtml += '<tr>';
-      tableHtml += '<th class="p-2 border border-slate-800">Bloque / Ejercicio</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center">Series</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center">Pausa</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 1 (68%)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 2 (75%)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 3 (80%)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 4 (84%)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 5 (88%)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-cyan-300">SEM 6 (95%+ 🔥)</th>';
-      tableHtml += '</tr></thead>';
-
-      tableHtml += '<tbody class="divide-y divide-slate-800 text-slate-300">';
-      detalles.forEach(ej => {
-        tableHtml += '<tr class="hover:bg-slate-800/40">';
-        tableHtml += '<td class="p-2 border border-slate-800"><div class="font-bold text-white">' + escaparHTML(ej.ejercicio) + '</div><div class="text-[9px] text-amber-300">' + escaparHTML(def(ej.bloque, '')) + '</div></td>';
-        tableHtml += '<td class="p-2 border border-slate-800 text-center">' + def(ej.series, 4) + '</td>';
-        tableHtml += '<td class="p-2 border border-slate-800 text-center">' + def(ej.descanso, "90''") + '</td>';
-        
-        for (let s = 1; s <= 6; s++) {
-          const w = def(ej.progresionSemanal && ej.progresionSemanal['s' + s], { reps: 'reps', carga: '68%' });
-          const cRes = resolverCargaKilos(ej.ejercicio, w.carga);
-          tableHtml += '<td class="p-2 border border-slate-800 text-center font-bold text-emerald-300">' + cRes.textoDisplay + ' <span class="text-slate-400 font-normal">(' + w.reps + ')</span></td>';
-        }
-        tableHtml += '</tr>';
-      });
-      tableHtml += '</tbody></table>';
-
-      contenedor.innerHTML = tableHtml;
-    }
-
-    function cerrarVistaPlanillaDrive() {
-      document.getElementById('modal-planilla-drive').classList.add('hidden');
-    }
-
-    // PANEL DEL COACH CON CONTROL DE CUOTAS
+    // 11. PANEL DEL COACH Y GESTIÓN
     async function cargarVistaCoach() {
       if (!sb) return;
       const { data: atletas } = await sb.from('perfiles_usuarios').select('*').eq('rol', 'alumno');
@@ -1942,6 +1877,44 @@
         return gHtml;
       }).join('');
     }
+
+    // 12. EXPOSICIÓN GLOBAL DE FUNCIONES A WINDOW (PREVENCIÓN DE REFERENCEERROR)
+    window.ejecutarAuth = ejecutarAuth;
+    window.cambiarModoAuth = cambiarModoAuth;
+    window.cerrarSesion = cerrarSesion;
+    window.confirmarTurnoKoena = confirmarTurnoKoena;
+    window.agendarLlamadaWhatsAppOnline = agendarLlamadaWhatsAppOnline;
+    window.descartarCargaSugerida = descartarCargaSugerida;
+    window.abrirFichaAtleta = abrirFichaAtleta;
+    window.cerrarFichaAtleta = cerrarFichaAtleta;
+    window.guardarDatosFichaAtleta = guardarDatosFichaAtleta;
+    window.entrarPortalAlumno = entrarPortalAlumno;
+    window.abrirVistaPlanillaDrive = abrirVistaPlanillaDrive;
+    window.cerrarVistaPlanillaDrive = cerrarVistaPlanillaDrive;
+    window.abrirModalDiscos = abrirModalDiscos;
+    window.cerrarModalDiscos = cerrarModalDiscos;
+    window.establecerPesoBarra = establecerPesoBarra;
+    window.calcularDistribucionDiscos = calcularDistribucionDiscos;
+    window.iniciarModoActivo = iniciarModoActivo;
+    window.cerrarModoActivo = cerrarModoActivo;
+    window.moverEjercicioActivo = moverEjercicioActivo;
+    window.pausarReanudarTimer = pausarReanudarTimer;
+    window.cerrarTimer = cerrarTimer;
+    window.nuevoPlan = nuevoPlan;
+    window.abrirModalCreadorRapido = abrirModalCreadorRapido;
+    window.cerrarModalCreadorRapido = cerrarModalCreadorRapido;
+    window.actualizarColumnasMatrizCoach = actualizarColumnasMatrizCoach;
+    window.aplicarPresetProgresionRamiro = aplicarPresetProgresionRamiro;
+    window.aplicarPresetRepsRapido = aplicarPresetRepsRapido;
+    window.actualizarListaEjerciciosPorCategoria = actualizarListaEjerciciosPorCategoria;
+    window.seleccionarEjercicioDeLista = seleccionarEjercicioDeLista;
+    window.agregarFilaRutina = agregarFilaRutina;
+    window.guardarPlanificacionCoach = guardarPlanificacionCoach;
+    window.exportarBaseAlumnosCSV = exportarBaseAlumnosCSV;
+    window.cargarPlanesCoach = cargarPlanesCoach;
+    window.togglePlegarBloque = togglePlegarBloque;
+    window.actualizarTestRM = actualizarTestRM;
+    window.guardarFechaSesion = guardarFechaSesion;
 
     // AUTO-RECUPERACIÓN DE SESIÓN AL INICIAR
     function iniciarApp() {
