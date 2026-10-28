@@ -158,7 +158,7 @@
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
           <h4 id="titulo-creador" class="font-black text-white text-base">🛠️ Diseñador de Planificación</h4>
-          <span id="sub-creador" class="text-[11px] text-slate-400">Progresión semanal ondulada de 6 semanas y guardado directo.</span>
+          <span id="sub-creador" class="text-[11px] text-slate-400">Progresión semanal ondulada de 6 semanas enlazada al 1RM.</span>
         </div>
         <button type="button" onclick="cerrarModalCreadorRapido()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 p-2 rounded-xl cursor-pointer">✕</button>
       </div>
@@ -202,7 +202,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Configurar Ejercicio</span>
           <button type="button" onclick="aplicarPresetProgresionRamiro()" class="text-[11px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-lg font-black cursor-pointer">
-            ⚡ Preset Ondulado
+            ⚡ Preset Ondulado (Enlazado al 1RM)
           </button>
         </div>
 
@@ -221,26 +221,22 @@
           <div class="md:col-span-2">
             <label class="text-[10px] text-slate-400 font-bold">Categoría de Ejercicios</label>
             <select id="sel-categoria-ejercicios" onchange="actualizarListaEjerciciosPorCategoria()" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white mt-1">
-              <optgroup label="Movilidad Articular">
-                <option value="mov_tobillo">Movilidad: Tobillo</option>
+              <optgroup label="Fuerza Principal (Enlazada a 1RM)">
+                <option value="inf_rodilla" selected>Sentadillas (Trasera / Frontal / Búlgara)</option>
+                <option value="inf_cadera">Peso Muerto (Convencional / Hex Bar / Hip Thrust)</option>
+                <option value="sup_empuje">Empuje (Press Banca / Militar)</option>
+                <option value="sup_traccion">Tracción (Remo con barra / Dominadas / Jalón)</option>
+                <option value="olimpicos">Levantamiento Olímpico (Cargadas de Potencia)</option>
+              </optgroup>
+              <optgroup label="Movilidad & Core">
                 <option value="mov_cadera">Movilidad: Cadera (90/90, Spiderman)</option>
                 <option value="mov_toracica">Movilidad: Columna Torácica</option>
                 <option value="mov_escapula_hombro">Movilidad: Hombro & Escápula (YTWL)</option>
-                <option value="mov_muneca">Movilidad: Muñecas</option>
-              </optgroup>
-              <optgroup label="Zona Media & Core Funcional">
-                <option value="core_antiextension">Core: Antiextensión (Deadbug, Plancha)</option>
-                <option value="core_antirrotacion">Core: Antirrotación (Pallof, Bird Dog)</option>
-                <option value="core_antiflexion_lat">Core: Antiflexión Lateral (Copenhague)</option>
-                <option value="core_dinamico">Core: Dinámico / Rotacional</option>
-              </optgroup>
-              <optgroup label="Fuerza & Rendimiento">
-                <option value="inf_rodilla" selected>Tren Inferior: Sentadillas / Rodilla</option>
-                <option value="inf_cadera">Tren Inferior: Peso Muerto / Hip Thrust</option>
-                <option value="sup_empuje">Tren Superior: Press Pecho / Militar</option>
-                <option value="sup_traccion">Tren Superior: Remos / Jalones / Dominadas</option>
-                <option value="olimpicos">Levantamiento Olímpico (Cargadas / Snatch)</option>
-                <option value="potencia_pliometria">Potencia & Pliometría</option>
+                <option value="mov_tobillo">Movilidad: Tobillo</option>
+                <option value="core_antiflexion_lat">Core: Antiflexión (Copenhague Plank)</option>
+                <option value="core_antiextension">Core: Antiextensión (Plancha / Rueda)</option>
+                <option value="core_antirrotacion">Core: Antirrotación (Pallof Press)</option>
+                <option value="potencia_pliometria">Balístico / Med Ball</option>
               </optgroup>
             </select>
           </div>
@@ -272,11 +268,10 @@
             <label class="text-[10px] font-bold text-emerald-400 block mb-1">⚡ Selector Rápido de Esquemas:</label>
             <select onchange="aplicarPresetRepsRapido(this.value)" class="w-full bg-slate-950 border border-emerald-500/40 text-emerald-300 rounded-xl p-2 text-xs font-bold">
               <option value="">▼ Elegir esquema predefinido...</option>
-              <option value="ramiro_fuerza">🔥 Ramiro Abbattista: Progresión 6 Semanas (65% -> 95%+)</option>
+              <option value="ramiro_fuerza">🔥 Progresión 6 Semanas (Enlazada al 1RM: 68% -> 95%+)</option>
               <option value="3x10">3x10 reps (Hipertrofia)</option>
               <option value="4x8">4x8 reps (Fuerza-Hipertrofia)</option>
               <option value="4x6">4x6 reps (Fuerza Base)</option>
-              <option value="5x5">5x5 reps (Fuerza Básica)</option>
               <option value="core">3x40 seg / 3x12 por lado (Core/Activación)</option>
               <option value="movilidad">2x12 por lado / Flujo (Calor & Movilidad)</option>
             </select>
@@ -293,37 +288,37 @@
         </div>
 
         <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-2">
-          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">🎯 Cargas Sugeridas Semanales (% y Carga):</span>
+          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">🎯 Prescripción Semanal (Podes ingresar % o Carga directa):</span>
           <div id="grid-matriz-coach" class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs">
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 1 (65-70%):</span>
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 1 (68%):</span>
               <input type="text" id="prog-s1-reps" value="10 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s1-carga" value="75 kg (68%)" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <input type="text" id="prog-s1-carga" value="68%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 2 (72.5-75%):</span>
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 2 (75%):</span>
               <input type="text" id="prog-s2-reps" value="8 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s2-carga" value="82.5 kg (75%)" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <input type="text" id="prog-s2-carga" value="75%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 3 (77.5-80%):</span>
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 3 (80%):</span>
               <input type="text" id="prog-s3-reps" value="6 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s3-carga" value="87.5 kg (80%)" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <input type="text" id="prog-s3-carga" value="80%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 4 (82.5-85%):</span>
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 4 (84%):</span>
               <input type="text" id="prog-s4-reps" value="5 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s4-carga" value="92.5 kg (84%)" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <input type="text" id="prog-s4-carga" value="84%" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div id="col-s5-coach" class="bg-slate-950 p-1.5 rounded-lg border border-emerald-500/50">
-              <span class="text-[9px] font-bold text-emerald-400 block mb-0.5">Sem 5 (87.5-90%):</span>
+              <span class="text-[9px] font-bold text-emerald-400 block mb-0.5">Sem 5 (88%):</span>
               <input type="text" id="prog-s5-reps" value="4 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s5-carga" value="97.5 kg (88%)" class="w-full bg-slate-900 border border-emerald-500 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <input type="text" id="prog-s5-carga" value="88%" class="w-full bg-slate-900 border border-emerald-500 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div id="col-s6-coach" class="bg-slate-950 p-1.5 rounded-lg border border-cyan-500/50">
-              <span class="text-[9px] font-bold text-cyan-400 block mb-0.5">Sem 6 (Test 95%+):</span>
-              <input type="text" id="prog-s6-reps" value="2 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s6-carga" value="105 kg (95%+)" class="w-full bg-slate-900 border border-cyan-500 rounded p-1 text-cyan-300 font-mono font-bold text-[11px]">
+              <span class="text-[9px] font-bold text-cyan-400 block mb-0.5">Sem 6 (95%+):</span>
+              <input type="text" id="prog-s6-reps" value="2 reps (Test)" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s6-carga" value="95%" class="w-full bg-slate-900 border border-cyan-500 rounded p-1 text-cyan-300 font-mono font-bold text-[11px]">
             </div>
           </div>
         </div>
@@ -463,58 +458,32 @@
         </div>
       </div>
 
-      <!-- TABLA RESUMEN 1RM ESTILO EXCEL -->
+      <!-- TABLA RESUMEN 1RM INTERACTIVA ENLAZADA A LAS CARGAS -->
       <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">📊 Resumen de Control 1RM & Porcentajes:</span>
-          <span class="text-[10px] text-slate-500 font-mono">Planificación Noviembre</span>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <div>
+            <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">📊 Control de 1RM & Cargas Dinámicas (Enlazado al Plan):</span>
+            <span class="text-[10px] text-slate-400">Editá el test en kg o reps y todas las semanas se recalculan en vivo.</span>
+          </div>
+          <span class="text-[10px] text-slate-500 font-mono">Fórmula Epley Automática</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-[11px] font-mono">
             <thead class="text-slate-400 border-b border-slate-800 text-[10px]">
               <tr>
-                <th class="pb-1">Ejercicio Clave</th>
-                <th class="pb-1 text-center">Test (kg)</th>
-                <th class="pb-1 text-center">Reps</th>
-                <th class="pb-1 text-center text-emerald-400 font-bold">1RM Est.</th>
-                <th class="pb-1 text-center">70%</th>
-                <th class="pb-1 text-center">75%</th>
-                <th class="pb-1 text-center">80%</th>
-                <th class="pb-1 text-center">85%</th>
-                <th class="pb-1 text-center text-cyan-300 font-bold">90%+</th>
+                <th class="pb-1.5">Ejercicio Clave</th>
+                <th class="pb-1.5 text-center">Test (kg)</th>
+                <th class="pb-1.5 text-center">Reps</th>
+                <th class="pb-1.5 text-center text-emerald-400 font-bold">1RM Est.</th>
+                <th class="pb-1.5 text-center">68%</th>
+                <th class="pb-1.5 text-center">75%</th>
+                <th class="pb-1.5 text-center">80%</th>
+                <th class="pb-1.5 text-center">84%</th>
+                <th class="pb-1.5 text-center">88%</th>
+                <th class="pb-1.5 text-center text-cyan-300 font-bold">95%+</th>
               </tr>
             </thead>
             <tbody id="tabla-control-rm-body" class="divide-y divide-slate-800/60 text-slate-300">
-              <tr>
-                <td class="py-1 text-white font-bold">Sentadilla Trasera</td>
-                <td class="text-center">110.0</td><td class="text-center">2</td>
-                <td class="text-center text-emerald-400 font-bold">117.3 kg</td>
-                <td class="text-center">82.1</td><td class="text-center">88.0</td><td class="text-center">93.8</td><td class="text-center">99.7</td><td class="text-center text-cyan-300 font-bold">105.6</td>
-              </tr>
-              <tr>
-                <td class="py-1 text-white font-bold">Peso Muerto Convencional</td>
-                <td class="text-center">100.0</td><td class="text-center">2</td>
-                <td class="text-center text-emerald-400 font-bold">106.7 kg</td>
-                <td class="text-center">74.7</td><td class="text-center">80.0</td><td class="text-center">85.4</td><td class="text-center">90.7</td><td class="text-center text-cyan-300 font-bold">96.0</td>
-              </tr>
-              <tr>
-                <td class="py-1 text-white font-bold">Press Banca / Militar</td>
-                <td class="text-center">55.0</td><td class="text-center">1</td>
-                <td class="text-center text-emerald-400 font-bold">56.8 kg</td>
-                <td class="text-center">39.8</td><td class="text-center">42.6</td><td class="text-center">45.4</td><td class="text-center">48.3</td><td class="text-center text-cyan-300 font-bold">51.1</td>
-              </tr>
-              <tr>
-                <td class="py-1 text-white font-bold">Remo con barra prono</td>
-                <td class="text-center">55.0</td><td class="text-center">4</td>
-                <td class="text-center text-emerald-400 font-bold">62.3 kg</td>
-                <td class="text-center">43.6</td><td class="text-center">46.7</td><td class="text-center">49.8</td><td class="text-center">53.0</td><td class="text-center text-cyan-300 font-bold">56.1</td>
-              </tr>
-              <tr>
-                <td class="py-1 text-white font-bold">Cargadas de Potencia</td>
-                <td class="text-center">60.0</td><td class="text-center">3</td>
-                <td class="text-center text-emerald-400 font-bold">66.0 kg</td>
-                <td class="text-center">46.2</td><td class="text-center">49.5</td><td class="text-center">52.8</td><td class="text-center">56.1</td><td class="text-center text-cyan-300 font-bold">59.4</td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -599,41 +568,6 @@
 
     // BIBLIOTECA COMPLETA DE EJERCICIOS
     const BIBLIOTECA_RAMIRO = {
-      mov_tobillo: [
-        { nombre: "Movilidad de Tobillo (Dorsiflexión dinámica)", criterio: "Tobillo: talón bien apoyado sin despegar; empujar rodilla.", video: "" },
-        { nombre: "Dorsiflexión de tobillo en pared con rodilla al frente", criterio: "Liberar flexión dorsal previa a sentadillas y running.", video: "" }
-      ],
-      mov_cadera: [
-        { nombre: "Movilidad de Cadera Profunda (Sentadilla Kosaka + 90/90)", criterio: "Cadera, aductores y flexores; ganar profundidad limpia.", video: "" },
-        { nombre: "Puente de Glúteos Bipodal con apertura de Miniband", criterio: "Activación del glúteo medio y estabilidad lumbo-pélvica.", video: "" },
-        { nombre: "Flujo 90/90 dinámico en suelo con inclinación anterior", criterio: "Apertura coxofemoral rápida sin redondear lumbares.", video: "" }
-      ],
-      mov_toracica: [
-        { nombre: "Movilidad Dinámica de Hombros y Escápulas (Y-W-T en prono con banda)", criterio: "Hombros y trapecio inferior; retracción escapular activa.", video: "" },
-        { nombre: "Movilidad Torácica Dinámica en Cuadrupedia (Thread the Needle)", criterio: "Columna torácica y rotación dorsal sin compensación lumbar.", video: "" }
-      ],
-      mov_escapula_hombro: [
-        { nombre: "Movilidad de Columna Torácica y Hombros (Cat-Cow + YTWL)", criterio: "Desbloqueo articular completo cintura escapular.", video: "" },
-        { nombre: "Dislocaciones de hombro con bastón de madera o banda", criterio: "Paso controlado a dos manos sin flexionar codos.", video: "" }
-      ],
-      mov_muneca: [
-        { nombre: "Movilidad Articular Dinámica de Muñecas, Codos y Hombros", criterio: "Muñecas y antebrazos para rack de cargadas y press.", video: "" }
-      ],
-      core_antiextension: [
-        { nombre: "Plancha Frontal Isométrica con Desplazamiento", criterio: "Core 360° anti-extensión; glúteos y abdomen co-contraídos.", video: "" },
-        { nombre: "Rueda Abdominal (Ab Wheel) desde rodillas", criterio: "Abdominales y dorsal ancho; control excéntrico estricto.", video: "" }
-      ],
-      core_antirrotacion: [
-        { nombre: "Pallof Press en Polea con Split", criterio: "Anti-rotación y estabilidad pélvica en split stance.", video: "https://www.youtube.com/shorts/5_8k3kK0m9o" },
-        { nombre: "Bird Dog en cuadrupedia con pausa isométrica", criterio: "Extender brazo y pierna opuesta sin desalinear pelvis.", video: "" }
-      ],
-      core_antiflexion_lat: [
-        { nombre: "Copenhagen Plank (Plancha Copenhague en banco)", criterio: "Aductores (prioridad preventiva) y estabilidad de pubis.", video: "" },
-        { nombre: "Caminata de Granjero pesada con mancuernas (Farmer Walk)", criterio: "Pasos firmes, pecho erguido y hombros abajo.", video: "" }
-      ],
-      core_dinamico: [
-        { nombre: "Lanzamientos de Med Ball c/ rotación contra pared", criterio: "Torque para transferencia y potencia balística.", video: "https://www.youtube.com/shorts/0Lz8g8q0VbI" }
-      ],
       inf_rodilla: [
         { nombre: "Sentadilla Trasera con Barra", criterio: "Sentadilla profunda con recorrido completo sin colapsar rodillas.", video: "https://www.youtube.com/shorts/bEv6CCg2BC8" },
         { nombre: "Sentadilla Frontal", criterio: "Codos altos, torso totalmente erguido.", video: "https://www.youtube.com/shorts/uYumuL_G_V0" },
@@ -657,22 +591,53 @@
         { nombre: "Cargadas de Potencia Colgado (Hang Power Clean)", criterio: "Extensión violenta de cadera; recepción sólida en cuarto de sentadilla.", video: "https://www.youtube.com/shorts/mEyoH5fZuF8" },
         { nombre: "Cargada de Potencia + Sentadilla Frontal", criterio: "Combinado olímpico de potencia y recepción profunda.", video: "https://www.youtube.com/shorts/V0A8Z0_n3E0" }
       ],
+      mov_cadera: [
+        { nombre: "Movilidad de Cadera Profunda (Sentadilla Kosaka + 90/90)", criterio: "Cadera, aductores y flexores; ganar profundidad limpia.", video: "" },
+        { nombre: "Puente de Glúteos Bipodal con apertura de Miniband", criterio: "Activación del glúteo medio y estabilidad lumbo-pélvica.", video: "" },
+        { nombre: "Flujo 90/90 dinámico en suelo con inclinación anterior", criterio: "Apertura coxofemoral rápida sin redondear lumbares.", video: "" }
+      ],
+      mov_toracica: [
+        { nombre: "Movilidad Dinámica de Hombros y Escápulas (Y-W-T en prono con banda)", criterio: "Hombros y trapecio inferior; retracción escapular activa.", video: "" },
+        { nombre: "Movilidad Torácica Dinámica en Cuadrupedia (Thread the Needle)", criterio: "Columna torácica y rotación dorsal sin compensación lumbar.", video: "" }
+      ],
+      mov_escapula_hombro: [
+        { nombre: "Movilidad de Columna Torácica y Hombros (Cat-Cow + YTWL)", criterio: "Desbloqueo articular completo cintura escapular.", video: "" },
+        { nombre: "Dislocaciones de hombro con bastón de madera o banda", criterio: "Paso controlado a dos manos sin flexionar codos.", video: "" }
+      ],
+      mov_tobillo: [
+        { nombre: "Movilidad de Tobillo (Dorsiflexión dinámica)", criterio: "Tobillo: talón bien apoyado sin despegar; empujar rodilla.", video: "" }
+      ],
+      core_antiflexion_lat: [
+        { nombre: "Copenhagen Plank (Plancha Copenhague en banco)", criterio: "Aductores (prioridad preventiva) y estabilidad de pubis.", video: "" },
+        { nombre: "Caminata de Granjero pesada con mancuernas (Farmer Walk)", criterio: "Pasos firmes, pecho erguido y hombros abajo.", video: "" }
+      ],
+      core_antiextension: [
+        { nombre: "Plancha Frontal Isométrica con Desplazamiento", criterio: "Core 360° anti-extensión; glúteos y abdomen co-contraídos.", video: "" },
+        { nombre: "Rueda Abdominal (Ab Wheel) desde rodillas", criterio: "Abdominales y dorsal ancho; control excéntrico estricto.", video: "" }
+      ],
+      core_antirrotacion: [
+        { nombre: "Pallof Press en Polea con Split", criterio: "Anti-rotación y estabilidad pélvica en split stance.", video: "https://www.youtube.com/shorts/5_8k3kK0m9o" }
+      ],
       potencia_pliometria: [
-        { nombre: "Lanzamientos Med Ball / Slam Ball", criterio: "Aceleración máxima explosiva.", video: "https://www.youtube.com/shorts/0Lz8g8q0VbI" }
+        { nombre: "Lanzamientos de Med Ball c/ rotación contra pared", criterio: "Torque para transferencia y potencia balística.", video: "https://www.youtube.com/shorts/0Lz8g8q0VbI" }
       ]
     };
 
     let usuarioActual = null;
     let perfilActual = null;
     let rutinasActivas = [];
-    let marcasRMAlumno = {
-      "sentadilla trasera": 117.3,
-      "peso muerto convencional": 106.7,
-      "press banca / militar": 56.8,
-      "remo con barra prono": 62.3,
-      "cargadas de potencia": 66.0,
-      "sentadilla frontal": 71.5
-    };
+
+    // BASE DE DATOS LOCAL DE 1RM VINCULADA
+    let listaControlRM = [
+      { id: 'sentadilla', nombre: 'Sentadilla Trasera', pesoTest: 110, repsTest: 2, rm: 117.3, patron: 'sentadilla' },
+      { id: 'peso_muerto', nombre: 'Peso Muerto Convencional', pesoTest: 100, repsTest: 2, rm: 106.7, patron: 'muerto' },
+      { id: 'press_banca', nombre: 'Press Banca / Militar', pesoTest: 55, repsTest: 1, rm: 56.8, patron: 'banca' },
+      { id: 'remo', nombre: 'Remo con barra prono', pesoTest: 55, repsTest: 4, rm: 62.3, patron: 'remo' },
+      { id: 'cargadas', nombre: 'Cargadas de Potencia', pesoTest: 60, repsTest: 3, rm: 66.0, patron: 'cargada' },
+      { id: 'hex_bar', nombre: 'Barra Hexagonal', pesoTest: 90, repsTest: 8, rm: 114.0, patron: 'hex' },
+      { id: 'hip_thrust', nombre: 'Hip Thrust en Banco', pesoTest: 80, repsTest: 8, rm: 101.3, patron: 'hip' }
+    ];
+
     let semanaActiva = 1;
     let diaActivoId = null;
     let planEditandoId = null;
@@ -692,6 +657,114 @@
 
     let indiceEjercicioActivo = 0;
     let listaEjerciciosModoActivo = [];
+
+    // 3. TABLA DE CONTROL DE 1RM INTERACTIVA
+    function renderizarTablaControlRM() {
+      const tbody = document.getElementById('tabla-control-rm-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = listaControlRM.map((item, idx) => {
+        const c68 = (item.rm * 0.68).toFixed(1);
+        const c75 = (item.rm * 0.75).toFixed(1);
+        const c80 = (item.rm * 0.80).toFixed(1);
+        const c84 = (item.rm * 0.84).toFixed(1);
+        const c88 = (item.rm * 0.88).toFixed(1);
+        const c95 = (item.rm * 0.95).toFixed(1);
+
+        return `
+          <tr>
+            <td class="py-1.5 text-white font-bold">${item.nombre}</td>
+            <td class="text-center">
+              <input type="number" step="0.5" value="${item.pesoTest}" onchange="actualizarTestRM(${idx}, this.value, null)" class="w-14 bg-slate-900 border border-slate-800 rounded p-1 text-center font-bold text-white">
+            </td>
+            <td class="text-center">
+              <input type="number" min="1" max="20" value="${item.repsTest}" onchange="actualizarTestRM(${idx}, null, this.value)" class="w-10 bg-slate-900 border border-slate-800 rounded p-1 text-center font-bold text-white">
+            </td>
+            <td class="text-center text-emerald-400 font-black">${item.rm} kg</td>
+            <td class="text-center text-slate-300 font-mono">${c68}</td>
+            <td class="text-center text-slate-300 font-mono">${c75}</td>
+            <td class="text-center text-slate-300 font-mono">${c80}</td>
+            <td class="text-center text-slate-300 font-mono">${c84}</td>
+            <td class="text-center text-slate-300 font-mono">${c88}</td>
+            <td class="text-center text-cyan-300 font-bold font-mono">${c95}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function actualizarTestRM(idx, nuevoPeso, nuevasReps) {
+      const item = listaControlRM[idx];
+      if (nuevoPeso !== null) item.pesoTest = parseFloat(nuevoPeso) || item.pesoTest;
+      if (nuevasReps !== null) item.repsTest = parseInt(nuevasReps) || item.repsTest;
+      
+      // Fórmula Epley: 1RM = Peso * (1 + Reps / 30)
+      item.rm = Math.round((item.pesoTest * (1 + item.repsTest / 30)) * 10) / 10;
+      renderizarTablaControlRM();
+
+      // Guardar en Supabase
+      if (usuarioActual && sb) {
+        await sb.from('marcas_rm').upsert({
+          user_id: usuarioActual.id,
+          ejercicio: item.nombre,
+          peso_levantado: item.pesoTest,
+          reps_hechas: item.repsTest,
+          rm_calculado: item.rm,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id,ejercicio' });
+      }
+
+      // RECALCULAR AUTOMÁTICAMENTE LA RUTINA EN VIVO
+      const rutina = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) || rutinasActivas[0];
+      if (rutina) activarDia(rutina.id);
+      mostrarToast(`✓ 1RM de ${item.nombre} actualizado a ${item.rm} kg`);
+    }
+
+    // 4. MOTOR INTELIGENTE DE ENLACE DE CARGAS SUGERIDAS (1RM -> SEMANA)
+    function resolverCargaKilos(ejercicioNombre, textoPrescripcion) {
+      const nom = (ejercicioNombre || '').toLowerCase();
+      
+      // Encontrar a qué básico pertenece
+      let rmEncontrado = null;
+      if (nom.includes('sentadilla') && !nom.includes('búlgara') && !nom.includes('sumo')) {
+        rmEncontrado = listaControlRM.find(x => x.patron === 'sentadilla')?.rm;
+      } else if (nom.includes('muerto') || nom.includes('deadlift')) {
+        rmEncontrado = listaControlRM.find(x => x.patron === 'muerto')?.rm;
+      } else if (nom.includes('banca') || nom.includes('pecho plano') || nom.includes('militar')) {
+        rmEncontrado = listaControlRM.find(x => x.patron === 'banca')?.rm;
+      } else if (nom.includes('remo') && nom.includes('barra')) {
+        rmEncontrado = listaControlRM.find(x => x.patron === 'remo')?.rm;
+      } else if (nom.includes('cargada') || nom.includes('power clean')) {
+        rmEncontrado = listaControlRM.find(x => x.patron === 'cargada')?.rm;
+      } else if (nom.includes('hexagonal') || nom.includes('hex bar')) {
+        rmEncontrado = listaControlRM.find(x => x.patron === 'hex')?.rm;
+      } else if (nom.includes('hip thrust')) {
+        rmEncontrado = listaControlRM.find(x => x.patron === 'hip')?.rm;
+      }
+
+      // Porcentajes estándar de progresión de 6 semanas de Ramiro
+      const pctSemanas = { 1: 0.68, 2: 0.75, 3: 0.80, 4: 0.84, 5: 0.88, 6: 0.95 };
+      const pctObj = pctSemanas[semanaActiva] || 0.70;
+
+      // Si el texto trae un % explícito (ej: "75%")
+      if (textoPrescripcion && textoPrescripcion.includes('%')) {
+        const m = textoPrescripcion.match(/(\d+(\.\d+)?)%/);
+        const p = m ? parseFloat(m[1]) / 100 : pctObj;
+        if (rmEncontrado) {
+          const kg = (Math.round((rmEncontrado * p) / 2.5) * 2.5).toFixed(1); // Redondeo a discos de 1.25/2.5kg
+          return { textoDisplay: `${kg} kg (${Math.round(p * 100)}%)`, kgSugeridoNum: parseFloat(kg) };
+        }
+      }
+
+      // Si encontramos su RM y estamos en la semana activa
+      if (rmEncontrado) {
+        const kg = (Math.round((rmEncontrado * pctObj) / 2.5) * 2.5).toFixed(1);
+        return { textoDisplay: `${kg} kg (${Math.round(pctObj * 100)}%)`, kgSugeridoNum: parseFloat(kg) };
+      }
+
+      // Si no es un básico con RM, usamos el texto prescripto original
+      const sugeridoNum = parseFloat(textoPrescripcion) || null;
+      return { textoDisplay: def(textoPrescripcion, 'Sugerida'), kgSugeridoNum: sugeridoNum };
+    }
 
     function togglePlegarBloque(bloqueKey) {
       bloquesPlegados[bloqueKey] = !bloquesPlegados[bloqueKey];
@@ -729,37 +802,26 @@
       if (tipo === 'ramiro_fuerza') {
         document.getElementById('inp-series').value = "4";
         document.getElementById('prog-s1-reps').value = "10 reps";
-        document.getElementById('prog-s1-carga').value = "75 kg (68%)";
+        document.getElementById('prog-s1-carga').value = "68%";
         document.getElementById('prog-s2-reps').value = "8 reps";
-        document.getElementById('prog-s2-carga').value = "82.5 kg (75%)";
+        document.getElementById('prog-s2-carga').value = "75%";
         document.getElementById('prog-s3-reps').value = "6 reps";
-        document.getElementById('prog-s3-carga').value = "87.5 kg (80%)";
+        document.getElementById('prog-s3-carga').value = "80%";
         document.getElementById('prog-s4-reps').value = "5 reps";
-        document.getElementById('prog-s4-carga').value = "92.5 kg (84%)";
+        document.getElementById('prog-s4-carga').value = "84%";
         document.getElementById('prog-s5-reps').value = "4 reps";
-        document.getElementById('prog-s5-carga').value = "97.5 kg (88%)";
-        document.getElementById('prog-s6-reps').value = "2 reps";
-        document.getElementById('prog-s6-carga').value = "105 kg (95%+)";
+        document.getElementById('prog-s5-carga').value = "88%";
+        document.getElementById('prog-s6-reps').value = "2 reps (Test)";
+        document.getElementById('prog-s6-carga').value = "95%";
       } else if (tipo === '3x10') {
         document.getElementById('inp-series').value = "3";
-        for (let i = 1; i <= 6; i++) {
-          document.getElementById('prog-s' + i + '-reps').value = "3x10 reps";
-        }
+        for (let i = 1; i <= 6; i++) document.getElementById('prog-s' + i + '-reps').value = "3x10 reps";
       } else if (tipo === '4x8') {
         document.getElementById('inp-series').value = "4";
-        for (let i = 1; i <= 6; i++) {
-          document.getElementById('prog-s' + i + '-reps').value = "4x8 reps";
-        }
+        for (let i = 1; i <= 6; i++) document.getElementById('prog-s' + i + '-reps').value = "4x8 reps";
       } else if (tipo === '4x6') {
         document.getElementById('inp-series').value = "4";
-        for (let i = 1; i <= 6; i++) {
-          document.getElementById('prog-s' + i + '-reps').value = "4x6 reps";
-        }
-      } else if (tipo === '5x5') {
-        document.getElementById('inp-series').value = "5";
-        for (let i = 1; i <= 6; i++) {
-          document.getElementById('prog-s' + i + '-reps').value = "5x5 reps";
-        }
+        for (let i = 1; i <= 6; i++) document.getElementById('prog-s' + i + '-reps').value = "4x6 reps";
       } else if (tipo === 'core') {
         document.getElementById('inp-series').value = "3";
         for (let i = 1; i <= 6; i++) {
@@ -773,7 +835,7 @@
           document.getElementById('prog-s' + i + '-carga').value = "Banda/BW";
         }
       }
-      mostrarToast("✓ Esquema " + tipo + " aplicado");
+      mostrarToast("✓ Esquema " + tipo + " enlazado");
     }
 
     function nombreEj(planId, idx) {
@@ -931,7 +993,7 @@
       document.getElementById('usuario-info').classList.add('hidden');
     }
 
-    // CARGA DE PERFILES Y ROLES OPTIMIZADA
+    // CARGA DE PERFILES Y ROLES
     async function cargarPerfilYRoles() {
       if (!usuarioActual ? true : !sb) return;
 
@@ -964,6 +1026,7 @@
           document.getElementById('seccion-admin').classList.add('hidden');
         }
 
+        renderizarTablaControlRM();
         cargarMarcasRM();
         cargarRutinasAlumno();
         calcularRachaYCalendario();
@@ -977,26 +1040,17 @@
       try {
         const { data } = await sb.from('marcas_rm').select('*').eq('user_id', usuarioActual.id);
         (data ? data : []).forEach(r => {
-          marcasRMAlumno[r.ejercicio.trim().toLowerCase()] = r.rm_calculado;
+          const item = listaControlRM.find(x => x.nombre.toLowerCase() === r.ejercicio.trim().toLowerCase());
+          if (item) {
+            item.pesoTest = r.peso_levantado || item.pesoTest;
+            item.repsTest = r.reps_hechas || item.repsTest;
+            item.rm = r.rm_calculado || item.rm;
+          }
         });
+        renderizarTablaControlRM();
       } catch (e) {
         console.warn("Aviso RM:", e);
       }
-    }
-
-    function resolverCargaKilos(ejercicioNombre, textoPrescripcion) {
-      if (!textoPrescripcion) return { textoDisplay: 'Sugerida', kgCalculado: null };
-      const nombreNorm = def(ejercicioNombre, '').trim().toLowerCase();
-      const rm = marcasRMAlumno[nombreNorm];
-
-      if (textoPrescripcion.includes('%') && rm && rm > 0) {
-        const pct = parseFloat(textoPrescripcion.replace(/[^0-9.]/g, ''));
-        if (!isNaN(pct)) {
-          const kg = Math.round(rm * (pct / 100) * 10) / 10;
-          return { textoDisplay: pct + '% (' + kg + ' kg)', kgCalculado: kg };
-        }
-      }
-      return { textoDisplay: textoPrescripcion, kgCalculado: null };
     }
 
     // CARGA DE RUTINAS
@@ -1051,7 +1105,7 @@
 
     function renderizarBotonesSemanas() {
       const contSem = document.getElementById('barra-solapas-semanas');
-      const nombresSemRamiro = ["1 (65-70%)", "2 (72.5-75%)", "3 (77.5-80%)", "4 (82.5-85%)", "5 (87.5-90%)", "6 (Test 95%+ 🔥)"];
+      const nombresSemRamiro = ["1 (68%)", "2 (75%)", "3 (80%)", "4 (84%)", "5 (88%)", "6 (95%+ 🔥)"];
       
       contSem.innerHTML = Array.from({ length: totalSemanas }).map((_, idx) => {
         const s = idx + 1;
@@ -1111,12 +1165,12 @@
       }, { onConflict: 'planificacion_id,user_id,ejercicio_index,semana_num,serie_num' });
 
       if (!error) {
-        mostrarToast("✓ Fecha de sesión guardada");
+        mostrarToast("✓ Fecha guardada");
         calcularRachaYCalendario();
       }
     }
 
-    // RENDERIZADO ESTILO EXCEL CON CARGA SUGERIDA Y CONTROL DE FECHA
+    // RENDERIZADO ESTILO EXCEL CON CARGA SUGERIDA ENLAZADA A 1RM
     function renderizarTarjetaRutina(rutina, mapaSeries) {
       const cont = document.getElementById('lista-rutinas');
       const detalles = def(rutina.ejercicios_detalle, []);
@@ -1131,7 +1185,7 @@
 
       let html = '<div id="card-rutina-' + rutina.id + '" class="space-y-4">';
       
-      // Cabecera de la sesión con Selector de Fecha
+      // Control de fecha estilo planilla
       const fechaRegistroCtrl = (mapaSeries['999_1'] && mapaSeries['999_1'].completed_at) ? mapaSeries['999_1'].completed_at.slice(0, 10) : obtenerFechaLocalString();
 
       html += '<div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-3">';
@@ -1181,9 +1235,11 @@
             const ej = item.ej;
             const itmIdx = item.itmIdx;
             const prog = def(ej.progresionSemanal, {});
-            const semData = def(prog['s' + semanaActiva], { reps: def(ej.reps, '10 reps'), carga: 'Sugerida' });
+            const semData = def(prog['s' + semanaActiva], { reps: def(ej.reps, '10 reps'), carga: '68%' });
             const esFallo = esUltimaSemana ? true : /fallo|test/i.test(semData.reps);
             const cantSeries = (parseInt(ej.series) ? parseInt(ej.series) : 4) + (esFallo ? 1 : 0);
+            
+            // CÁLCULO ENLAZADO AL 1RM
             const cargaResuelta = resolverCargaKilos(ej.ejercicio, semData.carga);
             const desc = def(ej.descanso, "90''");
 
@@ -1197,7 +1253,7 @@
               html += '<p class="text-[11px] text-amber-300/90 font-medium leading-relaxed italic">↳ Indicación técnica / Criterio: ' + escaparHTML(txtCriterio) + '</p>';
             }
 
-            // TARJETA DE CARGA SUGERIDA ESTILO EXCEL
+            // TARJETA DE CARGA SUGERIDA (ENLAZADA AUTOMÁTICAMENTE AL 1RM)
             html += '<div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/90 flex flex-wrap items-center gap-3 text-xs">';
             html += '<div><span class="text-[10px] text-slate-400 font-bold uppercase block">Carga Sugerida (Sem ' + semanaActiva + '):</span><strong class="text-emerald-400 font-mono text-sm">' + escaparHTML(cargaResuelta.textoDisplay) + '</strong></div>';
             html += '<div><span class="text-[10px] text-slate-400 font-bold uppercase block">Reps Objetivo:</span><strong class="text-white font-mono">' + escaparHTML(semData.reps) + '</strong></div>';
@@ -1211,9 +1267,9 @@
             }
             html += '</div>';
 
-            // REGISTRO DE SERIES (CARGA REAL Y REPS REALES)
+            // SERIES TÁCTILES CON CHECKMARK DE 1 SOLO CLIC
             html += '<div class="space-y-1 pt-1">';
-            html += '<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Series ejecutadas (Carga Real & Reps Reales):</span>';
+            html += '<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Series ejecutadas:</span>';
             html += '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">';
             for (let sIdx = 0; sIdx < cantSeries; sIdx++) {
               const sNum = sIdx + 1;
@@ -1222,16 +1278,19 @@
               const boxDone = hecha ? 'serie-done-box' : '';
               const btnClass = hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-950 text-rose-300 border-rose-500/40';
               const btnTxt = hecha ? '✓' : '✗';
+              
+              // Si no escribió carga real, usa la sugerida calculada por 1RM
               const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
+              const placeholderCarga = cargaResuelta.kgSugeridoNum ? `${cargaResuelta.kgSugeridoNum} kg` : 'Kg Real';
               const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
 
               html += '<div class="serie-box bg-slate-950 p-2 rounded-xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-1.5" id="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">';
               html += '<span class="text-[10px] text-slate-400 font-mono font-bold w-6">S' + sNum + '</span>';
               html += '<div class="flex items-center gap-1 flex-1">';
-              html += '<input type="number" step="0.5" inputmode="decimal" placeholder="Kg Real" value="' + valCarga + '" class="inp-carga w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
-              html += '<input type="number" inputmode="numeric" placeholder="Reps" value="' + valRIR + '" class="inp-rir w-14 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
+              html += '<input type="number" step="0.5" inputmode="decimal" id="inp-c-' + rutina.id + '-' + itmIdx + '-' + sNum + '" placeholder="' + placeholderCarga + '" value="' + valCarga + '" class="inp-carga w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
+              html += '<input type="number" inputmode="numeric" id="inp-r-' + rutina.id + '-' + itmIdx + '-' + sNum + '" placeholder="Reps" value="' + valRIR + '" class="inp-rir w-14 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
               html += '</div>';
-              html += '<button type="button" class="btn-toggle-serie px-2.5 py-1 rounded-lg text-xs font-black border cursor-pointer ' + btnClass + '" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '" data-descanso="' + desc + '" data-target="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">' + btnTxt + '</button>';
+              html += '<button type="button" class="btn-toggle-serie px-3 py-1 rounded-lg text-xs font-black border cursor-pointer ' + btnClass + '" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '" data-descanso="' + desc + '" data-sug="' + def(cargaResuelta.kgSugeridoNum, '') + '" data-target="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">' + btnTxt + '</button>';
               html += '</div>';
             }
             html += '</div></div></div>';
@@ -1252,8 +1311,25 @@
         b.onclick = () => abrirPlayerVideo(b.dataset.video, b.dataset.title);
       });
 
+      // TILDE DE 1 SOLO CLIC: TOMA LA CARGA REAL O LA SUGERIDA AUTOMÁTICAMENTE
       document.querySelectorAll('.btn-toggle-serie').forEach(b => {
-        b.onclick = () => toggleSerieCloud(b.dataset.plan, parseInt(b.dataset.idx), parseInt(b.dataset.sem), parseInt(b.dataset.serie), b.dataset.descanso, b, b.dataset.target);
+        b.onclick = () => {
+          const plan = b.dataset.plan;
+          const idx = parseInt(b.dataset.idx);
+          const sem = parseInt(b.dataset.sem);
+          const serie = parseInt(b.dataset.serie);
+          const desc = b.dataset.descanso;
+          const sug = b.dataset.sug;
+          const target = b.dataset.target;
+
+          // Si el input está vacío, autocompleta con la sugerencia calculada
+          const inpC = document.getElementById('inp-c-' + plan + '-' + idx + '-' + serie);
+          if (inpC && !inpC.value && sug) {
+            inpC.value = sug;
+            guardarCargaCloud(plan, idx, sem, serie, sug);
+          }
+          toggleSerieCloud(plan, idx, sem, serie, desc, b, target);
+        };
       });
 
       document.querySelectorAll('.inp-carga').forEach(inp => {
@@ -1329,14 +1405,14 @@
         if (box) {
           if (nuevoEstado) {
             box.classList.add('serie-done-box');
-            btnElement.className = "btn-toggle-serie px-2.5 py-1 rounded-lg text-xs font-black border bg-emerald-500 text-slate-950 border-emerald-400 cursor-pointer";
+            btnElement.className = "btn-toggle-serie px-3 py-1 rounded-lg text-xs font-black border bg-emerald-500 text-slate-950 border-emerald-400 cursor-pointer";
             btnElement.textContent = '✓';
             if (navigator.vibrate) navigator.vibrate(60);
             iniciarTimerDescanso(parseSegundos(descanso));
             calcularRachaYCalendario();
           } else {
             box.classList.remove('serie-done-box');
-            btnElement.className = "btn-toggle-serie px-2.5 py-1 rounded-lg text-xs font-black border bg-slate-950 text-rose-300 border-rose-500/40 cursor-pointer";
+            btnElement.className = "btn-toggle-serie px-3 py-1 rounded-lg text-xs font-black border bg-slate-950 text-rose-300 border-rose-500/40 cursor-pointer";
             btnElement.textContent = '✗';
           }
         }
@@ -1403,25 +1479,26 @@
       tableHtml += '<th class="p-2 border border-slate-800">Bloque / Ejercicio</th>';
       tableHtml += '<th class="p-2 border border-slate-800 text-center">Series</th>';
       tableHtml += '<th class="p-2 border border-slate-800 text-center">Pausa</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 1 (65-70%)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 2 (72.5-75%)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 3 (77.5-80%)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 4 (82.5-85%)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 5 (87.5-90%)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-cyan-300">SEM 6 (Test 95%+)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 1 (68%)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 2 (75%)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 3 (80%)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 4 (84%)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 5 (88%)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-cyan-300">SEM 6 (95%+ 🔥)</th>';
       tableHtml += '</tr></thead>';
 
       tableHtml += '<tbody class="divide-y divide-slate-800 text-slate-300">';
       detalles.forEach(ej => {
-        const prog = def(ej.progresionSemanal, {});
         tableHtml += '<tr class="hover:bg-slate-800/40">';
         tableHtml += '<td class="p-2 border border-slate-800"><div class="font-bold text-white">' + escaparHTML(ej.ejercicio) + '</div><div class="text-[9px] text-amber-300">' + escaparHTML(def(ej.bloque, '')) + '</div></td>';
         tableHtml += '<td class="p-2 border border-slate-800 text-center">' + def(ej.series, 4) + '</td>';
         tableHtml += '<td class="p-2 border border-slate-800 text-center">' + def(ej.descanso, "90''") + '</td>';
         
         for (let s = 1; s <= 6; s++) {
-          const w = def(prog['s' + s], { carga: '-', reps: '-' });
-          tableHtml += '<td class="p-2 border border-slate-800 text-center font-bold text-emerald-300">' + w.carga + ' <span class="text-slate-400 font-normal">(' + w.reps + ')</span></td>';
+          const w = def(ej.progresionSemanal && ej.progresionSemanal['s' + s], { reps: 'reps', carga: '68%' });
+          // Calculamos la carga según el 1RM
+          const cRes = resolverCargaKilos(ej.ejercicio, w.carga);
+          tableHtml += '<td class="p-2 border border-slate-800 text-center font-bold text-emerald-300">' + cRes.textoDisplay + ' <span class="text-slate-400 font-normal">(' + w.reps + ')</span></td>';
         }
         tableHtml += '</tr>';
       });
@@ -1934,10 +2011,16 @@
       const mapActivo = {};
       (seriesCargadas ? seriesCargadas : []).forEach(s => { mapActivo[s.serie_num] = s; });
 
+      // Carga sugerida calculada por 1RM
+      const prog = def(item.progresionSemanal, {});
+      const semData = def(prog['s' + semanaActiva], { reps: def(item.reps, '10 reps'), carga: '68%' });
+      const cResActivo = resolverCargaKilos(item.ejercicio, semData.carga);
+
       let html = '<div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-4">';
       html += '<div class="flex items-center justify-between border-b border-slate-800 pb-3">';
       html += '<div><span class="text-[10px] text-emerald-400 font-bold uppercase block">' + escaparHTML(item.bloque) + '</span>';
       html += '<h3 class="text-xl font-black text-white">' + escaparHTML(item.ejercicio) + '</h3>';
+      html += '<p class="text-xs text-emerald-400 font-mono font-bold mt-0.5">Sugerencia: ' + cResActivo.textoDisplay + ' • ' + semData.reps + '</p>';
       if (item.criterio ? true : item.indicacion) {
         html += '<p class="text-[11px] text-amber-300 italic">↳ ' + escaparHTML(def(item.criterio, item.indicacion)) + '</p>';
       }
@@ -1956,16 +2039,17 @@
         const boxDone = hecha ? 'serie-done-box' : '';
         const btnClass = hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-900 text-rose-300 border-rose-500/40';
         const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
+        const placeholderCarga = cResActivo.kgSugeridoNum ? `${cResActivo.kgSugeridoNum} kg` : 'Kg Real';
         const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
         const btnTxt = hecha ? '✓' : '✗';
 
         html += '<div class="serie-box bg-slate-950 p-3 rounded-2xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-3" id="act-box-' + sNum + '">';
         html += '<span class="font-mono font-bold text-slate-400 text-sm">S' + sNum + '</span>';
         html += '<div class="flex items-center gap-2 flex-1">';
-        html += '<input type="number" step="0.5" placeholder="Kg Real" value="' + valCarga + '" class="inp-carga-act w-24 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
+        html += '<input type="number" step="0.5" id="act-c-' + sNum + '" placeholder="' + placeholderCarga + '" value="' + valCarga + '" class="inp-carga-act w-28 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
         html += '<input type="number" placeholder="Reps" value="' + valRIR + '" class="inp-rir-act w-16 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
         html += '</div>';
-        html += '<button type="button" class="btn-toggle-act px-4 py-2.5 rounded-xl text-xs font-black border cursor-pointer ' + btnClass + '" data-serie="' + sNum + '" data-descanso="' + def(item.descanso, "90''") + '">' + btnTxt + '</button>';
+        html += '<button type="button" class="btn-toggle-act px-4 py-2.5 rounded-xl text-xs font-black border cursor-pointer ' + btnClass + '" data-serie="' + sNum + '" data-descanso="' + def(item.descanso, "90''") + '" data-sug="' + def(cResActivo.kgSugeridoNum, '') + '">' + btnTxt + '</button>';
         html += '</div>';
       }
       html += '</div></div>';
@@ -1984,7 +2068,16 @@
         i.onchange = () => guardarRIRCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(i.dataset.serie), i.value);
       });
       cont.querySelectorAll('.btn-toggle-act').forEach(b => {
-        b.onclick = () => toggleSerieCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(b.dataset.serie), b.dataset.descanso, b, 'act-box-' + b.dataset.serie);
+        b.onclick = () => {
+          const serie = parseInt(b.dataset.serie);
+          const sug = b.dataset.sug;
+          const inpC = document.getElementById('act-c-' + serie);
+          if (inpC && !inpC.value && sug) {
+            inpC.value = sug;
+            guardarCargaCloud(rId, indiceEjercicioActivo, semanaActiva, serie, sug);
+          }
+          toggleSerieCloud(rId, indiceEjercicioActivo, semanaActiva, serie, b.dataset.descanso, b, 'act-box-' + serie);
+        };
       });
       cont.querySelectorAll('.btn-play-short').forEach(b => {
         b.onclick = () => abrirPlayerVideo(b.dataset.video, b.dataset.title);
