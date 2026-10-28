@@ -46,7 +46,6 @@
     }
     .btn-tipo-barra-active { background-color: #10b981 !important; color: #020617 !important; font-weight: 900 !important; }
     
-    /* Burbujas de acción por serie */
     .burbuja-serie {
       width: 32px;
       height: 32px;
@@ -546,31 +545,40 @@
             <span id="estado-turno-koena-txt" class="text-xs text-slate-300 font-medium">Consultando próximo turno...</span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <div>
-              <label class="text-[10px] font-bold text-slate-400 block mb-1">Día de entrenamiento presencial:</label>
-              <input type="date" id="koena-fecha-turno" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 font-mono text-xs font-bold">
+          <!-- BLOQUE EXCLUSIVO PARA ALUMNOS: FORMULARIO DE RESERVA / CONFIRMACIÓN -->
+          <div id="form-turno-alumno-koena" class="space-y-2.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
+                <label class="text-[10px] font-bold text-slate-400 block mb-1">Día de entrenamiento presencial:</label>
+                <input type="date" id="koena-fecha-turno" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 font-mono text-xs font-bold">
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-slate-400 block mb-1">Horario disponible sede:</label>
+                <select id="koena-hora-turno" class="w-full bg-slate-900 border border-slate-700 text-cyan-300 rounded-xl p-2.5 font-bold text-xs">
+                  <option value="08:00">08:00 hs (Mañana)</option>
+                  <option value="09:00">09:00 hs</option>
+                  <option value="17:00">17:00 hs (Tarde)</option>
+                  <option value="18:00">18:00 hs</option>
+                  <option value="19:00" selected>19:00 hs (Turno Central)</option>
+                  <option value="20:00">20:00 hs</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label class="text-[10px] font-bold text-slate-400 block mb-1">Horario disponible sede:</label>
-              <select id="koena-hora-turno" class="w-full bg-slate-900 border border-slate-700 text-cyan-300 rounded-xl p-2.5 font-bold text-xs">
-                <option value="08:00">08:00 hs (Mañana)</option>
-                <option value="09:00">09:00 hs</option>
-                <option value="17:00">17:00 hs (Tarde)</option>
-                <option value="18:00">18:00 hs</option>
-                <option value="19:00" selected>19:00 hs (Turno Central)</option>
-                <option value="20:00">20:00 hs</option>
-              </select>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button type="button" onclick="confirmarTurnoKoena(true)" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black py-2.5 rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1 shadow-md">
+                <span>✓</span> Confirmar Asistencia
+              </button>
+              <button type="button" onclick="confirmarTurnoKoena(false)" class="bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-2.5 rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1">
+                <span>✕</span> Cancelar Turno
+              </button>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-2 pt-1">
-            <button type="button" onclick="confirmarTurnoKoena(true)" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black py-2.5 rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1 shadow-md">
-              <span>✓</span> Confirmar Asistencia
-            </button>
-            <button type="button" onclick="confirmarTurnoKoena(false)" class="bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-2.5 rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1">
-              <span>✕</span> Cancelar Turno
-            </button>
+          <!-- BLOQUE EXCLUSIVO PARA COACH: AGENDA VISUAL ESTILO HARBIZ (FOTOS/AVATARES DE CONFIRMADOS) -->
+          <div id="vista-turnos-coach-koena" class="hidden space-y-2">
+            <span class="text-[10px] font-black uppercase text-cyan-400 tracking-wider block">Atletas con asistencia confirmada (Sede Koena):</span>
+            <div id="lista-asistencias-coach" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"></div>
           </div>
         </div>
 
@@ -638,10 +646,10 @@
         </div>
       </div>
 
-      <!-- HABIT TRACKER / CALENDARIO CON DÍA ACTUAL ILUMINADO -->
+      <!-- HABIT TRACKER / CALENDARIO CON DÍA ACTUAL ILUMINADO Y AVATARES DE CONFIRMADOS -->
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia (Mes Actual):</span>
+          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia & Asistencia:</span>
           <span class="text-[9px] text-emerald-400 font-mono font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-emerald-400"></span> Día de hoy resaltado</span>
         </div>
         <div id="grid-calendario-adherencia" class="grid grid-cols-7 gap-1 text-center text-[10px] font-mono"></div>
@@ -1016,12 +1024,21 @@
           cambiarPaginaModalidad('KOENA');
         }
 
-        if (perfilActual.rol === 'coach') {
+        const esCoach = perfilActual.rol === 'coach';
+        const formTurno = document.getElementById('form-turno-alumno-koena');
+        const vistaCoachTurnos = document.getElementById('vista-turnos-coach-koena');
+
+        if (esCoach) {
           document.getElementById('seccion-admin').classList.remove('hidden');
+          if (formTurno) formTurno.classList.add('hidden');
+          if (vistaCoachTurnos) vistaCoachTurnos.classList.remove('hidden');
           cargarVistaCoach();
           cargarPlanesCoach();
+          cargarAsistenciasKoenaCoach();
         } else {
           document.getElementById('seccion-admin').classList.add('hidden');
+          if (formTurno) formTurno.classList.remove('hidden');
+          if (vistaCoachTurnos) vistaCoachTurnos.classList.add('hidden');
         }
 
         renderizarTablaControlRM();
@@ -1755,6 +1772,7 @@
       if (!error) {
         mostrarToast(asiste ? "✓ Turno confirmado en Koena" : "✓ Cancelación registrada");
         consultarTurnoActual();
+        calcularRachaYCalendario();
       } else {
         alert("Error al registrar turno: " + error.message);
       }
@@ -1777,8 +1795,45 @@
         const estadoClase = data.estado === 'confirmado' ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
         txt.innerHTML = 'Próximo turno: <strong>' + data.fecha + ' a las ' + data.hora + ' hs</strong> — Estado: <span class="' + estadoClase + '">' + data.estado.toUpperCase() + '</span>';
       } else {
-        txt.innerHTML = 'No tenés turnos confirmados para esta semana todavía.';
+        txt.innerHTML = 'No hay turnos confirmados para esta semana todavía.';
       }
+    }
+
+    // VISTA DEL COACH: ASISTENCIAS CONFIRMADAS ESTILO HARBIZ
+    async function cargarAsistenciasKoenaCoach() {
+      if (!sb) return;
+      const hoy = obtenerFechaLocalString();
+      const { data: turnos } = await sb.from('turnos_asistencia')
+        .select('*, perfiles_usuarios(nombre, email)')
+        .eq('tipo', 'KOENA')
+        .gte('fecha', hoy)
+        .order('fecha', { ascending: true });
+
+      const cont = document.getElementById('lista-asistencias-coach');
+      if (!cont) return;
+
+      if (!turnos || turnos.length === 0) {
+        cont.innerHTML = '<div class="text-xs text-slate-500 py-2">No hay turnos agendados en Koena para los próximos días.</div>';
+        return;
+      }
+
+      cont.innerHTML = turnos.map(t => {
+        const perfil = t.perfiles_usuarios || {};
+        const nom = def(perfil.nombre, def(perfil.email, 'Atleta'));
+        const inicial = nom.charAt(0).toUpperCase();
+        const esConf = t.estado === 'confirmado';
+        const tagClase = esConf ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+
+        return '<div class="bg-slate-900 border border-slate-800 p-2.5 rounded-2xl flex items-center justify-between">' +
+          '<div class="flex items-center gap-2.5">' +
+          '<div class="w-8 h-8 rounded-full bg-slate-950 border border-cyan-400 flex items-center justify-center font-bold text-cyan-300 text-xs shadow-sm">' + inicial + '</div>' +
+          '<div>' +
+          '<span class="text-xs font-bold text-white block leading-tight">' + escaparHTML(nom) + '</span>' +
+          '<span class="text-[10px] text-slate-400 font-mono">' + t.fecha + ' • ' + t.hora + ' hs</span>' +
+          '</div></div>' +
+          '<span class="text-[9px] font-black uppercase px-2 py-0.5 rounded border ' + tagClase + '">' + t.estado + '</span>' +
+          '</div>';
+      }).join('');
     }
 
     function agendarLlamadaWhatsAppOnline() {
@@ -2069,21 +2124,29 @@
       return year + '-' + month + '-' + day;
     }
 
-    // CALENDARIO CON DÍA ACTUAL DESTACADO
+    // CALENDARIO CON DÍA ACTUAL DESTACADO Y TURNOS CONFIRMADOS
     async function calcularRachaYCalendario() {
       if (!usuarioActual || !sb) return;
 
-      const { data: registros } = await sb
-        .from('registros_series')
-        .select('completed_at')
-        .eq('user_id', usuarioActual.id)
-        .eq('completada', true);
+      const [resSeries, resTurnos] = await Promise.all([
+        sb.from('registros_series').select('completed_at').eq('user_id', usuarioActual.id).eq('completada', true),
+        sb.from('turnos_asistencia').select('fecha, hora, estado, perfiles_usuarios(nombre)').eq('estado', 'confirmado')
+      ]);
 
       const diasEntrenados = new Set();
-      (registros || []).forEach(r => {
+      (resSeries.data || []).forEach(r => {
         if (r.completed_at) {
           const loc = new Date(r.completed_at);
           diasEntrenados.add(obtenerFechaLocalString(loc));
+        }
+      });
+
+      const turnosMap = {};
+      (resTurnos.data || []).forEach(t => {
+        if (t.fecha) {
+          if (!turnosMap[t.fecha]) turnosMap[t.fecha] = [];
+          const nom = (t.perfiles_usuarios && t.perfiles_usuarios.nombre) ? t.perfiles_usuarios.nombre : 'Atleta';
+          turnosMap[t.fecha].push({ hora: t.hora, inicial: nom.charAt(0).toUpperCase(), nombre: nom });
         }
       });
 
@@ -2097,6 +2160,7 @@
         const strDia = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
         const ent = diasEntrenados.has(strDia);
         const esHoy = d === diaHoyNum;
+        const confirmadosDia = turnosMap[strDia] || [];
 
         let estiloDia = 'bg-slate-900 text-slate-600';
         if (ent) {
@@ -2105,9 +2169,16 @@
         
         let bordeHoy = esHoy ? 'border-2 border-emerald-400 ring-2 ring-emerald-400/30 font-black text-white relative' : '';
 
-        html += '<div class="h-7 flex flex-col items-center justify-center rounded-lg ' + estiloDia + ' ' + bordeHoy + '">' +
+        let badgeTurno = '';
+        if (confirmadosDia.length > 0) {
+          const primero = confirmadosDia[0];
+          badgeTurno = '<span class="text-[8px] bg-cyan-400 text-slate-950 px-1 rounded-full font-black leading-tight mt-0.5" title="' + primero.nombre + ' (' + primero.hora + ' hs)">' + primero.inicial + '</span>';
+        }
+
+        html += '<div class="min-h-[34px] p-0.5 flex flex-col items-center justify-center rounded-lg ' + estiloDia + ' ' + bordeHoy + '">' +
           '<span>' + d + '</span>' +
-          (esHoy ? '<span class="w-1 h-1 bg-emerald-400 rounded-full mt-0.5"></span>' : '') +
+          badgeTurno +
+          (esHoy && confirmadosDia.length === 0 ? '<span class="w-1 h-1 bg-emerald-400 rounded-full mt-0.5"></span>' : '') +
           '</div>';
       }
       cont.innerHTML = html;
