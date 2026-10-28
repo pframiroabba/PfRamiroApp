@@ -36,14 +36,14 @@
       border-color: #10b981 !important;
     }
     .avatar-circulo {
-      width: 48px; height: 48px; border-radius: 9999px; object-fit: cover;
+      width: 44px; height: 44px; border-radius: 9999px; object-fit: cover;
       display: flex; align-items: center; justify-content: center;
-      font-size: 24px; background-color: #0f172a; border: 2px solid #10b981; flex-shrink: 0;
+      background-color: #0f172a; border: 2px solid #10b981; flex-shrink: 0;
     }
     .btn-tipo-barra-active { background-color: #10b981 !important; color: #020617 !important; font-weight: 900 !important; }
     @media print {
       header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container,
-      #modal-discos, #modal-creador-rapido, #modal-modo-activo, #modal-video-player, #modal-pr-celebracion, #modal-planilla-drive {
+      #modal-discos, #modal-creador-rapido, #modal-modo-activo, #modal-video-player, #modal-pr-celebracion, #modal-planilla-drive, #modal-ficha-atleta {
         display: none !important;
       }
       body { background: white !important; color: black !important; }
@@ -77,6 +77,49 @@
       <button type="button" onclick="cerrarVistaPlanillaDrive()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 px-3 py-1.5 rounded-xl cursor-pointer">Cerrar ✕</button>
     </div>
     <div id="tabla-sábana-contenedor" class="flex-1 overflow-x-auto overflow-y-auto border border-slate-800 rounded-2xl bg-slate-900/60 p-2 text-xs">
+    </div>
+  </div>
+
+  <!-- MODAL FICHA DE ATLETA (ESTILO HARBIZ / ATLYO) -->
+  <div id="modal-ficha-atleta" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 max-w-md w-full rounded-3xl p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-full bg-slate-950 border border-emerald-500 flex items-center justify-center font-black text-emerald-400 text-sm" id="ficha-avatar">A</div>
+          <div>
+            <h4 class="font-black text-white text-sm" id="ficha-nombre">Atleta</h4>
+            <span class="text-[10px] text-slate-400" id="ficha-email">correo@ejemplo.com</span>
+          </div>
+        </div>
+        <button type="button" onclick="cerrarFichaAtleta()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 p-1.5 rounded-xl cursor-pointer">✕</button>
+      </div>
+      
+      <div class="space-y-3 bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+          <span class="text-slate-400 font-bold">Estado de Cuota / Pago:</span>
+          <select id="ficha-sel-pago" class="bg-slate-900 border border-slate-700 text-white rounded-lg p-1 font-bold">
+            <option value="al_dia">🟢 Al Día</option>
+            <option value="pendiente">🔴 Pendiente / Moroso</option>
+          </select>
+        </div>
+        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+          <span class="text-slate-400 font-bold">Vencimiento de Cuota:</span>
+          <input type="date" id="ficha-inp-vence" class="bg-slate-900 border border-slate-700 text-emerald-400 rounded-lg p-1 font-mono font-bold">
+        </div>
+        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+          <span class="text-slate-400 font-bold">WhatsApp:</span>
+          <span id="ficha-txt-tel" class="font-mono text-white font-bold">Sin registrar</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-slate-400 font-bold">Entorno asignado:</span>
+          <span id="ficha-txt-entorno" class="text-cyan-300 font-bold">Koena (Presencial)</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button type="button" onclick="guardarDatosFichaAtleta()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">Guardar Cambios</button>
+        <button type="button" onclick="cerrarFichaAtleta()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs uppercase transition cursor-pointer">Cerrar</button>
+      </div>
     </div>
   </div>
 
@@ -373,10 +416,10 @@
     </div>
   </div>
 
-  <!-- ENCABEZADO -->
+  <!-- ENCABEZADO CON TU LOGO OFICIAL -->
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 md:px-8 py-3 flex justify-between items-center sticky top-0 z-40">
     <div class="flex items-center gap-3">
-      <div class="avatar-circulo text-xl">🏋️‍♂️</div>
+      <img src="logo-icono.webp" alt="PF Ramiro" class="avatar-circulo object-cover" onerror="this.onerror=null; this.src=''; this.innerHTML='🏋️‍♂️';">
       <div>
         <h1 class="text-base font-black tracking-wide text-white leading-tight">PF RAMIRO ABBATTISTA</h1>
         <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Rendimiento & Fuerza</span>
@@ -408,7 +451,7 @@
     <div class="space-y-4 text-left">
       <div id="campo-registro-nombre" class="hidden">
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Nombre Completo</label>
-        <input type="text" id="reg-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="ej: Ramiro Abbattista">
+        <input type="text" id="reg-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="ej: Dylan Losada">
       </div>
       <div id="campo-registro-telefono" class="hidden">
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">WhatsApp</label>
@@ -489,9 +532,12 @@
         </div>
       </div>
 
-      <!-- HABIT TRACKER / CALENDARIO -->
+      <!-- HABIT TRACKER / CALENDARIO CON DÍA ACTUAL ILUMINADO -->
       <div class="space-y-1.5">
-        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia (Mes Actual):</span>
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia (Mes Actual):</span>
+          <span class="text-[9px] text-emerald-400 font-mono font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-emerald-400"></span> Día de hoy resaltado</span>
+        </div>
         <div id="grid-calendario-adherencia" class="grid grid-cols-7 gap-1 text-center text-[10px] font-mono"></div>
       </div>
     </div>
@@ -501,7 +547,7 @@
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div>
           <h3 class="text-base font-black text-blue-400 flex items-center gap-2">🛡️ Panel del Coach — Harbiz Suite</h3>
-          <p class="text-xs text-slate-400">Directorio de atletas, monitoreo de racha y asignación de mesociclos.</p>
+          <p class="text-xs text-slate-400">Directorio de atletas, control de cuotas y asignación de mesociclos.</p>
         </div>
         <div class="flex gap-2">
           <button type="button" onclick="nuevoPlan()" class="bg-blue-600 hover:bg-blue-500 text-white font-black px-3 py-1.5 rounded-xl text-xs cursor-pointer">＋ Planificar Día</button>
@@ -626,6 +672,7 @@
     let usuarioActual = null;
     let perfilActual = null;
     let rutinasActivas = [];
+    let atletaSeleccionadoFicha = null;
 
     // BASE DE DATOS LOCAL DE 1RM VINCULADA
     let listaControlRM = [
@@ -697,11 +744,9 @@
       if (nuevoPeso !== null) item.pesoTest = parseFloat(nuevoPeso) || item.pesoTest;
       if (nuevasReps !== null) item.repsTest = parseInt(nuevasReps) || item.repsTest;
       
-      // Fórmula Epley: 1RM = Peso * (1 + Reps / 30)
       item.rm = Math.round((item.pesoTest * (1 + item.repsTest / 30)) * 10) / 10;
       renderizarTablaControlRM();
 
-      // Guardar en Supabase
       if (usuarioActual && sb) {
         await sb.from('marcas_rm').upsert({
           user_id: usuarioActual.id,
@@ -713,7 +758,6 @@
         }, { onConflict: 'user_id,ejercicio' });
       }
 
-      // RECALCULAR AUTOMÁTICAMENTE LA RUTINA EN VIVO
       const rutina = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) || rutinasActivas[0];
       if (rutina) activarDia(rutina.id);
       mostrarToast(`✓ 1RM de ${item.nombre} actualizado a ${item.rm} kg`);
@@ -723,7 +767,6 @@
     function resolverCargaKilos(ejercicioNombre, textoPrescripcion) {
       const nom = (ejercicioNombre || '').toLowerCase();
       
-      // Encontrar a qué básico pertenece
       let rmEncontrado = null;
       if (nom.includes('sentadilla') && !nom.includes('búlgara') && !nom.includes('sumo')) {
         rmEncontrado = listaControlRM.find(x => x.patron === 'sentadilla')?.rm;
@@ -741,27 +784,23 @@
         rmEncontrado = listaControlRM.find(x => x.patron === 'hip')?.rm;
       }
 
-      // Porcentajes estándar de progresión de 6 semanas de Ramiro
       const pctSemanas = { 1: 0.68, 2: 0.75, 3: 0.80, 4: 0.84, 5: 0.88, 6: 0.95 };
       const pctObj = pctSemanas[semanaActiva] || 0.70;
 
-      // Si el texto trae un % explícito (ej: "75%")
       if (textoPrescripcion && textoPrescripcion.includes('%')) {
         const m = textoPrescripcion.match(/(\d+(\.\d+)?)%/);
         const p = m ? parseFloat(m[1]) / 100 : pctObj;
         if (rmEncontrado) {
-          const kg = (Math.round((rmEncontrado * p) / 2.5) * 2.5).toFixed(1); // Redondeo a discos de 1.25/2.5kg
+          const kg = (Math.round((rmEncontrado * p) / 2.5) * 2.5).toFixed(1);
           return { textoDisplay: `${kg} kg (${Math.round(p * 100)}%)`, kgSugeridoNum: parseFloat(kg) };
         }
       }
 
-      // Si encontramos su RM y estamos en la semana activa
       if (rmEncontrado) {
         const kg = (Math.round((rmEncontrado * pctObj) / 2.5) * 2.5).toFixed(1);
         return { textoDisplay: `${kg} kg (${Math.round(pctObj * 100)}%)`, kgSugeridoNum: parseFloat(kg) };
       }
 
-      // Si no es un básico con RM, usamos el texto prescripto original
       const sugeridoNum = parseFloat(textoPrescripcion) || null;
       return { textoDisplay: def(textoPrescripcion, 'Sugerida'), kgSugeridoNum: sugeridoNum };
     }
@@ -1185,7 +1224,6 @@
 
       let html = '<div id="card-rutina-' + rutina.id + '" class="space-y-4">';
       
-      // Control de fecha estilo planilla
       const fechaRegistroCtrl = (mapaSeries['999_1'] && mapaSeries['999_1'].completed_at) ? mapaSeries['999_1'].completed_at.slice(0, 10) : obtenerFechaLocalString();
 
       html += '<div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-3">';
@@ -1197,7 +1235,6 @@
       html += '<input type="date" value="' + fechaRegistroCtrl + '" onchange="guardarFechaSesion(\'' + rutina.id + '\', ' + semanaActiva + ', this.value)" class="bg-slate-950 border border-slate-700 text-emerald-400 font-mono text-xs rounded-xl p-1.5 focus:border-emerald-500 font-bold">';
       html += '</div></div></div>';
 
-      // Iteración de bloques en acordeón
       Object.keys(bloques).forEach(bNom => {
         const listaItems = bloques[bNom];
         const estaPlegado = def(bloquesPlegados[bNom], false);
@@ -1239,7 +1276,6 @@
             const esFallo = esUltimaSemana ? true : /fallo|test/i.test(semData.reps);
             const cantSeries = (parseInt(ej.series) ? parseInt(ej.series) : 4) + (esFallo ? 1 : 0);
             
-            // CÁLCULO ENLAZADO AL 1RM
             const cargaResuelta = resolverCargaKilos(ej.ejercicio, semData.carga);
             const desc = def(ej.descanso, "90''");
 
@@ -1253,7 +1289,6 @@
               html += '<p class="text-[11px] text-amber-300/90 font-medium leading-relaxed italic">↳ Indicación técnica / Criterio: ' + escaparHTML(txtCriterio) + '</p>';
             }
 
-            // TARJETA DE CARGA SUGERIDA (ENLAZADA AUTOMÁTICAMENTE AL 1RM)
             html += '<div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/90 flex flex-wrap items-center gap-3 text-xs">';
             html += '<div><span class="text-[10px] text-slate-400 font-bold uppercase block">Carga Sugerida (Sem ' + semanaActiva + '):</span><strong class="text-emerald-400 font-mono text-sm">' + escaparHTML(cargaResuelta.textoDisplay) + '</strong></div>';
             html += '<div><span class="text-[10px] text-slate-400 font-bold uppercase block">Reps Objetivo:</span><strong class="text-white font-mono">' + escaparHTML(semData.reps) + '</strong></div>';
@@ -1267,7 +1302,6 @@
             }
             html += '</div>';
 
-            // SERIES TÁCTILES CON CHECKMARK DE 1 SOLO CLIC
             html += '<div class="space-y-1 pt-1">';
             html += '<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Series ejecutadas:</span>';
             html += '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">';
@@ -1279,7 +1313,6 @@
               const btnClass = hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400' : 'bg-slate-950 text-rose-300 border-rose-500/40';
               const btnTxt = hecha ? '✓' : '✗';
               
-              // Si no escribió carga real, usa la sugerida calculada por 1RM
               const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
               const placeholderCarga = cargaResuelta.kgSugeridoNum ? `${cargaResuelta.kgSugeridoNum} kg` : 'Kg Real';
               const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
@@ -1311,7 +1344,6 @@
         b.onclick = () => abrirPlayerVideo(b.dataset.video, b.dataset.title);
       });
 
-      // TILDE DE 1 SOLO CLIC: TOMA LA CARGA REAL O LA SUGERIDA AUTOMÁTICAMENTE
       document.querySelectorAll('.btn-toggle-serie').forEach(b => {
         b.onclick = () => {
           const plan = b.dataset.plan;
@@ -1322,7 +1354,6 @@
           const sug = b.dataset.sug;
           const target = b.dataset.target;
 
-          // Si el input está vacío, autocompleta con la sugerencia calculada
           const inpC = document.getElementById('inp-c-' + plan + '-' + idx + '-' + serie);
           if (inpC && !inpC.value && sug) {
             inpC.value = sug;
@@ -1427,6 +1458,7 @@
       return year + '-' + month + '-' + day;
     }
 
+    // CALENDARIO CON DÍA ACTUAL ILUMINADO Y DESTACADO
     async function calcularRachaYCalendario() {
       if (!usuarioActual ? true : !sb) return;
 
@@ -1446,14 +1478,29 @@
 
       const cont = document.getElementById('grid-calendario-adherencia');
       const hoy = new Date();
+      const diaHoyNum = hoy.getDate();
       const diasEnMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
 
       let html = '';
       for (let d = 1; d <= diasEnMes; d++) {
         const strDia = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
         const ent = diasEntrenados.has(strDia);
-        const estiloDia = ent ? 'bg-emerald-500 text-slate-950 font-black' : 'bg-slate-900 text-slate-600';
-        html += '<div class="h-6 flex items-center justify-center rounded-lg ' + estiloDia + '">' + d + '</div>';
+        const esHoy = d === diaHoyNum;
+
+        // Estilos: Hoy resaltado con borde esmeralda brillante
+        let estiloDia = 'bg-slate-900 text-slate-600';
+        if (ent) {
+          estiloDia = 'bg-emerald-500 text-slate-950 font-black shadow-md';
+        }
+        
+        let bordeHoy = esHoy ? 'border-2 border-emerald-400 ring-2 ring-emerald-400/30 font-black text-white relative' : '';
+
+        html += `
+          <div class="h-7 flex flex-col items-center justify-center rounded-lg ${estiloDia} ${bordeHoy}">
+            <span>${d}</span>
+            ${esHoy ? '<span class="w-1 h-1 bg-emerald-400 rounded-full mt-0.5"></span>' : ''}
+          </div>
+        `;
       }
       cont.innerHTML = html;
 
@@ -1496,7 +1543,6 @@
         
         for (let s = 1; s <= 6; s++) {
           const w = def(ej.progresionSemanal && ej.progresionSemanal['s' + s], { reps: 'reps', carga: '68%' });
-          // Calculamos la carga según el 1RM
           const cRes = resolverCargaKilos(ej.ejercicio, w.carga);
           tableHtml += '<td class="p-2 border border-slate-800 text-center font-bold text-emerald-300">' + cRes.textoDisplay + ' <span class="text-slate-400 font-normal">(' + w.reps + ')</span></td>';
         }
@@ -1511,7 +1557,7 @@
       document.getElementById('modal-planilla-drive').classList.add('hidden');
     }
 
-    // PANEL DEL COACH
+    // PANEL DEL COACH (CON CONTROL DE CUOTAS / ESTILO ATLYO & HARBIZ)
     async function cargarVistaCoach() {
       if (!sb) return;
       const { data: atletas } = await sb.from('perfiles_usuarios').select('*').eq('rol', 'alumno');
@@ -1538,19 +1584,56 @@
         const tagClase = alerta ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-400';
         const bordeClase = alerta ? 'border-rose-500/50' : 'border-slate-800';
 
+        const cuotaAlDia = a.estado_pago !== 'pendiente';
+        const tagPago = cuotaAlDia 
+          ? '<span class="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold">Cuota al Día</span>' 
+          : '<span class="text-[9px] bg-rose-500/20 text-rose-300 border border-rose-500/40 px-1.5 py-0.5 rounded font-bold">Cuota Pendiente</span>';
+
         let itemHtml = '<div class="bg-slate-950 p-4 rounded-2xl border ' + bordeClase + ' space-y-2 text-xs">';
         itemHtml += '<div class="flex justify-between items-center"><div class="flex items-center gap-2">';
         itemHtml += '<div class="w-8 h-8 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center font-bold text-white text-xs">' + def(a.nombre, 'A').charAt(0).toUpperCase() + '</div>';
         itemHtml += '<div><span class="font-bold text-white text-sm block leading-tight">' + escaparHTML(def(a.nombre, a.email)) + '</span>';
-        itemHtml += '<span class="text-[10px] text-slate-400">Atleta Asignado</span></div></div>';
+        itemHtml += '<div class="flex items-center gap-1.5 mt-0.5">' + tagPago + '</div></div></div>';
         itemHtml += '<span class="text-[10px] px-2 py-0.5 rounded font-bold ' + tagClase + '">' + tagTexto + '</span></div>';
         itemHtml += '<div class="text-slate-400">Últimos 14 días: <strong class="text-white">' + (st ? st.dias.size : 0) + '</strong> sesiones • <strong class="text-white">' + (st ? st.n : 0) + '</strong> series</div>';
         itemHtml += '<div class="text-slate-500 flex justify-between items-center pt-1 border-t border-slate-900">';
         itemHtml += '<span>WhatsApp: ' + escaparHTML(def(a.telefono, 'Sin cargar')) + '</span>';
-        itemHtml += '<button type="button" onclick="entrarPortalAlumno(\'' + a.id + '\', \'' + escaparHTML(def(a.nombre, a.email)) + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] cursor-pointer">Ver Ficha ➔</button>';
-        itemHtml += '</div></div>';
+        itemHtml += '<div class="flex gap-1.5">';
+        itemHtml += '<button type="button" onclick="abrirFichaAtleta(\'' + a.id + '\', \'' + escaparHTML(def(a.nombre, a.email)) + '\', \'' + escaparHTML(def(a.email, '')) + '\', \'' + escaparHTML(def(a.telefono, '')) + '\', \'' + def(a.estado_pago, 'al_dia') + '\', \'' + def(a.vencimiento_cuota, '') + '\')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded-lg text-[10px] cursor-pointer">👤 Ficha</button>';
+        itemHtml += '<button type="button" onclick="entrarPortalAlumno(\'' + a.id + '\', \'' + escaparHTML(def(a.nombre, a.email)) + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] cursor-pointer">Ver Plan ➔</button>';
+        itemHtml += '</div></div></div>';
         return itemHtml;
       }).join('');
+    }
+
+    function abrirFichaAtleta(id, nombre, email, tel, pago, vence) {
+      atletaSeleccionadoFicha = id;
+      document.getElementById('ficha-avatar').innerText = (nombre || 'A').charAt(0).toUpperCase();
+      document.getElementById('ficha-nombre').innerText = nombre;
+      document.getElementById('ficha-email').innerText = email;
+      document.getElementById('ficha-txt-tel').innerText = tel || 'Sin registrar';
+      document.getElementById('ficha-sel-pago').value = pago || 'al_dia';
+      document.getElementById('ficha-inp-vence').value = vence || '';
+      document.getElementById('modal-ficha-atleta').classList.remove('hidden');
+    }
+
+    function cerrarFichaAtleta() {
+      document.getElementById('modal-ficha-atleta').classList.add('hidden');
+    }
+
+    async function guardarDatosFichaAtleta() {
+      if (!atletaSeleccionadoFicha || !sb) return;
+      const estado_pago = document.getElementById('ficha-sel-pago').value;
+      const vencimiento_cuota = document.getElementById('ficha-inp-vence').value || null;
+
+      const { error } = await sb.from('perfiles_usuarios')
+        .update({ estado_pago, vencimiento_cuota })
+        .eq('id', atletaSeleccionadoFicha);
+
+      if (error) return alert("Error al guardar: " + error.message);
+      mostrarToast("✓ Ficha de atleta actualizada");
+      cerrarFichaAtleta();
+      cargarVistaCoach();
     }
 
     function entrarPortalAlumno(alId, alNombre) {
@@ -1574,10 +1657,10 @@
     function exportarBaseAlumnosCSV() {
       if (!sb) return;
       sb.from('perfiles_usuarios').select('*').then(({ data }) => {
-        let csv = "Nombre,Email,Telefono\n";
+        let csv = "Nombre,Email,Telefono,EstadoPago,Vencimiento\n";
         (data ? data : []).forEach(p => {
           const l = s => String(def(s, '')).replace(/^[=+\-@]/, "'").replace(/"/g, '""');
-          csv += '"' + l(p.nombre) + '","' + l(p.email) + '","' + l(p.telefono) + '"\n';
+          csv += `"${l(p.nombre)}","${l(p.email)}","${l(p.telefono)}","${l(p.estado_pago)}","${l(p.vencimiento_cuota)}"\n`;
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const a = document.createElement('a');
@@ -2011,7 +2094,6 @@
       const mapActivo = {};
       (seriesCargadas ? seriesCargadas : []).forEach(s => { mapActivo[s.serie_num] = s; });
 
-      // Carga sugerida calculada por 1RM
       const prog = def(item.progresionSemanal, {});
       const semData = def(prog['s' + semanaActiva], { reps: def(item.reps, '10 reps'), carga: '68%' });
       const cResActivo = resolverCargaKilos(item.ejercicio, semData.carga);
