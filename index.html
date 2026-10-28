@@ -23,6 +23,10 @@
       background-color: rgba(16, 185, 129, 0.15) !important;
       border-color: rgba(16, 185, 129, 0.5) !important;
     }
+    .serie-skipped-box {
+      background-color: rgba(225, 29, 72, 0.15) !important;
+      border-color: rgba(225, 29, 72, 0.5) !important;
+    }
     .tab-dia-active {
       background-color: #10b981 !important;
       color: #020617 !important;
@@ -41,6 +45,37 @@
       background-color: #0f172a; border: 2px solid #10b981; flex-shrink: 0;
     }
     .btn-tipo-barra-active { background-color: #10b981 !important; color: #020617 !important; font-weight: 900 !important; }
+    
+    /* Burbujas de acción por serie */
+    .burbuja-serie {
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: all 0.2s ease-in-out;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .burbuja-done-activa {
+      background-color: #10b981 !important;
+      color: #020617 !important;
+      font-weight: 900 !important;
+      border: 2px solid #34d399 !important;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.45);
+      transform: scale(1.05);
+    }
+    .burbuja-skip-activa {
+      background-color: #e11d48 !important;
+      color: #ffffff !important;
+      font-weight: 900 !important;
+      border: 2px solid #fb7185 !important;
+      box-shadow: 0 0 12px rgba(225, 29, 72, 0.45);
+      transform: scale(1.05);
+    }
+
     @media print {
       header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container,
       #modal-discos, #modal-creador-rapido, #modal-modo-activo, #modal-video-player, #modal-pr-celebracion, #modal-planilla-drive, #modal-ficha-atleta {
@@ -112,7 +147,10 @@
         </div>
         <div class="flex justify-between items-center">
           <span class="text-slate-400 font-bold">Entorno asignado:</span>
-          <span id="ficha-txt-entorno" class="text-cyan-300 font-bold">Koena (Presencial)</span>
+          <select id="ficha-sel-entorno" class="bg-slate-900 border border-slate-700 text-cyan-300 font-bold rounded-lg p-1 text-xs">
+            <option value="KOENA">Koena (Presencial)</option>
+            <option value="ONLINE">Personalizado Online</option>
+          </select>
         </div>
       </div>
 
@@ -481,53 +519,90 @@
         </div>
       </div>
 
-      <!-- SECCIÓN KOENA & PERSONALIZADO ONLINE (NUEVA INTEGRACIÓN) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <!-- Turnos Presenciales Koena -->
-        <div class="bg-slate-950 p-3.5 rounded-2xl border border-cyan-500/30 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-black uppercase text-cyan-400 tracking-wider flex items-center gap-1.5">
-              <span>📍</span> Koena — Turnos Presenciales
-            </span>
-            <span class="text-[9px] bg-cyan-500/10 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/20 font-bold">Banfield / Lomas</span>
+      <!-- NAVEGACIÓN MODALIDAD: KOENA PRESENCIAL VS PERSONALIZADO ONLINE (DOS PÁGINAS DENTRO DE LA MISMA) -->
+      <div class="space-y-3">
+        <div class="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-800 max-w-md mx-auto">
+          <button type="button" id="tab-mod-koena" onclick="cambiarPaginaModalidad('KOENA')" class="w-1/2 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-cyan-500 text-slate-950 cursor-pointer shadow-md">
+            <span>📍</span> Koena Presencial
+          </button>
+          <button type="button" id="tab-mod-online" onclick="cambiarPaginaModalidad('ONLINE')" class="w-1/2 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white cursor-pointer">
+            <span>🌐</span> Personalizado Online
+          </button>
+        </div>
+
+        <!-- PÁGINA 1: KOENA PRESENCIAL -->
+        <div id="pagina-modalidad-koena" class="bg-slate-950 p-4 rounded-3xl border border-cyan-500/30 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+            <div>
+              <span class="text-[10px] font-black uppercase text-cyan-400 tracking-wider flex items-center gap-1.5">
+                <span>🏢</span> Koena Fitness — Banfield / Lomas de Zamora
+              </span>
+              <span class="text-[11px] text-slate-400 block mt-0.5">Gestión de cupo y asistencia a sesiones presenciales de fuerza.</span>
+            </div>
+            <span class="text-[10px] bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded-md font-mono font-bold">Presencial</span>
           </div>
-          <p id="estado-turno-koena-txt" class="text-xs text-slate-400">Consultando próximo turno...</p>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <input type="date" id="koena-fecha-turno" class="bg-slate-900 border border-slate-700 text-white rounded-xl p-2 font-mono text-xs">
-            <select id="koena-hora-turno" class="bg-slate-900 border border-slate-700 text-white rounded-xl p-2 font-bold text-xs">
-              <option value="08:00">08:00 hs</option>
-              <option value="09:00">09:00 hs</option>
-              <option value="17:00">17:00 hs</option>
-              <option value="18:00">18:00 hs</option>
-              <option value="19:00" selected>19:00 hs</option>
-              <option value="20:00">20:00 hs</option>
-            </select>
+
+          <div class="bg-slate-900/80 p-3 rounded-2xl border border-slate-800/80 flex items-center justify-between">
+            <span id="estado-turno-koena-txt" class="text-xs text-slate-300 font-medium">Consultando próximo turno...</span>
           </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="text-[10px] font-bold text-slate-400 block mb-1">Día de entrenamiento presencial:</label>
+              <input type="date" id="koena-fecha-turno" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 font-mono text-xs font-bold">
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-slate-400 block mb-1">Horario disponible sede:</label>
+              <select id="koena-hora-turno" class="w-full bg-slate-900 border border-slate-700 text-cyan-300 rounded-xl p-2.5 font-bold text-xs">
+                <option value="08:00">08:00 hs (Mañana)</option>
+                <option value="09:00">09:00 hs</option>
+                <option value="17:00">17:00 hs (Tarde)</option>
+                <option value="18:00">18:00 hs</option>
+                <option value="19:00" selected>19:00 hs (Turno Central)</option>
+                <option value="20:00">20:00 hs</option>
+              </select>
+            </div>
+          </div>
+
           <div class="grid grid-cols-2 gap-2 pt-1">
-            <button type="button" onclick="confirmarTurnoKoena(true)" class="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-black py-2 rounded-xl text-xs transition cursor-pointer">✓ Confirmar</button>
-            <button type="button" onclick="confirmarTurnoKoena(false)" class="bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-2 rounded-xl text-xs transition cursor-pointer">✕ Cancelar</button>
+            <button type="button" onclick="confirmarTurnoKoena(true)" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black py-2.5 rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1 shadow-md">
+              <span>✓</span> Confirmar Asistencia
+            </button>
+            <button type="button" onclick="confirmarTurnoKoena(false)" class="bg-slate-900 hover:bg-slate-800 text-rose-400 border border-rose-500/30 font-bold py-2.5 rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1">
+              <span>✕</span> Cancelar Turno
+            </button>
           </div>
         </div>
 
-        <!-- Personalizado Online & Llamada WhatsApp -->
-        <div class="bg-slate-950 p-3.5 rounded-2xl border border-emerald-500/30 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-black uppercase text-emerald-400 tracking-wider flex items-center gap-1.5">
-              <span>🌐</span> Personalizado Online
-            </span>
-            <span class="text-[9px] bg-emerald-500/10 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">1 a 1</span>
+        <!-- PÁGINA 2: PERSONALIZADO ONLINE -->
+        <div id="pagina-modalidad-online" class="hidden bg-slate-950 p-4 rounded-3xl border border-emerald-500/30 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+            <div>
+              <span class="text-[10px] font-black uppercase text-emerald-400 tracking-wider flex items-center gap-1.5">
+                <span>🌐</span> Plan Personalizado Online — Coach 1 a 1
+              </span>
+              <span class="text-[11px] text-slate-400 block mt-0.5">Seguimiento a distancia, corrección de técnica y llamada mensual de 30'.</span>
+            </div>
+            <span class="text-[10px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md font-mono font-bold">1 a 1 Remoto</span>
           </div>
-          <p class="text-xs text-slate-400">Coordiná tu videollamada o feedback semanal de 30 minutos directo con Rama.</p>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <select id="online-tipo-llamada" class="bg-slate-900 border border-slate-700 text-white rounded-xl p-2 text-xs font-bold">
-              <option value="Feedback de técnica y videos">Feedback Técnica</option>
-              <option value="Ajuste de cargas y semanas">Ajuste de Cargas</option>
-              <option value="Revisión general del mesociclo">Revisión Mesociclo</option>
-            </select>
-            <input type="date" id="online-fecha-turno" class="bg-slate-900 border border-slate-700 text-white rounded-xl p-2 font-mono text-xs">
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="text-[10px] font-bold text-slate-400 block mb-1">Motivo del contacto / llamada:</label>
+              <select id="online-tipo-llamada" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 text-xs font-bold">
+                <option value="Feedback de técnica y videos biomecánicos">Feedback de Técnica & Videos</option>
+                <option value="Ajuste de cargas, RPE y semanas onduladas">Ajuste de Cargas & RPE</option>
+                <option value="Revisión general y planificación del próximo mesociclo">Revisión Próximo Mesociclo</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-slate-400 block mb-1">Fecha sugerida para coordinar:</label>
+              <input type="date" id="online-fecha-turno" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2.5 font-mono text-xs font-bold">
+            </div>
           </div>
-          <button type="button" onclick="agendarLlamadaWhatsAppOnline()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-2 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer flex items-center justify-center gap-1.5">
-            <span>📲</span> Coordinar por WhatsApp
+
+          <button type="button" onclick="agendarLlamadaWhatsAppOnline()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer flex items-center justify-center gap-2 shadow-md">
+            <span>📲</span> Abrir WhatsApp Directo con Ramiro
           </button>
         </div>
       </div>
@@ -704,7 +779,7 @@
     let perfilActual = null;
     let rutinasActivas = [];
     let atletaSeleccionadoFicha = null;
-    let cargasDescartadas = {};
+    let modalidadActiva = 'KOENA';
 
     let listaControlRM = [
       { id: 'sentadilla', nombre: 'Sentadilla Trasera', pesoTest: 110, repsTest: 2, rm: 117.3, patron: 'sentadilla' },
@@ -787,7 +862,28 @@
       return racha;
     }
 
-    // 3. AUTENTICACIÓN
+    // 3. CAMBIADOR DE PÁGINAS DENTRO DE LA MISMA (KOENA VS ONLINE)
+    function cambiarPaginaModalidad(tipo) {
+      modalidadActiva = tipo;
+      const tabKoena = document.getElementById('tab-mod-koena');
+      const tabOnline = document.getElementById('tab-mod-online');
+      const pagKoena = document.getElementById('pagina-modalidad-koena');
+      const pagOnline = document.getElementById('pagina-modalidad-online');
+
+      if (tipo === 'KOENA') {
+        tabKoena.className = "w-1/2 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-cyan-500 text-slate-950 cursor-pointer shadow-md";
+        tabOnline.className = "w-1/2 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white cursor-pointer";
+        pagKoena.classList.remove('hidden');
+        pagOnline.classList.add('hidden');
+      } else {
+        tabOnline.className = "w-1/2 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-emerald-500 text-slate-950 cursor-pointer shadow-md";
+        tabKoena.className = "w-1/2 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white cursor-pointer";
+        pagOnline.classList.remove('hidden');
+        pagKoena.classList.add('hidden');
+      }
+    }
+
+    // 4. AUTENTICACIÓN
     function cambiarModoAuth(modo) {
       modoAuth = modo;
       const tabL = document.getElementById('tab-auth-login');
@@ -908,11 +1004,17 @@
           .eq('id', usuarioActual.id)
           .maybeSingle();
 
-        perfilActual = def(perfil, { rol: 'coach', nombre: fallbackNombre });
+        perfilActual = def(perfil, { rol: 'coach', nombre: fallbackNombre, entorno: 'KOENA' });
         if (perfilActual.nombre) {
           document.getElementById('dash-alumno-nombre').innerText = 'Hola, ' + perfilActual.nombre;
         }
         document.getElementById('tag-rol-user').innerText = def(perfilActual.rol, 'coach').toUpperCase();
+
+        if (perfilActual.entorno === 'ONLINE') {
+          cambiarPaginaModalidad('ONLINE');
+        } else {
+          cambiarPaginaModalidad('KOENA');
+        }
 
         if (perfilActual.rol === 'coach') {
           document.getElementById('seccion-admin').classList.remove('hidden');
@@ -1055,7 +1157,7 @@
       }
     }
 
-    // 4. CONTROL DE 1RM INTERACTIVO
+    // 5. CONTROL DE 1RM INTERACTIVO
     function renderizarTablaControlRM() {
       const tbody = document.getElementById('tabla-control-rm-body');
       if (!tbody) return;
@@ -1107,7 +1209,7 @@
       mostrarToast('✓ 1RM actualizado a ' + item.rm + ' kg');
     }
 
-    // 5. MOTOR INTELIGENTE DE CÁLCULO DE CARGAS SUGERIDAS (1RM -> SEMANA)
+    // 6. MOTOR INTELIGENTE DE CÁLCULO DE CARGAS SUGERIDAS (1RM -> SEMANA)
     function resolverCargaKilos(ejercicioNombre, textoPrescripcion) {
       const nom = (ejercicioNombre || '').toLowerCase();
       
@@ -1162,7 +1264,7 @@
       if (rutina) activarDia(rutina.id);
     }
 
-    // 6. CREADOR Y DISEÑADOR DE RUTINAS DEL COACH (COMPLETO)
+    // 7. CREADOR Y DISEÑADOR DE RUTINAS DEL COACH (COMPLETO)
     function abrirModalCreadorRapido() {
       document.getElementById('modal-creador-rapido').classList.remove('hidden');
       actualizarListaEjerciciosPorCategoria();
@@ -1400,7 +1502,7 @@
       e.className = 'text-[11px] ' + (warn ? 'text-amber-400 font-bold' : 'text-slate-400');
     }
 
-    // 7. MODO ENTRENO ACTIVO (PASO A PASO)
+    // 8. MODO ENTRENO ACTIVO (PASO A PASO)
     function iniciarModoActivo() {
       if (rutinasActivas.length === 0) return alert("No hay entrenamientos cargados.");
       const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) || rutinasActivas[0];
@@ -1471,19 +1573,31 @@
         const sNum = sIdx + 1;
         const sData = def(mapActivo[sNum], {});
         const hecha = def(sData.completada, false);
-        const boxDone = hecha ? 'serie-done-box' : '';
-        const btnClass = hecha ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-black' : 'bg-slate-900 text-slate-400 border-slate-700 font-bold';
+        const omitida = def(sData.omitida, false);
+
+        let boxClass = 'border-slate-800';
+        if (hecha) boxClass = 'serie-done-box';
+        else if (omitida) boxClass = 'serie-skipped-box';
+
+        const claseBurbujaDone = hecha ? 'burbuja-done-activa' : 'bg-slate-900 text-slate-400 border border-slate-700 hover:border-emerald-500';
+        const claseBurbujaSkip = omitida ? 'burbuja-skip-activa' : 'bg-slate-900 text-slate-400 border border-slate-700 hover:border-rose-500';
+
         const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
         const placeholderCarga = cResActivo.kgSugeridoNum ? cResActivo.kgSugeridoNum + ' kg' : 'Kg Real';
         const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
 
-        html += '<div class="serie-box bg-slate-950 p-3 rounded-2xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-3" id="act-box-' + sNum + '">';
+        html += '<div class="serie-box bg-slate-950 p-3 rounded-2xl border ' + boxClass + ' flex items-center justify-between gap-3" id="act-box-' + sNum + '">';
         html += '<span class="font-mono font-bold text-slate-400 text-sm">S' + sNum + '</span>';
         html += '<div class="flex items-center gap-2 flex-1">';
         html += '<input type="number" step="0.5" id="act-c-' + sNum + '" placeholder="' + placeholderCarga + '" value="' + valCarga + '" class="inp-carga-act w-28 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
         html += '<input type="number" placeholder="Reps" value="' + valRIR + '" class="inp-rir-act w-16 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
         html += '</div>';
-        html += '<button type="button" class="btn-toggle-act px-4 py-2.5 rounded-xl text-xs border cursor-pointer ' + btnClass + '" data-serie="' + sNum + '" data-descanso="' + def(item.descanso, "90''") + '" data-sug="' + def(cResActivo.kgSugeridoNum, '') + '">✓</button>';
+
+        html += '<div class="flex items-center gap-1.5 shrink-0">';
+        html += '<button type="button" class="burbuja-serie ' + claseBurbujaDone + '" onclick="procesarAccionSerie(\'' + rId + '\', ' + indiceEjercicioActivo + ', ' + semanaActiva + ', ' + sNum + ', \'done\', \'' + def(item.descanso, "90''") + '\', \'' + def(cResActivo.kgSugeridoNum, '') + '\', \'act-box-' + sNum + '\', this)" title="Marcar como realizada">✓</button>';
+        html += '<button type="button" class="burbuja-serie ' + claseBurbujaSkip + '" onclick="procesarAccionSerie(\'' + rId + '\', ' + indiceEjercicioActivo + ', ' + semanaActiva + ', ' + sNum + ', \'skip\', \'' + def(item.descanso, "90''") + '\', \'' + def(cResActivo.kgSugeridoNum, '') + '\', \'act-box-' + sNum + '\', this)" title="Marcar como no realizada">✕</button>';
+        html += '</div>';
+
         html += '</div>';
       }
       html += '</div></div>';
@@ -1501,18 +1615,6 @@
       cont.querySelectorAll('.inp-rir-act').forEach(i => {
         i.onchange = () => guardarRIRCloud(rId, indiceEjercicioActivo, semanaActiva, parseInt(i.dataset.serie), i.value);
       });
-      cont.querySelectorAll('.btn-toggle-act').forEach(b => {
-        b.onclick = () => {
-          const serie = parseInt(b.dataset.serie);
-          const sug = b.dataset.sug;
-          const inpC = document.getElementById('act-c-' + serie);
-          if (inpC && !inpC.value && sug) {
-            inpC.value = sug;
-            guardarCargaCloud(rId, indiceEjercicioActivo, semanaActiva, serie, sug);
-          }
-          toggleSerieCloud(rId, indiceEjercicioActivo, semanaActiva, serie, b.dataset.descanso, b, 'act-box-' + serie);
-        };
-      });
       cont.querySelectorAll('.btn-play-short').forEach(b => {
         b.onclick = () => abrirPlayerVideo(b.dataset.video, b.dataset.title);
       });
@@ -1521,7 +1623,7 @@
       document.getElementById('btn-sig-act').onclick = () => moverEjercicioActivo(1, rId);
     }
 
-    // 8. DISCOS, TIMER Y UTILS
+    // 9. DISCOS, TIMER Y UTILS
     function establecerPesoBarra(p, b) {
       pesoBarraSeleccionada = p;
       document.querySelectorAll('.btn-tipo-barra').forEach(x => x.classList.remove('btn-tipo-barra-active'));
@@ -1632,12 +1734,12 @@
       document.getElementById('modal-video-player').classList.add('hidden');
     }
 
-    // 9. TURNOS KOENA Y ONLINE
+    // 10. TURNOS KOENA Y PERSONALIZADO ONLINE (PÁGINAS SEPARADAS)
     async function confirmarTurnoKoena(asiste) {
       if (!usuarioActual || !sb) return;
       const fecha = document.getElementById('koena-fecha-turno').value;
       const hora = document.getElementById('koena-hora-turno').value;
-      if (!fecha) return alert("Por favor seleccioná una fecha.");
+      if (!fecha) return alert("Por favor seleccioná una fecha en el calendario de Koena.");
 
       const estado = asiste ? 'confirmado' : 'cancelado';
 
@@ -1647,7 +1749,7 @@
         fecha,
         hora,
         estado,
-        motivo: 'Entrenamiento Presencial'
+        motivo: 'Entrenamiento Presencial Koena'
       });
 
       if (!error) {
@@ -1670,6 +1772,7 @@
         .maybeSingle();
 
       const txt = document.getElementById('estado-turno-koena-txt');
+      if (!txt) return;
       if (data) {
         const estadoClase = data.estado === 'confirmado' ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
         txt.innerHTML = 'Próximo turno: <strong>' + data.fecha + ' a las ' + data.hora + ' hs</strong> — Estado: <span class="' + estadoClase + '">' + data.estado.toUpperCase() + '</span>';
@@ -1683,26 +1786,92 @@
       const fecha = document.getElementById('online-fecha-turno').value || 'a coordinar';
       const alumnoNom = perfilActual ? perfilActual.nombre : 'Alumno';
 
-      const texto = encodeURIComponent('Hola Rama! Soy ' + alumnoNom + '. Te escribo para coordinar la llamada de 30 minutos de mi plan personalizado online:\n📌 Motivo: ' + tipo + '\n📅 Fecha propuesta: ' + fecha + '\nAvisame en qué horario te queda más cómodo hablar. Abrazo!');
+      const texto = encodeURIComponent('Hola Rama! Soy ' + alumnoNom + '. Te escribo desde mi plan personalizado online:\n📌 Motivo: ' + tipo + '\n📅 Fecha propuesta: ' + fecha + '\nAvisame qué horario te viene mejor para la llamada de 30 minutos. Abrazo!');
       const url = 'https://wa.me/5491141906766?text=' + texto;
       window.open(url, '_blank');
     }
 
-    // 10. CARGAS Y SERIES
-    function descartarCargaSugerida(planId, itmIdx, btnCruz) {
-      const clave = planId + '_' + itmIdx + '_' + semanaActiva;
-      cargasDescartadas[clave] = !cargasDescartadas[clave];
+    // 11. SISTEMA DE BURBUJAS POR SERIE (TILDE ✓ Y CRUZ ✕)
+    async function procesarAccionSerie(planId, ejercicioIdx, sem, serie, accion, descanso, pesoSugerido, targetBoxId, btnElement) {
+      if (!usuarioActual || !sb) return;
 
-      const descartada = cargasDescartadas[clave];
-      if (descartada) {
-        btnCruz.className = "btn-descartar-sug text-xs font-bold px-2 py-0.5 rounded-md bg-rose-600 text-white border border-rose-500 shadow-md cursor-pointer";
-        mostrarToast("✕ Carga sugerida no utilizada (anotá tu peso real)");
-      } else {
-        btnCruz.className = "btn-descartar-sug text-xs font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 hover:text-white cursor-pointer";
+      const { data: actual } = await sb.from('registros_series')
+        .select('completada, omitida')
+        .eq('planificacion_id', String(planId))
+        .eq('user_id', usuarioActual.id)
+        .eq('ejercicio_index', ejercicioIdx)
+        .eq('semana_num', sem)
+        .eq('serie_num', serie)
+        .maybeSingle();
+
+      const estadoActualHecha = actual ? actual.completada : false;
+      const estadoActualOmitida = actual ? actual.omitida : false;
+
+      let nuevaCompletada = false;
+      let nuevaOmitida = false;
+
+      if (accion === 'done') {
+        nuevaCompletada = !estadoActualHecha;
+        nuevaOmitida = false;
+      } else if (accion === 'skip') {
+        nuevaOmitida = !estadoActualOmitida;
+        nuevaCompletada = false;
       }
 
-      const primerInp = document.getElementById('inp-c-' + planId + '-' + itmIdx + '-1');
-      if (primerInp && descartada) primerInp.focus();
+      const inpC = document.getElementById('inp-c-' + planId + '-' + ejercicioIdx + '-' + serie) || document.getElementById('act-c-' + serie);
+      if (nuevaCompletada && inpC && !inpC.value && pesoSugerido) {
+        inpC.value = pesoSugerido;
+        await guardarCargaCloud(planId, ejercicioIdx, sem, serie, pesoSugerido);
+      }
+
+      const { error } = await sb.from('registros_series').upsert({
+        planificacion_id: String(planId),
+        user_id: usuarioActual.id,
+        ejercicio_index: ejercicioIdx,
+        ejercicio: nombreEj(planId, ejercicioIdx),
+        semana_num: sem,
+        serie_num: serie,
+        completada: nuevaCompletada,
+        omitida: nuevaOmitida,
+        completed_at: nuevaCompletada ? new Date().toISOString() : null,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'planificacion_id,user_id,ejercicio_index,semana_num,serie_num' });
+
+      if (error) {
+        alert("Error al actualizar la serie: " + error.message);
+        return;
+      }
+
+      mostrarToast();
+
+      const box = document.getElementById(targetBoxId);
+      if (box) {
+        box.classList.remove('serie-done-box', 'serie-skipped-box');
+        if (nuevaCompletada) box.classList.add('serie-done-box');
+        if (nuevaOmitida) box.classList.add('serie-skipped-box');
+
+        const btnDone = box.querySelector('.burbuja-done');
+        const btnSkip = box.querySelector('.burbuja-skip');
+
+        if (btnDone && btnSkip) {
+          if (nuevaCompletada) {
+            btnDone.className = "burbuja-serie burbuja-done burbuja-done-activa";
+            btnSkip.className = "burbuja-serie burbuja-skip bg-slate-900 text-slate-400 border border-slate-700 hover:border-rose-500";
+          } else if (nuevaOmitida) {
+            btnSkip.className = "burbuja-serie burbuja-skip burbuja-skip-activa";
+            btnDone.className = "burbuja-serie burbuja-done bg-slate-900 text-slate-400 border border-slate-700 hover:border-emerald-500";
+          } else {
+            btnDone.className = "burbuja-serie burbuja-done bg-slate-900 text-slate-400 border border-slate-700 hover:border-emerald-500";
+            btnSkip.className = "burbuja-serie burbuja-skip bg-slate-900 text-slate-400 border border-slate-700 hover:border-rose-500";
+          }
+        }
+      }
+
+      if (nuevaCompletada) {
+        if (navigator.vibrate) navigator.vibrate(60);
+        iniciarTimerDescanso(parseSegundos(descanso));
+        calcularRachaYCalendario();
+      }
     }
 
     function renderizarTarjetaRutina(rutina, mapaSeries) {
@@ -1773,11 +1942,6 @@
             
             const cargaResuelta = resolverCargaKilos(ej.ejercicio, semData.carga);
             const desc = def(ej.descanso, "90''");
-            const claveDescarte = rutina.id + '_' + itmIdx + '_' + semanaActiva;
-            const descartada = def(cargasDescartadas[claveDescarte], false);
-            const claseCruz = descartada 
-              ? 'btn-descartar-sug text-xs font-bold px-2 py-0.5 rounded-md bg-rose-600 text-white border border-rose-500 shadow-md cursor-pointer'
-              : 'btn-descartar-sug text-xs font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 hover:text-white cursor-pointer';
 
             html += '<div class="pt-3 first:pt-0 space-y-2.5">';
             html += '<div class="flex items-start justify-between gap-2">';
@@ -1789,13 +1953,9 @@
               html += '<p class="text-[11px] text-amber-300/90 font-medium leading-relaxed italic">↳ Indicación técnica / Criterio: ' + escaparHTML(txtCriterio) + '</p>';
             }
 
-            // TARJETA DE CARGA SUGERIDA CON CRUZ PARA DESCARTAR
             html += '<div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/90 flex flex-wrap items-center gap-3 text-xs">';
-            html += '<div class="flex items-center gap-2">';
             html += '<div><span class="text-[10px] text-slate-400 font-bold uppercase block">Carga Sugerida (Sem ' + semanaActiva + '):</span>';
-            html += '<strong class="text-emerald-400 font-mono text-sm ' + (descartada ? 'line-through text-slate-500' : '') + '">' + escaparHTML(cargaResuelta.textoDisplay) + '</strong></div>';
-            html += '<button type="button" onclick="descartarCargaSugerida(\'' + rutina.id + '\', ' + itmIdx + ', this)" class="' + claseCruz + '" title="Tocar si no pudiste usar esta carga exacta">✕</button>';
-            html += '</div>';
+            html += '<strong class="text-emerald-400 font-mono text-sm">' + escaparHTML(cargaResuelta.textoDisplay) + '</strong></div>';
             html += '<div><span class="text-[10px] text-slate-400 font-bold uppercase block">Reps Objetivo:</span><strong class="text-white font-mono">' + escaparHTML(semData.reps) + '</strong></div>';
             html += '<div><span class="text-[10px] text-slate-400 font-bold uppercase block">Pausa de Descanso:</span><strong class="text-cyan-300 font-mono">' + desc + '</strong></div>';
             html += '</div>';
@@ -1807,7 +1967,7 @@
             }
             html += '</div>';
 
-            // SERIES CON BOTÓN TILDE (✓) QUE SE PINTA DE VERDE
+            // SERIES CON BURBUJAS REDONDAS (✓ VERDE Y ✕ ROJA)
             html += '<div class="space-y-1 pt-1">';
             html += '<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Series ejecutadas:</span>';
             html += '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">';
@@ -1815,23 +1975,31 @@
               const sNum = sIdx + 1;
               const sData = def(mapaSeries[itmIdx + '_' + sNum], {});
               const hecha = def(sData.completada, false);
-              const boxDone = hecha ? 'serie-done-box' : '';
-              
-              const btnClass = hecha 
-                ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md font-black' 
-                : 'bg-slate-900 text-slate-400 border-slate-700 hover:border-emerald-500 font-bold';
-              
+              const omitida = def(sData.omitida, false);
+
+              let boxClass = 'border-slate-800';
+              if (hecha) boxClass = 'serie-done-box';
+              else if (omitida) boxClass = 'serie-skipped-box';
+
+              const claseBurbujaDone = hecha ? 'burbuja-done-activa' : 'bg-slate-900 text-slate-400 border border-slate-700 hover:border-emerald-500';
+              const claseBurbujaSkip = omitida ? 'burbuja-skip-activa' : 'bg-slate-900 text-slate-400 border border-slate-700 hover:border-rose-500';
+
               const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
-              const placeholderCarga = (!descartada && cargaResuelta.kgSugeridoNum) ? cargaResuelta.kgSugeridoNum + ' kg' : 'Kg Real';
+              const placeholderCarga = cargaResuelta.kgSugeridoNum ? cargaResuelta.kgSugeridoNum + ' kg' : 'Kg Real';
               const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
 
-              html += '<div class="serie-box bg-slate-950 p-2 rounded-xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-1.5" id="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">';
+              html += '<div class="serie-box bg-slate-950 p-2 rounded-xl border ' + boxClass + ' flex items-center justify-between gap-1.5" id="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">';
               html += '<span class="text-[10px] text-slate-400 font-mono font-bold w-6">S' + sNum + '</span>';
               html += '<div class="flex items-center gap-1 flex-1">';
               html += '<input type="number" step="0.5" inputmode="decimal" id="inp-c-' + rutina.id + '-' + itmIdx + '-' + sNum + '" placeholder="' + placeholderCarga + '" value="' + valCarga + '" class="inp-carga w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
               html += '<input type="number" inputmode="numeric" id="inp-r-' + rutina.id + '-' + itmIdx + '-' + sNum + '" placeholder="Reps" value="' + valRIR + '" class="inp-rir w-14 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
               html += '</div>';
-              html += '<button type="button" class="btn-toggle-serie px-3 py-1.5 rounded-lg text-xs border cursor-pointer transition ' + btnClass + '" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '" data-descanso="' + desc + '" data-sug="' + def(cargaResuelta.kgSugeridoNum, '') + '" data-target="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">✓</button>';
+
+              html += '<div class="flex items-center gap-1 shrink-0">';
+              html += '<button type="button" class="burbuja-serie burbuja-done ' + claseBurbujaDone + '" onclick="procesarAccionSerie(\'' + rutina.id + '\', ' + itmIdx + ', ' + semanaActiva + ', ' + sNum + ', \'done\', \'' + desc + '\', \'' + def(cargaResuelta.kgSugeridoNum, '') + '\', \'box-' + rutina.id + '-' + itmIdx + '-' + sNum + '\', this)" title="Marcar como realizada">✓</button>';
+              html += '<button type="button" class="burbuja-serie burbuja-skip ' + claseBurbujaSkip + '" onclick="procesarAccionSerie(\'' + rutina.id + '\', ' + itmIdx + ', ' + semanaActiva + ', ' + sNum + ', \'skip\', \'' + desc + '\', \'' + def(cargaResuelta.kgSugeridoNum, '') + '\', \'box-' + rutina.id + '-' + itmIdx + '-' + sNum + '\', this)" title="Marcar como no realizada">✕</button>';
+              html += '</div>';
+
               html += '</div>';
             }
             html += '</div></div></div>';
@@ -1850,28 +2018,6 @@
     function enlazarEventosDinamicos() {
       document.querySelectorAll('.btn-play-short').forEach(b => {
         b.onclick = () => abrirPlayerVideo(b.dataset.video, b.dataset.title);
-      });
-
-      document.querySelectorAll('.btn-toggle-serie').forEach(b => {
-        b.onclick = () => {
-          const plan = b.dataset.plan;
-          const idx = parseInt(b.dataset.idx);
-          const sem = parseInt(b.dataset.sem);
-          const serie = parseInt(b.dataset.serie);
-          const desc = b.dataset.descanso;
-          const sug = b.dataset.sug;
-          const target = b.dataset.target;
-
-          const claveDescarte = plan + '_' + idx + '_' + sem;
-          const estaDescartada = def(cargasDescartadas[claveDescarte], false);
-
-          const inpC = document.getElementById('inp-c-' + plan + '-' + idx + '-' + serie);
-          if (inpC && !inpC.value && sug && !estaDescartada) {
-            inpC.value = sug;
-            guardarCargaCloud(plan, idx, sem, serie, sug);
-          }
-          toggleSerieCloud(plan, idx, sem, serie, desc, b, target);
-        };
       });
 
       document.querySelectorAll('.inp-carga').forEach(inp => {
@@ -1913,50 +2059,6 @@
       }, { onConflict: 'planificacion_id,user_id,ejercicio_index,semana_num,serie_num' });
 
       if (!error) mostrarToast();
-    }
-
-    async function toggleSerieCloud(planId, ejercicioIdx, sem, serie, descanso, btnElement, targetBoxId) {
-      if (!usuarioActual || !sb) return;
-
-      const { data: actual } = await sb.from('registros_series')
-        .select('completada')
-        .eq('planificacion_id', String(planId))
-        .eq('user_id', usuarioActual.id)
-        .eq('ejercicio_index', ejercicioIdx)
-        .eq('semana_num', sem)
-        .eq('serie_num', serie)
-        .maybeSingle();
-
-      const nuevoEstado = !(actual ? actual.completada : false);
-
-      const { error } = await sb.from('registros_series').upsert({
-        planificacion_id: String(planId),
-        user_id: usuarioActual.id,
-        ejercicio_index: ejercicioIdx,
-        ejercicio: nombreEj(planId, ejercicioIdx),
-        semana_num: sem,
-        serie_num: serie,
-        completada: nuevoEstado,
-        completed_at: nuevoEstado ? new Date().toISOString() : null,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'planificacion_id,user_id,ejercicio_index,semana_num,serie_num' });
-
-      if (!error) {
-        mostrarToast();
-        const box = document.getElementById(targetBoxId);
-        if (box) {
-          if (nuevoEstado) {
-            box.classList.add('serie-done-box');
-            btnElement.className = "btn-toggle-serie px-3 py-1.5 rounded-lg text-xs border cursor-pointer transition bg-emerald-500 text-slate-950 border-emerald-400 shadow-md font-black";
-            if (navigator.vibrate) navigator.vibrate(60);
-            iniciarTimerDescanso(parseSegundos(descanso));
-            calcularRachaYCalendario();
-          } else {
-            box.classList.remove('serie-done-box');
-            btnElement.className = "btn-toggle-serie px-3 py-1.5 rounded-lg text-xs border cursor-pointer transition bg-slate-900 text-slate-400 border-slate-700 hover:border-emerald-500 font-bold";
-          }
-        }
-      }
     }
 
     function obtenerFechaLocalString(d) {
@@ -2013,7 +2115,7 @@
       document.getElementById('stat-racha').innerText = calcularRacha(diasEntrenados) + ' sem';
     }
 
-    // 11. PANEL DEL COACH Y GESTIÓN
+    // 12. PANEL DEL COACH Y GESTIÓN
     async function cargarVistaCoach() {
       if (!sb) return;
       const { data: atletas } = await sb.from('perfiles_usuarios').select('*').eq('rol', 'alumno');
@@ -2055,14 +2157,14 @@
         itemHtml += '<div class="text-slate-500 flex justify-between items-center pt-1 border-t border-slate-900">';
         itemHtml += '<span>WhatsApp: ' + escaparHTML(def(a.telefono, 'Sin cargar')) + '</span>';
         itemHtml += '<div class="flex gap-1.5">';
-        itemHtml += '<button type="button" onclick="abrirFichaAtleta(\'' + a.id + '\', \'' + escaparHTML(def(a.nombre, a.email)) + '\', \'' + escaparHTML(def(a.email, '')) + '\', \'' + escaparHTML(def(a.telefono, '')) + '\', \'' + def(a.estado_pago, 'al_dia') + '\', \'' + def(a.vencimiento_cuota, '') + '\')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded-lg text-[10px] cursor-pointer">👤 Ficha</button>';
+        itemHtml += '<button type="button" onclick="abrirFichaAtleta(\'' + a.id + '\', \'' + escaparHTML(def(a.nombre, a.email)) + '\', \'' + escaparHTML(def(a.email, '')) + '\', \'' + escaparHTML(def(a.telefono, '')) + '\', \'' + def(a.estado_pago, 'al_dia') + '\', \'' + def(a.vencimiento_cuota, '') + '\', \'' + def(a.entorno, 'KOENA') + '\')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded-lg text-[10px] cursor-pointer">👤 Ficha</button>';
         itemHtml += '<button type="button" onclick="entrarPortalAlumno(\'' + a.id + '\', \'' + escaparHTML(def(a.nombre, a.email)) + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] cursor-pointer">Ver Plan ➔</button>';
         itemHtml += '</div></div></div>';
         return itemHtml;
       }).join('');
     }
 
-    function abrirFichaAtleta(id, nombre, email, tel, pago, vence) {
+    function abrirFichaAtleta(id, nombre, email, tel, pago, vence, entorno) {
       atletaSeleccionadoFicha = id;
       document.getElementById('ficha-avatar').innerText = (nombre || 'A').charAt(0).toUpperCase();
       document.getElementById('ficha-nombre').innerText = nombre;
@@ -2070,6 +2172,7 @@
       document.getElementById('ficha-txt-tel').innerText = tel || 'Sin registrar';
       document.getElementById('ficha-sel-pago').value = pago || 'al_dia';
       document.getElementById('ficha-inp-vence').value = vence || '';
+      document.getElementById('ficha-sel-entorno').value = entorno || 'KOENA';
       document.getElementById('modal-ficha-atleta').classList.remove('hidden');
     }
 
@@ -2081,9 +2184,10 @@
       if (!atletaSeleccionadoFicha || !sb) return;
       const estado_pago = document.getElementById('ficha-sel-pago').value;
       const vencimiento_cuota = document.getElementById('ficha-inp-vence').value || null;
+      const entorno = document.getElementById('ficha-sel-entorno').value;
 
       const { error } = await sb.from('perfiles_usuarios')
-        .update({ estado_pago, vencimiento_cuota })
+        .update({ estado_pago, vencimiento_cuota, entorno })
         .eq('id', atletaSeleccionadoFicha);
 
       if (error) return alert("Error al guardar: " + error.message);
@@ -2241,14 +2345,15 @@
       document.getElementById('modal-planilla-drive').classList.add('hidden');
     }
 
-    // 12. EXPOSICIÓN GLOBAL DE FUNCIONES A WINDOW (PREVENCIÓN TOTAL DE REFERENCEERROR)
+    // 13. EXPOSICIÓN GLOBAL DE FUNCIONES A WINDOW (CERO REFERENCEERROR)
     window.ejecutarAuth = ejecutarAuth;
     window.cambiarModoAuth = cambiarModoAuth;
     window.recuperarPassword = recuperarPassword;
     window.cerrarSesion = cerrarSesion;
+    window.cambiarPaginaModalidad = cambiarPaginaModalidad;
     window.confirmarTurnoKoena = confirmarTurnoKoena;
     window.agendarLlamadaWhatsAppOnline = agendarLlamadaWhatsAppOnline;
-    window.descartarCargaSugerida = descartarCargaSugerida;
+    window.procesarAccionSerie = procesarAccionSerie;
     window.abrirFichaAtleta = abrirFichaAtleta;
     window.cerrarFichaAtleta = cerrarFichaAtleta;
     window.guardarDatosFichaAtleta = guardarDatosFichaAtleta;
