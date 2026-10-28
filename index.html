@@ -71,8 +71,8 @@
   <div id="modal-planilla-drive" class="hidden fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex flex-col p-3 md:p-6">
     <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
       <div class="flex items-center gap-2">
-        <span class="text-sm font-black text-white">📋 Vista Planilla Drive — Dylan Losada (Oct/Nov)</span>
-        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded font-mono">6 Semanas Onduladas</span>
+        <span class="text-sm font-black text-white">📋 Vista Planilla Drive — Progresión 6 Semanas</span>
+        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded font-mono">Formato Excel Completo</span>
       </div>
       <button type="button" onclick="cerrarVistaPlanillaDrive()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 px-3 py-1.5 rounded-xl cursor-pointer">Cerrar ✕</button>
     </div>
@@ -158,7 +158,7 @@
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
           <h4 id="titulo-creador" class="font-black text-white text-base">🛠️ Diseñador de Planificación</h4>
-          <span id="sub-creador" class="text-[11px] text-slate-400">Progresión semanal ondulada y guardado directo en Supabase.</span>
+          <span id="sub-creador" class="text-[11px] text-slate-400">Progresión semanal ondulada de 6 semanas y guardado directo.</span>
         </div>
         <button type="button" onclick="cerrarModalCreadorRapido()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 p-2 rounded-xl cursor-pointer">✕</button>
       </div>
@@ -188,7 +188,7 @@
             <select id="admin-duracion-semanas" onchange="actualizarColumnasMatrizCoach()" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-emerald-300 font-bold">
               <option value="4">4 Semanas</option>
               <option value="5">5 Semanas</option>
-              <option value="6" selected>6 Semanas (Planilla Dylan)</option>
+              <option value="6" selected>6 Semanas (Periodización)</option>
             </select>
           </div>
           <div>
@@ -210,11 +210,12 @@
           <div class="md:col-span-2">
             <label class="text-[10px] text-slate-400 font-bold">Bloque de la Sesión</label>
             <select id="inp-bloque" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-emerald-300 font-bold mt-1">
-              <option value="⚙ CALOR & MOVILIDAD">⚙ CALOR & MOVILIDAD</option>
-              <option value="🏋 BLOQUE 1: FUERZA BÁSICA" selected>🏋 BLOQUE 1: FUERZA BÁSICA</option>
-              <option value="⚡ BLOQUE 2: ACCESORIOS & CORE">⚡ BLOQUE 2: ACCESORIOS & CORE</option>
-              <option value="🧩 DÍA MODULAR / POTENCIA">🧩 DÍA MODULAR / POTENCIA</option>
-              <option value="🏠 EXTRA MOVILIDAD CASA">🏠 EXTRA MOVILIDAD CASA</option>
+              <option value="⚙ ENTRADA EN CALOR & MOVILIDAD">⚙ ENTRADA EN CALOR & MOVILIDAD</option>
+              <option value="⚡ BLOQUE OLÍMPICO + BALÍSTICO">⚡ BLOQUE OLÍMPICO + BALÍSTICO</option>
+              <option value="🏋 BLOQUE PRINCIPAL: MÉTODO HÍBRIDO" selected>🏋 BLOQUE PRINCIPAL: MÉTODO HÍBRIDO</option>
+              <option value="★ BLOQUE 4: CORE AVANZADO & PREVENCIÓN">★ BLOQUE 4: CORE AVANZADO & PREVENCIÓN</option>
+              <option value="🧩 DÍA MODULAR / FULL BODY">🧩 DÍA MODULAR / FULL BODY</option>
+              <option value="🏃 EXTRA RUNNING & CAPACIDAD">🏃 EXTRA RUNNING & CAPACIDAD</option>
             </select>
           </div>
           <div class="md:col-span-2">
@@ -224,13 +225,13 @@
                 <option value="mov_tobillo">Movilidad: Tobillo</option>
                 <option value="mov_cadera">Movilidad: Cadera (90/90, Spiderman)</option>
                 <option value="mov_toracica">Movilidad: Columna Torácica</option>
-                <option value="mov_escapula_hombro">Movilidad: Hombro & Escápula</option>
+                <option value="mov_escapula_hombro">Movilidad: Hombro & Escápula (YTWL)</option>
                 <option value="mov_muneca">Movilidad: Muñecas</option>
               </optgroup>
               <optgroup label="Zona Media & Core Funcional">
                 <option value="core_antiextension">Core: Antiextensión (Deadbug, Plancha)</option>
                 <option value="core_antirrotacion">Core: Antirrotación (Pallof, Bird Dog)</option>
-                <option value="core_antiflexion_lat">Core: Antiflexión Lateral (Granjero)</option>
+                <option value="core_antiflexion_lat">Core: Antiflexión Lateral (Copenhague)</option>
                 <option value="core_dinamico">Core: Dinámico / Rotacional</option>
               </optgroup>
               <optgroup label="Fuerza & Rendimiento">
@@ -238,7 +239,7 @@
                 <option value="inf_cadera">Tren Inferior: Peso Muerto / Hip Thrust</option>
                 <option value="sup_empuje">Tren Superior: Press Pecho / Militar</option>
                 <option value="sup_traccion">Tren Superior: Remos / Jalones / Dominadas</option>
-                <option value="olimpicos">Levantamiento Olímpico (Clean / Snatch)</option>
+                <option value="olimpicos">Levantamiento Olímpico (Cargadas / Snatch)</option>
                 <option value="potencia_pliometria">Potencia & Pliometría</option>
               </optgroup>
             </select>
@@ -253,7 +254,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
           <div>
             <label class="text-[10px] text-slate-400 font-bold">Nombre del Ejercicio</label>
-            <input type="text" id="inp-ejercicio-nombre" placeholder="ej: Sentadilla Trasera Barra Olímpica" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white mt-1">
+            <input type="text" id="inp-ejercicio-nombre" placeholder="ej: Sentadilla Trasera con Barra" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white mt-1">
           </div>
           <div>
             <label class="text-[10px] text-slate-400 font-bold">Video Short (YouTube)</label>
@@ -262,8 +263,8 @@
         </div>
 
         <div>
-          <label class="text-[10px] text-amber-400 font-bold">↳ Indicación técnica / Criterio Biomecánico (Estilo Drive):</label>
-          <input type="text" id="inp-criterio-tecnico" placeholder="ej: Barra firme sobre trapecios; rodillas alineadas con puntas de pie sin colapsar valgo." class="w-full bg-slate-900 border border-amber-500/40 rounded-xl p-2 text-xs text-amber-200 mt-1">
+          <label class="text-[10px] text-amber-400 font-bold">↳ Indicación técnica / Criterio Biomecánico (Estilo Excel):</label>
+          <input type="text" id="inp-criterio-tecnico" placeholder="ej: Sentadilla profunda con recorrido completo sin colapsar rodillas." class="w-full bg-slate-900 border border-amber-500/40 rounded-xl p-2 text-xs text-amber-200 mt-1">
         </div>
 
         <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -271,58 +272,58 @@
             <label class="text-[10px] font-bold text-emerald-400 block mb-1">⚡ Selector Rápido de Esquemas:</label>
             <select onchange="aplicarPresetRepsRapido(this.value)" class="w-full bg-slate-950 border border-emerald-500/40 text-emerald-300 rounded-xl p-2 text-xs font-bold">
               <option value="">▼ Elegir esquema predefinido...</option>
-              <option value="dylan_fuerza">🔥 Dylan Losada: Fuerza 6 Semanas (10-8-6-5-4-Test)</option>
+              <option value="ramiro_fuerza">🔥 Ramiro Abbattista: Progresión 6 Semanas (65% -> 95%+)</option>
               <option value="3x10">3x10 reps (Hipertrofia)</option>
               <option value="4x8">4x8 reps (Fuerza-Hipertrofia)</option>
               <option value="4x6">4x6 reps (Fuerza Base)</option>
               <option value="5x5">5x5 reps (Fuerza Básica)</option>
-              <option value="core">3x30 seg / 3x12 por lado (Core/Activación)</option>
-              <option value="movilidad">2x8 por lado / Flujo (Calor & Movilidad)</option>
+              <option value="core">3x40 seg / 3x12 por lado (Core/Activación)</option>
+              <option value="movilidad">2x12 por lado / Flujo (Calor & Movilidad)</option>
             </select>
           </div>
           <div>
             <label class="text-[10px] font-bold text-emerald-400 block mb-1">⚡ Cantidad de Series:</label>
             <select id="inp-series" class="w-full bg-slate-950 border border-emerald-500/40 text-emerald-300 rounded-xl p-2 text-xs font-bold">
               <option value="2">2 Series (Calor / Movilidad)</option>
-              <option value="3" selected>3 Series (Fuerza Principal Dylan)</option>
-              <option value="4">4 Series</option>
+              <option value="3">3 Series</option>
+              <option value="4" selected>4 Series (Fuerza Principal)</option>
               <option value="5">5 Series</option>
             </select>
           </div>
         </div>
 
         <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-2">
-          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">🎯 Prescripción Semanal de Cargas & Reps:</span>
+          <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">🎯 Cargas Sugeridas Semanales (% y Carga):</span>
           <div id="grid-matriz-coach" class="grid grid-cols-2 sm:grid-cols-6 gap-2 text-xs">
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 1 (10-12r):</span>
-              <input type="text" id="prog-s1-reps" value="3x10-12" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s1-carga" value="70.0 kg" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 1 (65-70%):</span>
+              <input type="text" id="prog-s1-reps" value="10 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s1-carga" value="75 kg (68%)" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 2 (8r):</span>
-              <input type="text" id="prog-s2-reps" value="3x8 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s2-carga" value="75.0 kg" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 2 (72.5-75%):</span>
+              <input type="text" id="prog-s2-reps" value="8 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s2-carga" value="82.5 kg (75%)" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 3 (6r):</span>
-              <input type="text" id="prog-s3-reps" value="3x6 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s3-carga" value="82.5 kg" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 3 (77.5-80%):</span>
+              <input type="text" id="prog-s3-reps" value="6 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s3-carga" value="87.5 kg (80%)" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 4 (2x6-2x4):</span>
-              <input type="text" id="prog-s4-reps" value="3x5 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s4-carga" value="87.5 kg" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Sem 4 (82.5-85%):</span>
+              <input type="text" id="prog-s4-reps" value="5 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s4-carga" value="92.5 kg (84%)" class="w-full bg-slate-900 border border-emerald-500/40 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div id="col-s5-coach" class="bg-slate-950 p-1.5 rounded-lg border border-emerald-500/50">
-              <span class="text-[9px] font-bold text-emerald-400 block mb-0.5">Sem 5 (4x4r):</span>
-              <input type="text" id="prog-s5-reps" value="3x4 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s5-carga" value="92.5 kg" class="w-full bg-slate-900 border border-emerald-500 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
+              <span class="text-[9px] font-bold text-emerald-400 block mb-0.5">Sem 5 (87.5-90%):</span>
+              <input type="text" id="prog-s5-reps" value="4 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s5-carga" value="97.5 kg (88%)" class="w-full bg-slate-900 border border-emerald-500 rounded p-1 text-emerald-300 font-mono font-bold text-[11px]">
             </div>
             <div id="col-s6-coach" class="bg-slate-950 p-1.5 rounded-lg border border-cyan-500/50">
-              <span class="text-[9px] font-bold text-cyan-400 block mb-0.5">Sem 6 (Test RM):</span>
-              <input type="text" id="prog-s6-reps" value="3x3-RM" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
-              <input type="text" id="prog-s6-carga" value="100.0 kg" class="w-full bg-slate-900 border border-cyan-500 rounded p-1 text-cyan-300 font-mono font-bold text-[11px]">
+              <span class="text-[9px] font-bold text-cyan-400 block mb-0.5">Sem 6 (Test 95%+):</span>
+              <input type="text" id="prog-s6-reps" value="2 reps" class="w-full bg-slate-900 border border-slate-800 rounded p-1 mb-1 text-white font-mono text-[11px]">
+              <input type="text" id="prog-s6-carga" value="105 kg (95%+)" class="w-full bg-slate-900 border border-cyan-500 rounded p-1 text-cyan-300 font-mono font-bold text-[11px]">
             </div>
           </div>
         </div>
@@ -330,7 +331,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div>
             <label class="text-[10px] text-slate-400 font-bold">Reps / RIR Objetivo Base</label>
-            <input type="text" id="inp-rir" value="Prog. Semanal (3 series)" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
+            <input type="text" id="inp-rir" value="S1:10r | S2:8r | S3:6r | S4:5r | S5:4r | S6:Test" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-2 text-xs text-white">
           </div>
           <div>
             <label class="text-[10px] text-slate-400 font-bold">Pausa de Descanso</label>
@@ -338,9 +339,9 @@
               <option value="30''">30 seg (Calor / Movilidad)</option>
               <option value="45''">45 seg (Accesorios / Core)</option>
               <option value="60''">60 seg</option>
-              <option value="90''">90 seg (Remo unilateral)</option>
-              <option value="2'">2 min (Banca / Hip Thrust)</option>
-              <option value="2'30''" selected>2 min 30 seg (Sentadilla / Hex Bar)</option>
+              <option value="90''">90 seg (Olímpico)</option>
+              <option value="2'00''">2 min (Banca / Anselmi)</option>
+              <option value="2'30''" selected>2 min 30 seg (Sentadilla / Muerto)</option>
             </select>
           </div>
         </div>
@@ -404,7 +405,6 @@
       <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma Cloud Blindada</p>
     </div>
 
-    <!-- Pestañas Auth -->
     <div class="flex bg-slate-950 p-1 rounded-2xl border border-slate-800">
       <button type="button" id="tab-auth-login" onclick="cambiarModoAuth('login')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition bg-emerald-500 text-slate-950 cursor-pointer">Ingresar</button>
       <button type="button" id="tab-auth-registro" onclick="cambiarModoAuth('registro')" class="w-1/2 py-2 rounded-xl text-xs font-bold transition text-slate-400 hover:text-white cursor-pointer">Crear Cuenta</button>
@@ -413,7 +413,7 @@
     <div class="space-y-4 text-left">
       <div id="campo-registro-nombre" class="hidden">
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Nombre Completo</label>
-        <input type="text" id="reg-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="ej: Dylan Losada">
+        <input type="text" id="reg-nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 text-sm" placeholder="ej: Ramiro Abbattista">
       </div>
       <div id="campo-registro-telefono" class="hidden">
         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">WhatsApp</label>
@@ -463,11 +463,11 @@
         </div>
       </div>
 
-      <!-- TABLA RESUMEN 1RM ESTILO DRIVE -->
+      <!-- TABLA RESUMEN 1RM ESTILO EXCEL -->
       <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2">
         <div class="flex items-center justify-between">
           <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">📊 Resumen de Control 1RM & Porcentajes:</span>
-          <span class="text-[10px] text-slate-500 font-mono">Dylan Losada (Oct/Nov)</span>
+          <span class="text-[10px] text-slate-500 font-mono">Planificación Noviembre</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-[11px] font-mono">
@@ -486,28 +486,34 @@
             </thead>
             <tbody id="tabla-control-rm-body" class="divide-y divide-slate-800/60 text-slate-300">
               <tr>
-                <td class="py-1 text-white font-bold">Sentadilla Trasera (Rack)</td>
-                <td class="text-center">80.0</td><td class="text-center">8</td>
-                <td class="text-center text-emerald-400 font-bold">101.3 kg</td>
-                <td class="text-center">70.9</td><td class="text-center">76.0</td><td class="text-center">81.0</td><td class="text-center">86.1</td><td class="text-center text-cyan-300 font-bold">91.2</td>
+                <td class="py-1 text-white font-bold">Sentadilla Trasera</td>
+                <td class="text-center">110.0</td><td class="text-center">2</td>
+                <td class="text-center text-emerald-400 font-bold">117.3 kg</td>
+                <td class="text-center">82.1</td><td class="text-center">88.0</td><td class="text-center">93.8</td><td class="text-center">99.7</td><td class="text-center text-cyan-300 font-bold">105.6</td>
               </tr>
               <tr>
-                <td class="py-1 text-white font-bold">Barra Hexagonal (Potencia)</td>
-                <td class="text-center">90.0</td><td class="text-center">8</td>
-                <td class="text-center text-emerald-400 font-bold">114.0 kg</td>
-                <td class="text-center">79.8</td><td class="text-center">85.5</td><td class="text-center">91.2</td><td class="text-center">96.9</td><td class="text-center text-cyan-300 font-bold">102.6</td>
+                <td class="py-1 text-white font-bold">Peso Muerto Convencional</td>
+                <td class="text-center">100.0</td><td class="text-center">2</td>
+                <td class="text-center text-emerald-400 font-bold">106.7 kg</td>
+                <td class="text-center">74.7</td><td class="text-center">80.0</td><td class="text-center">85.4</td><td class="text-center">90.7</td><td class="text-center text-cyan-300 font-bold">96.0</td>
               </tr>
               <tr>
-                <td class="py-1 text-white font-bold">Press Pecho Plano Barra</td>
-                <td class="text-center">60.0</td><td class="text-center">8</td>
-                <td class="text-center text-emerald-400 font-bold">76.0 kg</td>
-                <td class="text-center">53.2</td><td class="text-center">57.0</td><td class="text-center">60.8</td><td class="text-center">64.6</td><td class="text-center text-cyan-300 font-bold">68.4</td>
+                <td class="py-1 text-white font-bold">Press Banca / Militar</td>
+                <td class="text-center">55.0</td><td class="text-center">1</td>
+                <td class="text-center text-emerald-400 font-bold">56.8 kg</td>
+                <td class="text-center">39.8</td><td class="text-center">42.6</td><td class="text-center">45.4</td><td class="text-center">48.3</td><td class="text-center text-cyan-300 font-bold">51.1</td>
               </tr>
               <tr>
-                <td class="py-1 text-white font-bold">Hip Thrust c/ Barra Olímpica</td>
-                <td class="text-center">80.0</td><td class="text-center">8</td>
-                <td class="text-center text-emerald-400 font-bold">101.3 kg</td>
-                <td class="text-center">70.9</td><td class="text-center">76.0</td><td class="text-center">81.0</td><td class="text-center">86.1</td><td class="text-center text-cyan-300 font-bold">91.2</td>
+                <td class="py-1 text-white font-bold">Remo con barra prono</td>
+                <td class="text-center">55.0</td><td class="text-center">4</td>
+                <td class="text-center text-emerald-400 font-bold">62.3 kg</td>
+                <td class="text-center">43.6</td><td class="text-center">46.7</td><td class="text-center">49.8</td><td class="text-center">53.0</td><td class="text-center text-cyan-300 font-bold">56.1</td>
+              </tr>
+              <tr>
+                <td class="py-1 text-white font-bold">Cargadas de Potencia</td>
+                <td class="text-center">60.0</td><td class="text-center">3</td>
+                <td class="text-center text-emerald-400 font-bold">66.0 kg</td>
+                <td class="text-center">46.2</td><td class="text-center">49.5</td><td class="text-center">52.8</td><td class="text-center">56.1</td><td class="text-center text-cyan-300 font-bold">59.4</td>
               </tr>
             </tbody>
           </table>
@@ -521,7 +527,7 @@
       </div>
     </div>
 
-    <!-- PANEL EXCLUSIVO DEL COACH (DIRECTORIO ESTILO HARBIZ) -->
+    <!-- PANEL EXCLUSIVO DEL COACH -->
     <div id="seccion-admin" class="hidden space-y-4 bg-slate-900 border border-blue-500/40 p-5 rounded-3xl">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div>
@@ -591,85 +597,68 @@
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     }
 
-    // BIBLIOTECA COMPLETA DE EJERCICIOS CON VIDEOS Y CRITERIOS BIOMECÁNICOS
+    // BIBLIOTECA COMPLETA DE EJERCICIOS
     const BIBLIOTECA_RAMIRO = {
       mov_tobillo: [
-        { nombre: "Dorsiflexión de tobillo en pared con rodilla al frente", criterio: "Talón bien apoyado sin despegar; empujar rodilla superando la punta del pie.", video: "" },
-        { nombre: "Dorsiflexión de tobillo en estocada con banda", criterio: "Tracción constante en astrágalo para liberar movilidad.", video: "" },
-        { nombre: "Círculos controlados de tobillo (CARs)", criterio: "Máxima amplitud articular sin mover tibia.", video: "" }
+        { nombre: "Movilidad de Tobillo (Dorsiflexión dinámica)", criterio: "Tobillo: talón bien apoyado sin despegar; empujar rodilla.", video: "" },
+        { nombre: "Dorsiflexión de tobillo en pared con rodilla al frente", criterio: "Liberar flexión dorsal previa a sentadillas y running.", video: "" }
       ],
       mov_cadera: [
-        { nombre: "Flujo 90/90 dinámico en suelo con inclinación anterior de torso", criterio: "Apertura coxofemoral rápida sin redondear lumbares; lubrica cadera para sentadilla profunda.", video: "" },
-        { nombre: "Spiderman Lunge con rotación torácica profunda", criterio: "Zancada amplia abriendo cadera y acompañando con mirada hacia la mano.", video: "https://www.youtube.com/shorts/Xh07T2pZ0lU" },
-        { nombre: "Puente glúteo bipodal con pausa isométrica de 2s arriba", criterio: "Bloqueo neto de glúteos en el tope sin arquear columna lumbar.", video: "" },
-        { nombre: "Frog Stretch dinámico para aductores", criterio: "Caderas hacia atrás manteniendo columna neutra.", video: "" }
+        { nombre: "Movilidad de Cadera Profunda (Sentadilla Kosaka + 90/90)", criterio: "Cadera, aductores y flexores; ganar profundidad limpia.", video: "" },
+        { nombre: "Puente de Glúteos Bipodal con apertura de Miniband", criterio: "Activación del glúteo medio y estabilidad lumbo-pélvica.", video: "" },
+        { nombre: "Flujo 90/90 dinámico en suelo con inclinación anterior", criterio: "Apertura coxofemoral rápida sin redondear lumbares.", video: "" }
       ],
       mov_toracica: [
-        { nombre: "Rotaciones torácicas en cuadrupedia + Dislocaciones con bastón", criterio: "Desbloqueo dorsal escapular activo sin compensación lumbar; paso limpio con bastón.", video: "" },
-        { nombre: "Extensión torácica sobre Foam Roller", criterio: "Foco en apertura de pecho sin hiperextender cuello.", video: "" },
-        { nombre: "Open Book (Aperturas en suelo de lado)", criterio: "Acompañar con la cabeza la apertura del brazo.", video: "" }
+        { nombre: "Movilidad Dinámica de Hombros y Escápulas (Y-W-T en prono con banda)", criterio: "Hombros y trapecio inferior; retracción escapular activa.", video: "" },
+        { nombre: "Movilidad Torácica Dinámica en Cuadrupedia (Thread the Needle)", criterio: "Columna torácica y rotación dorsal sin compensación lumbar.", video: "" }
       ],
       mov_escapula_hombro: [
-        { nombre: "Flexiones escapulares en plancha (Scapular Push-ups)", criterio: "Retracción y protracción escapular pura con brazos estirados.", video: "" },
-        { nombre: "Deslizamientos en pared (Wall Slides para serrato)", criterio: "Mantener lumbares y antebrazos en contacto con pared.", video: "" },
-        { nombre: "Dislocaciones con bastón de madera o toalla", criterio: "Paso controlado a dos manos sin flexionar codos.", video: "" }
+        { nombre: "Movilidad de Columna Torácica y Hombros (Cat-Cow + YTWL)", criterio: "Desbloqueo articular completo cintura escapular.", video: "" },
+        { nombre: "Dislocaciones de hombro con bastón de madera o banda", criterio: "Paso controlado a dos manos sin flexionar codos.", video: "" }
       ],
       mov_muneca: [
-        { nombre: "Cargas de peso en cuadrupedia con dedos al frente y atrás", criterio: "Presión progresiva en talón de la mano preparando rack de sentadilla frontal.", video: "" }
+        { nombre: "Movilidad Articular Dinámica de Muñecas, Codos y Hombros", criterio: "Muñecas y antebrazos para rack de cargadas y press.", video: "" }
       ],
       core_antiextension: [
-        { nombre: "Plancha frontal isométrica en colchoneta con braceo activo", criterio: "Co-contracción máxima: glúteos apretados y ombligo adentro; pelvis neutra.", video: "" },
-        { nombre: "Deadbug isométrico presionando Fitball", criterio: "Empuje constante manteniendo zona lumbar pegada al suelo.", video: "https://www.youtube.com/shorts/g_BYB0R-4Ws" },
-        { nombre: "Rollout con rueda abdominal o barra", criterio: "Extensión hasta el punto de control sin arquear lumbares.", video: "" }
+        { nombre: "Plancha Frontal Isométrica con Desplazamiento", criterio: "Core 360° anti-extensión; glúteos y abdomen co-contraídos.", video: "" },
+        { nombre: "Rueda Abdominal (Ab Wheel) desde rodillas", criterio: "Abdominales y dorsal ancho; control excéntrico estricto.", video: "" }
       ],
       core_antirrotacion: [
-        { nombre: "Press Pallof en Polea Multifunción (Pausa 2s)", criterio: "Altura al esternón; resistir rotación fijando cadera al frente.", video: "https://www.youtube.com/shorts/5_8k3kK0m9o" },
-        { nombre: "Bird Dog en cuadrupedia con pausa isométrica", criterio: "Extender brazo y pierna opuesta sin rotar pelvis.", video: "" },
-        { nombre: "Remo Renegado en plancha con mancuernas", criterio: "Tracción firme sin balancear la cadera de lado.", video: "" }
+        { nombre: "Pallof Press en Polea con Split", criterio: "Anti-rotación y estabilidad pélvica en split stance.", video: "https://www.youtube.com/shorts/5_8k3kK0m9o" },
+        { nombre: "Bird Dog en cuadrupedia con pausa isométrica", criterio: "Extender brazo y pierna opuesta sin desalinear pelvis.", video: "" }
       ],
       core_antiflexion_lat: [
-        { nombre: "Caminata de Granjero pesada con mancuernas (Farmer Walk)", criterio: "Pasos firmes, pecho erguido y hombros abajo; torso totalmente vertical.", video: "" },
-        { nombre: "Plancha lateral apoyando antebrazo", criterio: "Línea recta de tobillos a hombros sin caer cadera.", video: "" },
-        { nombre: "Suitcase Carry (Paseo del granjero unilateral)", criterio: "Resistir la inclinación hacia el lado del peso.", video: "" }
+        { nombre: "Copenhagen Plank (Plancha Copenhague en banco)", criterio: "Aductores (prioridad preventiva) y estabilidad de pubis.", video: "" },
+        { nombre: "Caminata de Granjero pesada con mancuernas (Farmer Walk)", criterio: "Pasos firmes, pecho erguido y hombros abajo.", video: "" }
       ],
       core_dinamico: [
-        { nombre: "Hanging Knee / Leg Raises colgado", criterio: "Flexión de cadera con retroversión sin balanceo por inercia.", video: "" },
-        { nombre: "Lanzamientos rotacionales Med Ball contra pared", criterio: "Transferencia de fuerza desde cadera hacia las manos.", video: "" }
+        { nombre: "Lanzamientos de Med Ball c/ rotación contra pared", criterio: "Torque para transferencia y potencia balística.", video: "https://www.youtube.com/shorts/0Lz8g8q0VbI" }
       ],
       inf_rodilla: [
-        { nombre: "Sentadilla Trasera con Barra Olímpica (Rack Koena)", criterio: "Barra firme sobre trapecios; empuje de suelo distribuyendo peso; romper paralelo.", video: "https://www.youtube.com/shorts/bEv6CCg2BC8" },
-        { nombre: "Sentadilla Frontal con Barra (Front Squat)", criterio: "Codos altos, torso vertical y descenso controlado.", video: "https://www.youtube.com/shorts/uYumuL_G_V0" },
-        { nombre: "Sentadilla Búlgara con Mancuernas", criterio: "Rodilla delantera estable sin colapso en valgo.", video: "https://www.youtube.com/shorts/2C-uNgKwPLE" },
-        { nombre: "Estocadas Reversas con Mancuernas", criterio: "Paso atrás para frenado sin impacto rotuliano ni cizalla.", video: "" },
-        { nombre: "Goblet Squat con Kettlebell", criterio: "Codos pegados y descenso vertical profundo.", video: "" }
+        { nombre: "Sentadilla Trasera con Barra", criterio: "Sentadilla profunda con recorrido completo sin colapsar rodillas.", video: "https://www.youtube.com/shorts/bEv6CCg2BC8" },
+        { nombre: "Sentadilla Frontal", criterio: "Codos altos, torso totalmente erguido.", video: "https://www.youtube.com/shorts/uYumuL_G_V0" },
+        { nombre: "Sentadilla Búlgara c/ Mancuernas", criterio: "Fuerza unipodal; eje rodilla-tobillo estable.", video: "https://www.youtube.com/shorts/2C-uNgKwPLE" },
+        { nombre: "Sentadilla Sumo c/ KB pesada", criterio: "Aductores y glúteos con rango amplio de apertura.", video: "" }
       ],
       inf_cadera: [
-        { nombre: "Barra Hexagonal (Potencia / Eje Lumbar Neutro)", criterio: "Empuje de suelo con eje lumbar neutro ideal para atletas; extensión neta de cadera.", video: "" },
-        { nombre: "Peso Muerto Convencional con Barra Olímpica", criterio: "Barra rozando tibias, bloqueo firme de dorsales.", video: "https://www.youtube.com/shorts/op9kVnSso6Q" },
-        { nombre: "Peso Muerto Rumano c/ Mancuernas (RDL)", criterio: "Bisagra de cadera hacia atrás sintiendo tensión isquiosural.", video: "https://www.youtube.com/shorts/JCXUYuzwNrM" },
-        { nombre: "Hip Thrust en Banco c/ Barra Olímpica y almohadilla", criterio: "Espinillas estrictamente verticales a 90° arriba; bloqueo neto de glúteos en el tope.", video: "https://www.youtube.com/shorts/SEdqd1n0cvg" },
-        { nombre: "Good Morning (Buenos Días con barra)", criterio: "Flexión de cadera con espalda rígida en todo momento.", video: "" }
+        { nombre: "Peso Muerto Convencional", criterio: "Fuerza de tracción de suelo con bisagra pura de cadera.", video: "https://www.youtube.com/shorts/op9kVnSso6Q" },
+        { nombre: "Barra Hexagonal (Potencia / Eje Lumbar Neutro)", criterio: "Empuje de suelo con eje lumbar neutro ideal para potencia.", video: "" },
+        { nombre: "Hip Thrust en Banco c/ Barra Olímpica", criterio: "Bloqueo neto de glúteos en el tope con espinillas a 90°.", video: "https://www.youtube.com/shorts/SEdqd1n0cvg" }
       ],
       sup_empuje: [
-        { nombre: "Press Pecho Plano con Barra Olímpica (Rack Koena)", criterio: "Escápulas clavadas en banco; trayectoria diagonal al esternón con codos a 45°.", video: "https://www.youtube.com/shorts/rT7DgCr-3pg" },
-        { nombre: "Press Inclinado con Mancuernas (30°)", criterio: "Pectoral superior con codos a 45°; empuje fluido.", video: "https://www.youtube.com/shorts/8iPEnn-ltC8" },
-        { nombre: "Press Militar Sentado c/ Mancuernas (80°)", criterio: "Apoyo en respaldo, protección lumbar; bloqueo overhead.", video: "https://www.youtube.com/shorts/2yjwXTZQDDI" },
-        { nombre: "Extensiones de Tríceps en Polea c/ Soga", criterio: "Codos pegados al cuerpo; apertura al final del recorrido.", video: "" }
+        { nombre: "Press de Banca Plano (8 Pesadas + 30 Aperturas de Bombeo)", criterio: "Método Anselmi: estímulo mecánico pesado seguido de congestión metabólica.", video: "https://www.youtube.com/shorts/rT7DgCr-3pg" },
+        { nombre: "Press Banca / Militar", criterio: "Trayectoria limpia y bloqueo overhead estricto.", video: "https://www.youtube.com/shorts/2yjwXTZQDDI" }
       ],
       sup_traccion: [
-        { nombre: "Remo Unilateral c/ Mancuerna pesada apoyando rodilla en banco", criterio: "Apoyo trípode firme; tracción hacia el bolsillo sin rotar torso.", video: "" },
-        { nombre: "Jalón Dorsal en Polea Koena (Barra Larga)", criterio: "Depresión escapular estricta al pecho sin balanceo.", video: "" },
-        { nombre: "Remo en TRX c/ Pausa Arriba (Suspensión)", criterio: "Cuerpo como una tabla; retracción escapular con 1s de pausa.", video: "" },
-        { nombre: "Facepull en Polea Multifunción c/ Soga Koena", criterio: "Traccionar hacia la frente separando soga; salud escapular y manguito rotador.", video: "" },
-        { nombre: "Dominadas Pronas Estrictas (Pull-ups)", criterio: "Rango completo desde bloqueo articular hasta barbilla sobre barra.", video: "https://www.youtube.com/shorts/eGo4IYlbE5g" }
+        { nombre: "Remo con barra prono (Pesadas + Slam Ball PAP)", criterio: "Post-activación potente: remo pesado y aceleración balística.", video: "https://www.youtube.com/shorts/h4nKGfU_qG0" },
+        { nombre: "Remo Unilateral c/ Mancuerna pesada", criterio: "Apoyo trípode firme sin rotar columna.", video: "" }
       ],
       olimpicos: [
-        { nombre: "Power Clean (Cargada de Potencia)", criterio: "Triple extensión explosiva recibiendo en cuarto de sentadilla.", video: "https://www.youtube.com/shorts/mEyoH5fZuF8" },
-        { nombre: "Hang Clean (Cargada Colgante)", criterio: "Impulso desde posición colgada con aceleración máxima.", video: "https://www.youtube.com/shorts/V0A8Z0_n3E0" }
+        { nombre: "Cargadas de Potencia Colgado (Hang Power Clean)", criterio: "Extensión violenta de cadera; recepción sólida en cuarto de sentadilla.", video: "https://www.youtube.com/shorts/mEyoH5fZuF8" },
+        { nombre: "Cargada de Potencia + Sentadilla Frontal", criterio: "Combinado olímpico de potencia y recepción profunda.", video: "https://www.youtube.com/shorts/V0A8Z0_n3E0" }
       ],
       potencia_pliometria: [
-        { nombre: "Lanzamientos Med Ball / Slam Ball (6 a 8kg)", criterio: "Aceleración balística explosiva sin frenar el movimiento.", video: "https://www.youtube.com/shorts/0Lz8g8q0VbI" },
-        { nombre: "Saltos al Cajón (Box Jump)", criterio: "Recepción amortiguada en media sentadilla silenciosa.", video: "https://www.youtube.com/shorts/52r_Ul5k03g" }
+        { nombre: "Lanzamientos Med Ball / Slam Ball", criterio: "Aceleración máxima explosiva.", video: "https://www.youtube.com/shorts/0Lz8g8q0VbI" }
       ]
     };
 
@@ -677,10 +666,12 @@
     let perfilActual = null;
     let rutinasActivas = [];
     let marcasRMAlumno = {
-      "sentadilla trasera con barra olímpica (rack)": 101.3,
-      "barra hexagonal (potencia / eje lumbar neutro)": 114.0,
-      "press pecho plano con barra olímpica": 76.0,
-      "hip thrust en banco c/ barra olímpica": 101.3
+      "sentadilla trasera": 117.3,
+      "peso muerto convencional": 106.7,
+      "press banca / militar": 56.8,
+      "remo con barra prono": 62.3,
+      "cargadas de potencia": 66.0,
+      "sentadilla frontal": 71.5
     };
     let semanaActiva = 1;
     let diaActivoId = null;
@@ -735,20 +726,20 @@
 
     function aplicarPresetRepsRapido(tipo) {
       if (!tipo) return;
-      if (tipo === 'dylan_fuerza') {
-        document.getElementById('inp-series').value = "3";
-        document.getElementById('prog-s1-reps').value = "3x10-12";
-        document.getElementById('prog-s1-carga').value = "70.0 kg";
-        document.getElementById('prog-s2-reps').value = "3x8 reps";
-        document.getElementById('prog-s2-carga').value = "75.0 kg";
-        document.getElementById('prog-s3-reps').value = "3x6 reps";
-        document.getElementById('prog-s3-carga').value = "82.5 kg";
-        document.getElementById('prog-s4-reps').value = "3x5 reps";
-        document.getElementById('prog-s4-carga').value = "87.5 kg";
-        document.getElementById('prog-s5-reps').value = "3x4 reps";
-        document.getElementById('prog-s5-carga').value = "92.5 kg";
-        document.getElementById('prog-s6-reps').value = "3x3-RM";
-        document.getElementById('prog-s6-carga').value = "100.0 kg";
+      if (tipo === 'ramiro_fuerza') {
+        document.getElementById('inp-series').value = "4";
+        document.getElementById('prog-s1-reps').value = "10 reps";
+        document.getElementById('prog-s1-carga').value = "75 kg (68%)";
+        document.getElementById('prog-s2-reps').value = "8 reps";
+        document.getElementById('prog-s2-carga').value = "82.5 kg (75%)";
+        document.getElementById('prog-s3-reps').value = "6 reps";
+        document.getElementById('prog-s3-carga').value = "87.5 kg (80%)";
+        document.getElementById('prog-s4-reps').value = "5 reps";
+        document.getElementById('prog-s4-carga').value = "92.5 kg (84%)";
+        document.getElementById('prog-s5-reps').value = "4 reps";
+        document.getElementById('prog-s5-carga').value = "97.5 kg (88%)";
+        document.getElementById('prog-s6-reps').value = "2 reps";
+        document.getElementById('prog-s6-carga').value = "105 kg (95%+)";
       } else if (tipo === '3x10') {
         document.getElementById('inp-series').value = "3";
         for (let i = 1; i <= 6; i++) {
@@ -772,13 +763,13 @@
       } else if (tipo === 'core') {
         document.getElementById('inp-series').value = "3";
         for (let i = 1; i <= 6; i++) {
-          document.getElementById('prog-s' + i + '-reps').value = "3x30'' / 3x12";
+          document.getElementById('prog-s' + i + '-reps').value = "3x40'' / 3x12";
           document.getElementById('prog-s' + i + '-carga').value = "Corporal";
         }
       } else if (tipo === 'movilidad') {
         document.getElementById('inp-series').value = "2";
         for (let i = 1; i <= 6; i++) {
-          document.getElementById('prog-s' + i + '-reps').value = "2x8 por lado";
+          document.getElementById('prog-s' + i + '-reps').value = "2x12 por lado";
           document.getElementById('prog-s' + i + '-carga').value = "Banda/BW";
         }
       }
@@ -940,32 +931,30 @@
       document.getElementById('usuario-info').classList.add('hidden');
     }
 
-    // CARGA DE PERFILES Y ROLES OPTIMIZADA (INMEDIATA)
+    // CARGA DE PERFILES Y ROLES OPTIMIZADA
     async function cargarPerfilYRoles() {
       if (!usuarioActual ? true : !sb) return;
 
       try {
-        // 1. Mostrar pantalla de inmediato
         document.getElementById('seccion-auth').classList.add('hidden');
         document.getElementById('seccion-panel').classList.remove('hidden');
         document.getElementById('usuario-info').classList.remove('hidden');
         document.getElementById('usuario-info').classList.add('flex');
         
-        const fallbackNombre = usuarioActual.email ? usuarioActual.email.split('@')[0] : 'Dylan Losada';
+        const fallbackNombre = usuarioActual.email ? usuarioActual.email.split('@')[0] : 'Ramiro Abbattista';
         document.getElementById('dash-alumno-nombre').innerText = 'Hola, ' + fallbackNombre;
 
-        // 2. Traer perfil
         const { data: perfil } = await sb
           .from('perfiles_usuarios')
           .select('*')
           .eq('id', usuarioActual.id)
           .maybeSingle();
 
-        perfilActual = def(perfil, { rol: 'alumno', nombre: fallbackNombre });
+        perfilActual = def(perfil, { rol: 'coach', nombre: fallbackNombre });
         if (perfilActual.nombre) {
           document.getElementById('dash-alumno-nombre').innerText = 'Hola, ' + perfilActual.nombre;
         }
-        document.getElementById('tag-rol-user').innerText = def(perfilActual.rol, 'alumno').toUpperCase();
+        document.getElementById('tag-rol-user').innerText = def(perfilActual.rol, 'coach').toUpperCase();
 
         if (perfilActual.rol === 'coach') {
           document.getElementById('seccion-admin').classList.remove('hidden');
@@ -975,7 +964,6 @@
           document.getElementById('seccion-admin').classList.add('hidden');
         }
 
-        // 3. Cargar datos en segundo plano
         cargarMarcasRM();
         cargarRutinasAlumno();
         calcularRachaYCalendario();
@@ -1011,7 +999,7 @@
       return { textoDisplay: textoPrescripcion, kgCalculado: null };
     }
 
-    // CARGA DE RUTINAS CON PARSEO COMPATIBLE
+    // CARGA DE RUTINAS
     async function cargarRutinasAlumno() {
       if (!sb ? true : !usuarioActual) return;
       try {
@@ -1035,7 +1023,7 @@
       const contSem = document.getElementById('barra-solapas-semanas');
 
       if (rutinasActivas.length === 0) {
-        document.getElementById('lista-rutinas').innerHTML = '<div class="p-8 bg-slate-900 rounded-3xl text-center text-slate-500">No hay planes activos asignados por el Coach todavía.</div>';
+        document.getElementById('lista-rutinas').innerHTML = '<div class="p-8 bg-slate-900 rounded-3xl text-center text-slate-500">No hay planes activos asignados todavía. Podés crear uno desde el Panel del Coach.</div>';
         return;
       }
 
@@ -1063,11 +1051,11 @@
 
     function renderizarBotonesSemanas() {
       const contSem = document.getElementById('barra-solapas-semanas');
-      const nombresSemDylan = ["1 (10-12r)", "2 (8r)", "3 (6r)", "4 (2x6)", "5 (4x4)", "6 (Test RM 🔥)"];
+      const nombresSemRamiro = ["1 (65-70%)", "2 (72.5-75%)", "3 (77.5-80%)", "4 (82.5-85%)", "5 (87.5-90%)", "6 (Test 95%+ 🔥)"];
       
       contSem.innerHTML = Array.from({ length: totalSemanas }).map((_, idx) => {
         const s = idx + 1;
-        const textoSem = (idx < nombresSemDylan.length) ? nombresSemDylan[idx] : String(s);
+        const textoSem = (idx < nombresSemRamiro.length) ? nombresSemRamiro[idx] : String(s);
         const claseActive = s === semanaActiva ? 'tab-sem-active' : 'bg-slate-950 border-slate-700 text-slate-400';
         return '<button type="button" onclick="cambiarSemana(' + s + ')" class="btn-sem px-3 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer ' + claseActive + '">Sem ' + textoSem + '</button>';
       }).join('');
@@ -1107,13 +1095,33 @@
       renderizarTarjetaRutina(rutina, mapa);
     }
 
-    // RENDERIZADO ESTILO DRIVE CON BLOQUES PLEGABLES (ACORDEÓN)
+    // REGISTRO DE FECHA DE SESIÓN
+    async function guardarFechaSesion(planId, sem, fechaVal) {
+      if (!usuarioActual ? true : !sb) return;
+      const { error } = await sb.from('registros_series').upsert({
+        planificacion_id: String(planId),
+        user_id: usuarioActual.id,
+        ejercicio_index: 999,
+        ejercicio: 'CONTROL_FECHA_SESION',
+        semana_num: sem,
+        serie_num: 1,
+        completed_at: fechaVal ? new Date(fechaVal).toISOString() : new Date().toISOString(),
+        completada: true,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'planificacion_id,user_id,ejercicio_index,semana_num,serie_num' });
+
+      if (!error) {
+        mostrarToast("✓ Fecha de sesión guardada");
+        calcularRachaYCalendario();
+      }
+    }
+
+    // RENDERIZADO ESTILO EXCEL CON CARGA SUGERIDA Y CONTROL DE FECHA
     function renderizarTarjetaRutina(rutina, mapaSeries) {
       const cont = document.getElementById('lista-rutinas');
       const detalles = def(rutina.ejercicios_detalle, []);
       const esUltimaSemana = semanaActiva === totalSemanas;
 
-      // Agrupamos por bloques estilo Drive
       const bloques = {};
       detalles.forEach((ej, itmIdx) => {
         const bNom = def(ej.bloque, 'GENERAL');
@@ -1123,12 +1131,17 @@
 
       let html = '<div id="card-rutina-' + rutina.id + '" class="space-y-4">';
       
-      // Cabecera de la sesión
-      html += '<div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl flex justify-between items-center">';
-      html += '<div><span class="text-xs text-emerald-400 font-bold uppercase block">' + escaparHTML(def(rutina.mesociclo, 'Mesociclo Oct/Nov')) + '</span>';
+      // Cabecera de la sesión con Selector de Fecha
+      const fechaRegistroCtrl = (mapaSeries['999_1'] && mapaSeries['999_1'].completed_at) ? mapaSeries['999_1'].completed_at.slice(0, 10) : obtenerFechaLocalString();
+
+      html += '<div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-3">';
+      html += '<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">';
+      html += '<div><span class="text-xs text-emerald-400 font-bold uppercase block">' + escaparHTML(def(rutina.mesociclo, 'Planificación Noviembre')) + '</span>';
       html += '<h3 class="text-xl font-black text-white">' + escaparHTML(rutina.dia) + '</h3></div>';
-      html += '<div class="text-xs bg-slate-950 text-cyan-300 font-mono px-3 py-1.5 rounded-full border border-cyan-500/30 font-bold">Semana ' + semanaActiva + ' de ' + totalSemanas + '</div>';
-      html += '</div>';
+      html += '<div class="flex items-center gap-2">';
+      html += '<label class="text-[11px] font-bold text-slate-400">📅 Fecha de la sesión:</label>';
+      html += '<input type="date" value="' + fechaRegistroCtrl + '" onchange="guardarFechaSesion(\'' + rutina.id + '\', ' + semanaActiva + ', this.value)" class="bg-slate-950 border border-slate-700 text-emerald-400 font-mono text-xs rounded-xl p-1.5 focus:border-emerald-500 font-bold">';
+      html += '</div></div></div>';
 
       // Iteración de bloques en acordeón
       Object.keys(bloques).forEach(bNom => {
@@ -1136,23 +1149,24 @@
         const estaPlegado = def(bloquesPlegados[bNom], false);
         const iconoPlegar = estaPlegado ? '▼' : '▲';
         
-        // Color por bloque estilo Drive
         let colorBorde = 'border-slate-800';
         let colorTag = 'text-slate-400 bg-slate-800';
         if (bNom.includes('CALOR') ? true : bNom.includes('MOVILIDAD')) {
           colorBorde = 'border-amber-500/40';
           colorTag = 'text-amber-300 bg-amber-500/10 border-amber-500/30';
-        } else if (bNom.includes('BLOQUE 1') ? true : bNom.includes('FUERZA')) {
+        } else if (bNom.includes('OLÍMPICO') ? true : bNom.includes('BALÍSTICO')) {
+          colorBorde = 'border-purple-500/40';
+          colorTag = 'text-purple-300 bg-purple-500/10 border-purple-500/30';
+        } else if (bNom.includes('PRINCIPAL') ? true : bNom.includes('FUERZA')) {
           colorBorde = 'border-emerald-500/40';
           colorTag = 'text-emerald-300 bg-emerald-500/10 border-emerald-500/30';
-        } else if (bNom.includes('BLOQUE 2') ? true : bNom.includes('ACCESORIOS')) {
+        } else if (bNom.includes('CORE') ? true : bNom.includes('PREVENCIÓN')) {
           colorBorde = 'border-cyan-500/40';
           colorTag = 'text-cyan-300 bg-cyan-500/10 border-cyan-500/30';
         }
 
         html += '<div class="bg-slate-900 border ' + colorBorde + ' rounded-3xl overflow-hidden shadow-xl">';
         
-        // Cabecera clickeable para plegar/desplegar
         html += '<div onclick="togglePlegarBloque(\'' + bNom + '\')" class="p-4 bg-slate-950/80 flex justify-between items-center cursor-pointer border-b border-slate-800/80 hover:bg-slate-950 transition">';
         html += '<div class="flex items-center gap-2">';
         html += '<span class="text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border ' + colorTag + '">' + escaparHTML(bNom) + '</span>';
@@ -1161,43 +1175,46 @@
         html += '<span class="text-xs text-slate-400 font-mono font-bold">' + iconoPlegar + '</span>';
         html += '</div>';
 
-        // Contenido del bloque (ejercicios)
         if (!estaPlegado) {
           html += '<div class="p-4 space-y-4 divide-y divide-slate-800/60">';
           listaItems.forEach(item => {
             const ej = item.ej;
             const itmIdx = item.itmIdx;
             const prog = def(ej.progresionSemanal, {});
-            const semData = def(prog['s' + semanaActiva], { reps: def(ej.reps, '3x10-12'), carga: 'Sugerida' });
-            const esFallo = esUltimaSemana ? true : /fallo/i.test(semData.reps);
-            const cantSeries = (parseInt(ej.series) ? parseInt(ej.series) : 3) + (esFallo ? 1 : 0);
+            const semData = def(prog['s' + semanaActiva], { reps: def(ej.reps, '10 reps'), carga: 'Sugerida' });
+            const esFallo = esUltimaSemana ? true : /fallo|test/i.test(semData.reps);
+            const cantSeries = (parseInt(ej.series) ? parseInt(ej.series) : 4) + (esFallo ? 1 : 0);
             const cargaResuelta = resolverCargaKilos(ej.ejercicio, semData.carga);
             const desc = def(ej.descanso, "90''");
 
             html += '<div class="pt-3 first:pt-0 space-y-2.5">';
             html += '<div class="flex items-start justify-between gap-2">';
-            html += '<div class="space-y-0.5">';
+            html += '<div class="space-y-1">';
             html += '<h4 class="font-bold text-white text-sm md:text-base leading-tight">' + escaparHTML(ej.ejercicio) + '</h4>';
             
-            // Indicación técnica de Drive
             if (ej.criterio ? true : ej.indicacion) {
               const txtCriterio = def(ej.criterio, ej.indicacion);
-              html += '<p class="text-[11px] text-amber-300/90 font-medium leading-relaxed italic">↳ Indicación técnica: ' + escaparHTML(txtCriterio) + '</p>';
+              html += '<p class="text-[11px] text-amber-300/90 font-medium leading-relaxed italic">↳ Indicación técnica / Criterio: ' + escaparHTML(txtCriterio) + '</p>';
             }
 
-            html += '<div class="text-[11px] text-slate-400 flex flex-wrap items-center gap-2 pt-0.5">';
-            html += '<span>🎯 Pauta: <strong class="text-emerald-400 font-mono">' + escaparHTML(cargaResuelta.textoDisplay) + '</strong></span>';
-            html += '<span>• Reps Obj: <strong class="text-white">' + escaparHTML(semData.reps) + '</strong></span>';
-            html += '<span>• Pausa: <strong class="text-cyan-300 font-mono">' + desc + '</strong></span>';
-            html += '</div></div>';
+            // TARJETA DE CARGA SUGERIDA ESTILO EXCEL
+            html += '<div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/90 flex flex-wrap items-center gap-3 text-xs">';
+            html += '<div><span class="text-[10px] text-slate-400 font-bold uppercase block">Carga Sugerida (Sem ' + semanaActiva + '):</span><strong class="text-emerald-400 font-mono text-sm">' + escaparHTML(cargaResuelta.textoDisplay) + '</strong></div>';
+            html += '<div><span class="text-[10px] text-slate-400 font-bold uppercase block">Reps Objetivo:</span><strong class="text-white font-mono">' + escaparHTML(semData.reps) + '</strong></div>';
+            html += '<div><span class="text-[10px] text-slate-400 font-bold uppercase block">Pausa de Descanso:</span><strong class="text-cyan-300 font-mono">' + desc + '</strong></div>';
+            html += '</div>';
+
+            html += '</div>';
 
             if (ej.video) {
               html += '<button type="button" class="btn-play-short shrink-0 bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2.5 py-1 rounded-lg text-xs font-bold cursor-pointer" data-video="' + escaparHTML(ej.video) + '" data-title="' + escaparHTML(ej.ejercicio) + '">▶ Short</button>';
             }
             html += '</div>';
 
-            // Series táctiles compactas (Kg real / Reps reales)
-            html += '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pt-1">';
+            // REGISTRO DE SERIES (CARGA REAL Y REPS REALES)
+            html += '<div class="space-y-1 pt-1">';
+            html += '<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Series ejecutadas (Carga Real & Reps Reales):</span>';
+            html += '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">';
             for (let sIdx = 0; sIdx < cantSeries; sIdx++) {
               const sNum = sIdx + 1;
               const sData = def(mapaSeries[itmIdx + '_' + sNum], {});
@@ -1208,16 +1225,16 @@
               const valCarga = (sData.carga !== undefined && sData.carga !== null) ? sData.carga : '';
               const valRIR = (sData.rir_real !== undefined && sData.rir_real !== null) ? sData.rir_real : '';
 
-              html += '<div class="serie-box bg-slate-950 p-2.5 rounded-xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-2" id="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">';
-              html += '<span class="text-[11px] text-slate-400 font-mono font-bold w-7">S' + sNum + '</span>';
-              html += '<div class="flex items-center gap-1.5 flex-1">';
-              html += '<input type="number" step="0.5" inputmode="decimal" placeholder="Carga (Kg)" value="' + valCarga + '" class="inp-carga w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
-              html += '<input type="number" inputmode="numeric" placeholder="Reps" value="' + valRIR + '" class="inp-rir w-16 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
+              html += '<div class="serie-box bg-slate-950 p-2 rounded-xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-1.5" id="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">';
+              html += '<span class="text-[10px] text-slate-400 font-mono font-bold w-6">S' + sNum + '</span>';
+              html += '<div class="flex items-center gap-1 flex-1">';
+              html += '<input type="number" step="0.5" inputmode="decimal" placeholder="Kg Real" value="' + valCarga + '" class="inp-carga w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
+              html += '<input type="number" inputmode="numeric" placeholder="Reps" value="' + valRIR + '" class="inp-rir w-14 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-white text-center font-mono font-bold" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '">';
               html += '</div>';
               html += '<button type="button" class="btn-toggle-serie px-2.5 py-1 rounded-lg text-xs font-black border cursor-pointer ' + btnClass + '" data-plan="' + rutina.id + '" data-idx="' + itmIdx + '" data-sem="' + semanaActiva + '" data-serie="' + sNum + '" data-descanso="' + desc + '" data-target="box-' + rutina.id + '-' + itmIdx + '-' + sNum + '">' + btnTxt + '</button>';
               html += '</div>';
             }
-            html += '</div></div>';
+            html += '</div></div></div>';
           });
           html += '</div>';
         }
@@ -1367,7 +1384,7 @@
       document.getElementById('stat-racha').innerText = calcularRacha(diasEntrenados) + ' sem';
     }
 
-    // VISTA COMPLETA SÁBANA ESTILO DRIVE
+    // VISTA COMPLETA SÁBANA ESTILO EXCEL
     function abrirVistaPlanillaDrive() {
       const modal = document.getElementById('modal-planilla-drive');
       const contenedor = document.getElementById('tabla-sábana-contenedor');
@@ -1386,12 +1403,12 @@
       tableHtml += '<th class="p-2 border border-slate-800">Bloque / Ejercicio</th>';
       tableHtml += '<th class="p-2 border border-slate-800 text-center">Series</th>';
       tableHtml += '<th class="p-2 border border-slate-800 text-center">Pausa</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 1 (10-12r)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 2 (8r)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 3 (6r)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 4 (2x6)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 5 (4x4)</th>';
-      tableHtml += '<th class="p-2 border border-slate-800 text-center text-cyan-300">SEM 6 (Test RM)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 1 (65-70%)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 2 (72.5-75%)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 3 (77.5-80%)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 4 (82.5-85%)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-emerald-400">SEM 5 (87.5-90%)</th>';
+      tableHtml += '<th class="p-2 border border-slate-800 text-center text-cyan-300">SEM 6 (Test 95%+)</th>';
       tableHtml += '</tr></thead>';
 
       tableHtml += '<tbody class="divide-y divide-slate-800 text-slate-300">';
@@ -1399,7 +1416,7 @@
         const prog = def(ej.progresionSemanal, {});
         tableHtml += '<tr class="hover:bg-slate-800/40">';
         tableHtml += '<td class="p-2 border border-slate-800"><div class="font-bold text-white">' + escaparHTML(ej.ejercicio) + '</div><div class="text-[9px] text-amber-300">' + escaparHTML(def(ej.bloque, '')) + '</div></td>';
-        tableHtml += '<td class="p-2 border border-slate-800 text-center">' + def(ej.series, 3) + '</td>';
+        tableHtml += '<td class="p-2 border border-slate-800 text-center">' + def(ej.series, 4) + '</td>';
         tableHtml += '<td class="p-2 border border-slate-800 text-center">' + def(ej.descanso, "90''") + '</td>';
         
         for (let s = 1; s <= 6; s++) {
@@ -1417,7 +1434,7 @@
       document.getElementById('modal-planilla-drive').classList.add('hidden');
     }
 
-    // PANEL DEL COACH (DIRECTORIO HARBIZ)
+    // PANEL DEL COACH
     async function cargarVistaCoach() {
       if (!sb) return;
       const { data: atletas } = await sb.from('perfiles_usuarios').select('*').eq('rol', 'alumno');
@@ -1504,8 +1521,8 @@
       planEditandoId = null;
       ejEditIdx = null;
       sesionCoachTemporal = [];
-      document.getElementById('admin-mes').value = 'Mesociclo Dylan Losada (Oct/Nov)';
-      document.getElementById('admin-dia').value = 'Día 1 (Lun)';
+      document.getElementById('admin-mes').value = 'Noviembre 6 Semanas';
+      document.getElementById('admin-dia').value = 'Día 1';
       tituloCreador('🛠️ Nuevo plan', 'Progresión semanal ondulada de 6 semanas y guardado directo.', false);
       abrirModalCreadorRapido();
     }
@@ -1674,7 +1691,7 @@
     }
 
     function aplicarPresetProgresionRamiro() {
-      aplicarPresetRepsRapido('dylan_fuerza');
+      aplicarPresetRepsRapido('ramiro_fuerza');
     }
 
     function agregarFilaRutina() {
@@ -1687,7 +1704,7 @@
         bloque: v('inp-bloque'),
         ejercicio: ej,
         criterio: v('inp-criterio-tecnico').trim(),
-        series: parseInt(v('inp-series')) ? parseInt(v('inp-series')) : 3,
+        series: parseInt(v('inp-series')) ? parseInt(v('inp-series')) : 4,
         rir: v('inp-rir').trim(),
         descanso: v('inp-descanso'),
         video: v('inp-video').trim(),
@@ -1739,7 +1756,7 @@
       const fila = {
         alumno_id: alumnoId,
         entorno: document.getElementById('admin-entorno').value,
-        mesociclo: def(document.getElementById('admin-mes').value.trim(), 'Mes 1'),
+        mesociclo: def(document.getElementById('admin-mes').value.trim(), 'Noviembre 6 Semanas'),
         duracion_semanas: parseInt(document.getElementById('admin-duracion-semanas').value) ? parseInt(document.getElementById('admin-duracion-semanas').value) : 6,
         dia: def(document.getElementById('admin-dia').value.trim(), 'Día 1'),
         ejercicios_detalle: sesionCoachTemporal
@@ -1902,7 +1919,7 @@
     async function renderizarEjercicioActivo(rId) {
       const cont = document.getElementById('contenido-ejercicio-activo');
       const item = listaEjerciciosModoActivo[indiceEjercicioActivo];
-      const cantSeries = parseInt(item.series) ? parseInt(item.series) : 3;
+      const cantSeries = parseInt(item.series) ? parseInt(item.series) : 4;
 
       document.getElementById('txt-indice-activo').innerText = (indiceEjercicioActivo + 1) + ' de ' + listaEjerciciosModoActivo.length;
 
@@ -1945,7 +1962,7 @@
         html += '<div class="serie-box bg-slate-950 p-3 rounded-2xl border border-slate-800 ' + boxDone + ' flex items-center justify-between gap-3" id="act-box-' + sNum + '">';
         html += '<span class="font-mono font-bold text-slate-400 text-sm">S' + sNum + '</span>';
         html += '<div class="flex items-center gap-2 flex-1">';
-        html += '<input type="number" step="0.5" placeholder="Kg" value="' + valCarga + '" class="inp-carga-act w-24 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
+        html += '<input type="number" step="0.5" placeholder="Kg Real" value="' + valCarga + '" class="inp-carga-act w-24 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
         html += '<input type="number" placeholder="Reps" value="' + valRIR + '" class="inp-rir-act w-16 bg-slate-900 border border-slate-800 rounded-xl p-2 text-center text-sm text-white font-mono font-bold" data-serie="' + sNum + '">';
         html += '</div>';
         html += '<button type="button" class="btn-toggle-act px-4 py-2.5 rounded-xl text-xs font-black border cursor-pointer ' + btnClass + '" data-serie="' + sNum + '" data-descanso="' + def(item.descanso, "90''") + '">' + btnTxt + '</button>';
