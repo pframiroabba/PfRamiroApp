@@ -408,7 +408,7 @@
 
       <div class="overflow-x-auto border border-slate-800 rounded-2xl bg-slate-950 max-h-48 overflow-y-auto">
         <table class="w-full text-left text-xs">
-          <tbody id="tabla-ejercicios-body" class="divide-y divide-slate-800">
+          <tbody id="tabla-ejercicios-body" class="divide-y border-slate-800">
             <tr id="fila-vacia"><td class="p-3 text-center text-slate-500">Todavía no agregaste ejercicios a la sesión.</td></tr>
           </tbody>
         </table>
@@ -1167,6 +1167,7 @@
       }
     }
 
+    // 5. CONTROL DE 1RM INTERACTIVO
     function renderizarTablaControlRM() {
       const tbody = document.getElementById('tabla-control-rm-body');
       if (!tbody) return;
@@ -1218,6 +1219,7 @@
       mostrarToast('✓ 1RM actualizado a ' + item.rm + ' kg');
     }
 
+    // 6. MOTOR INTELIGENTE DE CÁLCULO DE CARGAS SUGERIDAS (1RM -> SEMANA)
     function resolverCargaKilos(ejercicioNombre, textoPrescripcion) {
       const nom = (ejercicioNombre || '').toLowerCase();
       
@@ -1272,6 +1274,7 @@
       if (rutina) activarDia(rutina.id);
     }
 
+    // 7. CREADOR Y DISEÑADOR DE RUTINAS DEL COACH
     function abrirModalCreadorRapido() {
       document.getElementById('modal-creador-rapido').classList.remove('hidden');
       actualizarListaEjerciciosPorCategoria();
@@ -1739,7 +1742,7 @@
       document.getElementById('modal-video-player').classList.add('hidden');
     }
 
-    // CONFIRMAR TURNO ALUMNO
+    // CONFIRMAR TURNO ALUMNO BLINDADO (SIN DEPENDER DE ONCONFLICT O CON COMPATIBILIDAD PLENA)
     async function confirmarTurnoKoena(asiste) {
       if (!usuarioActual || !sb) return;
       const fecha = document.getElementById('koena-fecha-turno').value;
@@ -1748,14 +1751,32 @@
 
       const estado = asiste ? 'confirmado' : 'cancelado';
 
-      const { error } = await sb.from('turnos_asistencia').upsert({
-        user_id: usuarioActual.id,
-        tipo: 'KOENA',
-        fecha,
-        hora,
-        estado,
-        motivo: 'Entrenamiento Presencial Koena'
-      }, { onConflict: 'user_id,fecha,hora' });
+      // 1. Verificamos si ya existe el turno para evitar fallos de duplicado en bases sin UNIQUE
+      const { data: turnoPrevio } = await sb.from('turnos_asistencia')
+        .select('id')
+        .eq('user_id', usuarioActual.id)
+        .eq('fecha', fecha)
+        .eq('hora', hora)
+        .maybeSingle();
+
+      let error = null;
+
+      if (turnoPrevio && turnoPrevio.id) {
+        const res = await sb.from('turnos_asistencia')
+          .update({ estado, tipo: 'KOENA', motivo: 'Entrenamiento Presencial Koena' })
+          .eq('id', turnoPrevio.id);
+        error = res.error;
+      } else {
+        const res = await sb.from('turnos_asistencia').insert([{
+          user_id: usuarioActual.id,
+          tipo: 'KOENA',
+          fecha,
+          hora,
+          estado,
+          motivo: 'Entrenamiento Presencial Koena'
+        }]);
+        error = res.error;
+      }
 
       if (!error) {
         mostrarToast(asiste ? "✓ Turno confirmado en Koena" : "✓ Cancelación registrada");
@@ -1795,7 +1816,6 @@
       if (!sb) return;
       const hoy = obtenerFechaLocalString();
 
-      // Obtenemos turnos y perfiles en paralelo para evitar errores de JOIN
       const [resTurnos, resPerfiles] = await Promise.all([
         sb.from('turnos_asistencia')
           .select('*')
@@ -2021,6 +2041,7 @@
             }
             html += '</div>';
 
+            // SERIES CON BURBUJAS REDONDAS
             html += '<div class="space-y-1 pt-1">';
             html += '<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Series ejecutadas:</span>';
             html += '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">';
@@ -2173,7 +2194,6 @@
 
         let badgeTurno = '';
         if (confirmadosDia.length > 0) {
-          // Renderiza el primer nombre truncado si entra, o los nombres apilados estilo Harbiz
           badgeTurno = confirmadosDia.slice(0, 2).map(c => {
             const primerNombre = c.nombre.split(' ')[0];
             return '<span class="text-[8px] bg-cyan-400 text-slate-950 px-1 py-0.2 rounded font-black truncate max-w-full block mt-0.5 leading-tight" title="' + c.nombre + ' (' + c.hora + ' hs)">' + primerNombre + '</span>';
