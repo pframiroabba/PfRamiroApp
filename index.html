@@ -101,7 +101,7 @@
     <span id="toast-texto">✓ Guardado en Supabase</span>
   </div>
 
-  <!-- MODAL VISTA PLANILLA DRIVE (SÁBANA COMPLETA) -->
+  <!-- MODAL VISTA PLANILLA DRIVE -->
   <div id="modal-planilla-drive" class="hidden fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex flex-col p-3 md:p-6">
     <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
       <div class="flex items-center gap-2">
@@ -114,7 +114,7 @@
     </div>
   </div>
 
-  <!-- MODAL FICHA DE ATLETA (ESTILO HARBIZ / ATLYO) -->
+  <!-- MODAL FICHA DE ATLETA -->
   <div id="modal-ficha-atleta" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 max-w-md w-full rounded-3xl p-5 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -518,7 +518,7 @@
         </div>
       </div>
 
-      <!-- NAVEGACIÓN MODALIDAD: KOENA PRESENCIAL VS PERSONALIZADO ONLINE (DOS PÁGINAS DENTRO DE LA MISMA) -->
+      <!-- NAVEGACIÓN MODALIDAD: KOENA PRESENCIAL VS PERSONALIZADO ONLINE -->
       <div class="space-y-3">
         <div class="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-800 max-w-md mx-auto">
           <button type="button" id="tab-mod-koena" onclick="cambiarPaginaModalidad('KOENA')" class="w-1/2 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-cyan-500 text-slate-950 cursor-pointer shadow-md">
@@ -545,7 +545,7 @@
             <span id="estado-turno-koena-txt" class="text-xs text-slate-300 font-medium">Consultando próximo turno...</span>
           </div>
 
-          <!-- BLOQUE EXCLUSIVO PARA ALUMNOS: FORMULARIO DE RESERVA / CONFIRMACIÓN -->
+          <!-- BLOQUE EXCLUSIVO PARA ALUMNOS -->
           <div id="form-turno-alumno-koena" class="space-y-2.5">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
@@ -575,7 +575,7 @@
             </div>
           </div>
 
-          <!-- BLOQUE EXCLUSIVO PARA COACH: AGENDA VISUAL ESTILO HARBIZ (FOTOS/AVATARES DE CONFIRMADOS) -->
+          <!-- BLOQUE EXCLUSIVO PARA COACH (ESTILO HARBIZ) -->
           <div id="vista-turnos-coach-koena" class="hidden space-y-2">
             <span class="text-[10px] font-black uppercase text-cyan-400 tracking-wider block">Atletas con asistencia confirmada (Sede Koena):</span>
             <div id="lista-asistencias-coach" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"></div>
@@ -615,7 +615,7 @@
         </div>
       </div>
 
-      <!-- TABLA RESUMEN 1RM INTERACTIVA ENLAZADA A LAS CARGAS -->
+      <!-- TABLA CONTROL 1RM -->
       <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
           <div>
@@ -640,17 +640,17 @@
                 <th class="pb-1.5 text-center text-cyan-300 font-bold">95%+</th>
               </tr>
             </thead>
-            <tbody id="tabla-control-rm-body" class="divide-y divide-slate-800/60 text-slate-300">
+            <tbody id="tabla-control-rm-body" class="divide-y border-slate-800/60 text-slate-300">
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- HABIT TRACKER / CALENDARIO CON DÍA ACTUAL ILUMINADO Y AVATARES DE CONFIRMADOS -->
+      <!-- CALENDARIO VISUAL HARBIZ CON NOMBRES DE ATLETAS -->
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia & Asistencia:</span>
-          <span class="text-[9px] text-emerald-400 font-mono font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-emerald-400"></span> Día de hoy resaltado</span>
+          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia & Turnos Confirmados:</span>
+          <span class="text-[9px] text-emerald-400 font-mono font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-emerald-400"></span> Hoy</span>
         </div>
         <div id="grid-calendario-adherencia" class="grid grid-cols-7 gap-1 text-center text-[10px] font-mono"></div>
       </div>
@@ -700,13 +700,11 @@
   </main>
 
   <script>
-    // 0. FUNCIONES AUXILIARES SEGURAS
     function def(valor, porDefecto) {
       if (valor !== undefined && valor !== null && valor !== '') return valor;
       return porDefecto;
     }
 
-    // 1. CAPTURA Y MUESTRA DE ERRORES DIRECTO EN PANTALLA
     window.onerror = function(msg, url, lineNo, columnNo, error) {
       const box = document.getElementById('debug-error-box');
       const txt = document.getElementById('debug-error-txt');
@@ -717,7 +715,6 @@
       return false;
     };
 
-    // 2. INICIALIZACIÓN DE SUPABASE
     const SUPABASE_URL = 'https://zuwqfzfncybtwvzwlqmw.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1d3FmemZuY3lidHd2endscW13Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2OTgzMTYsImV4cCI6MjEwNjI3NDMxNn0.B2NPB2q5Blni4KNcBoyvfp8yW70hC0KqOgm3O2q1gGI';
     
@@ -726,7 +723,6 @@
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     }
 
-    // BIBLIOTECA COMPLETA DE EJERCICIOS
     const BIBLIOTECA_RAMIRO = {
       inf_rodilla: [
         { nombre: "Sentadilla Trasera con Barra", criterio: "Sentadilla profunda con recorrido completo sin colapsar rodillas.", video: "https://www.youtube.com/shorts/bEv6CCg2BC8" },
@@ -817,7 +813,6 @@
     let indiceEjercicioActivo = 0;
     let listaEjerciciosModoActivo = [];
 
-    // UTILIDADES DE TEXTO Y FORMATO
     function escaparHTML(str) {
       if (str === null || str === undefined) return '';
       return String(str)
@@ -870,7 +865,6 @@
       return racha;
     }
 
-    // 3. CAMBIADOR DE PÁGINAS DENTRO DE LA MISMA (KOENA VS ONLINE)
     function cambiarPaginaModalidad(tipo) {
       modalidadActiva = tipo;
       const tabKoena = document.getElementById('tab-mod-koena');
@@ -891,7 +885,6 @@
       }
     }
 
-    // 4. AUTENTICACIÓN
     function cambiarModoAuth(modo) {
       modoAuth = modo;
       const tabL = document.getElementById('tab-auth-login');
@@ -1174,7 +1167,6 @@
       }
     }
 
-    // 5. CONTROL DE 1RM INTERACTIVO
     function renderizarTablaControlRM() {
       const tbody = document.getElementById('tabla-control-rm-body');
       if (!tbody) return;
@@ -1226,7 +1218,6 @@
       mostrarToast('✓ 1RM actualizado a ' + item.rm + ' kg');
     }
 
-    // 6. MOTOR INTELIGENTE DE CÁLCULO DE CARGAS SUGERIDAS (1RM -> SEMANA)
     function resolverCargaKilos(ejercicioNombre, textoPrescripcion) {
       const nom = (ejercicioNombre || '').toLowerCase();
       
@@ -1281,7 +1272,6 @@
       if (rutina) activarDia(rutina.id);
     }
 
-    // 7. CREADOR Y DISEÑADOR DE RUTINAS DEL COACH (COMPLETO)
     function abrirModalCreadorRapido() {
       document.getElementById('modal-creador-rapido').classList.remove('hidden');
       actualizarListaEjerciciosPorCategoria();
@@ -1519,7 +1509,6 @@
       e.className = 'text-[11px] ' + (warn ? 'text-amber-400 font-bold' : 'text-slate-400');
     }
 
-    // 8. MODO ENTRENO ACTIVO (PASO A PASO)
     function iniciarModoActivo() {
       if (rutinasActivas.length === 0) return alert("No hay entrenamientos cargados.");
       const rutinaVisible = rutinasActivas.find(r => String(r.id) === String(diaActivoId)) || rutinasActivas[0];
@@ -1640,7 +1629,6 @@
       document.getElementById('btn-sig-act').onclick = () => moverEjercicioActivo(1, rId);
     }
 
-    // 9. DISCOS, TIMER Y UTILS
     function establecerPesoBarra(p, b) {
       pesoBarraSeleccionada = p;
       document.querySelectorAll('.btn-tipo-barra').forEach(x => x.classList.remove('btn-tipo-barra-active'));
@@ -1751,7 +1739,7 @@
       document.getElementById('modal-video-player').classList.add('hidden');
     }
 
-    // 10. TURNOS KOENA Y PERSONALIZADO ONLINE (PÁGINAS SEPARADAS)
+    // CONFIRMAR TURNO ALUMNO
     async function confirmarTurnoKoena(asiste) {
       if (!usuarioActual || !sb) return;
       const fecha = document.getElementById('koena-fecha-turno').value;
@@ -1767,12 +1755,15 @@
         hora,
         estado,
         motivo: 'Entrenamiento Presencial Koena'
-      });
+      }, { onConflict: 'user_id,fecha,hora' });
 
       if (!error) {
         mostrarToast(asiste ? "✓ Turno confirmado en Koena" : "✓ Cancelación registrada");
-        consultarTurnoActual();
-        calcularRachaYCalendario();
+        await consultarTurnoActual();
+        await calcularRachaYCalendario();
+        if (perfilActual && perfilActual.rol === 'coach') {
+          await cargarAsistenciasKoenaCoach();
+        }
       } else {
         alert("Error al registrar turno: " + error.message);
       }
@@ -1799,39 +1790,48 @@
       }
     }
 
-    // VISTA DEL COACH: ASISTENCIAS CONFIRMADAS ESTILO HARBIZ
+    // CARGA DE ASISTENCIAS DEL COACH DIRECTA Y ROBUSTA
     async function cargarAsistenciasKoenaCoach() {
       if (!sb) return;
       const hoy = obtenerFechaLocalString();
-      const { data: turnos } = await sb.from('turnos_asistencia')
-        .select('*, perfiles_usuarios(nombre, email)')
-        .eq('tipo', 'KOENA')
-        .gte('fecha', hoy)
-        .order('fecha', { ascending: true });
+
+      // Obtenemos turnos y perfiles en paralelo para evitar errores de JOIN
+      const [resTurnos, resPerfiles] = await Promise.all([
+        sb.from('turnos_asistencia')
+          .select('*')
+          .eq('tipo', 'KOENA')
+          .gte('fecha', hoy)
+          .order('fecha', { ascending: true }),
+        sb.from('perfiles_usuarios').select('id, nombre, email')
+      ]);
 
       const cont = document.getElementById('lista-asistencias-coach');
       if (!cont) return;
 
-      if (!turnos || turnos.length === 0) {
-        cont.innerHTML = '<div class="text-xs text-slate-500 py-2">No hay turnos agendados en Koena para los próximos días.</div>';
+      const turnos = resTurnos.data || [];
+      const mapaUsuarios = {};
+      (resPerfiles.data || []).forEach(p => { mapaUsuarios[p.id] = p; });
+
+      if (turnos.length === 0) {
+        cont.innerHTML = '<div class="text-xs text-slate-500 py-3 col-span-2 text-center bg-slate-900/50 rounded-2xl border border-slate-800">No hay turnos agendados en Koena para los próximos días.</div>';
         return;
       }
 
       cont.innerHTML = turnos.map(t => {
-        const perfil = t.perfiles_usuarios || {};
-        const nom = def(perfil.nombre, def(perfil.email, 'Atleta'));
+        const u = mapaUsuarios[t.user_id] || {};
+        const nom = def(u.nombre, def(u.email, 'Atleta'));
         const inicial = nom.charAt(0).toUpperCase();
         const esConf = t.estado === 'confirmado';
         const tagClase = esConf ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40';
 
-        return '<div class="bg-slate-900 border border-slate-800 p-2.5 rounded-2xl flex items-center justify-between">' +
-          '<div class="flex items-center gap-2.5">' +
-          '<div class="w-8 h-8 rounded-full bg-slate-950 border border-cyan-400 flex items-center justify-center font-bold text-cyan-300 text-xs shadow-sm">' + inicial + '</div>' +
-          '<div>' +
-          '<span class="text-xs font-bold text-white block leading-tight">' + escaparHTML(nom) + '</span>' +
+        return '<div class="bg-slate-900 border border-slate-800 p-2.5 rounded-2xl flex items-center justify-between shadow-sm">' +
+          '<div class="flex items-center gap-2.5 min-w-0">' +
+          '<div class="w-8 h-8 rounded-full bg-slate-950 border border-cyan-400 flex items-center justify-center font-bold text-cyan-300 text-xs shrink-0">' + inicial + '</div>' +
+          '<div class="min-w-0">' +
+          '<span class="text-xs font-black text-white block truncate">' + escaparHTML(nom) + '</span>' +
           '<span class="text-[10px] text-slate-400 font-mono">' + t.fecha + ' • ' + t.hora + ' hs</span>' +
           '</div></div>' +
-          '<span class="text-[9px] font-black uppercase px-2 py-0.5 rounded border ' + tagClase + '">' + t.estado + '</span>' +
+          '<span class="text-[9px] font-black uppercase px-2 py-0.5 rounded border ' + tagClase + ' shrink-0 ml-2">' + t.estado + '</span>' +
           '</div>';
       }).join('');
     }
@@ -1846,7 +1846,6 @@
       window.open(url, '_blank');
     }
 
-    // 11. SISTEMA DE BURBUJAS POR SERIE (TILDE ✓ Y CRUZ ✕)
     async function procesarAccionSerie(planId, ejercicioIdx, sem, serie, accion, descanso, pesoSugerido, targetBoxId, btnElement) {
       if (!usuarioActual || !sb) return;
 
@@ -1986,7 +1985,7 @@
         html += '</div>';
 
         if (!estaPlegado) {
-          html += '<div class="p-4 space-y-4 divide-y divide-slate-800/60">';
+          html += '<div class="p-4 space-y-4 divide-y border-slate-800/60">';
           listaItems.forEach(item => {
             const ej = item.ej;
             const itmIdx = item.itmIdx;
@@ -2022,7 +2021,6 @@
             }
             html += '</div>';
 
-            // SERIES CON BURBUJAS REDONDAS (✓ VERDE Y ✕ ROJA)
             html += '<div class="space-y-1 pt-1">';
             html += '<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Series ejecutadas:</span>';
             html += '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">';
@@ -2124,14 +2122,18 @@
       return year + '-' + month + '-' + day;
     }
 
-    // CALENDARIO CON DÍA ACTUAL DESTACADO Y TURNOS CONFIRMADOS
+    // CALENDARIO CON DÍA ACTUAL Y ASISTENCIAS DETALLADAS CON NOMBRE
     async function calcularRachaYCalendario() {
       if (!usuarioActual || !sb) return;
 
-      const [resSeries, resTurnos] = await Promise.all([
+      const [resSeries, resTurnos, resPerfiles] = await Promise.all([
         sb.from('registros_series').select('completed_at').eq('user_id', usuarioActual.id).eq('completada', true),
-        sb.from('turnos_asistencia').select('fecha, hora, estado, perfiles_usuarios(nombre)').eq('estado', 'confirmado')
+        sb.from('turnos_asistencia').select('user_id, fecha, hora, estado').eq('estado', 'confirmado'),
+        sb.from('perfiles_usuarios').select('id, nombre, email')
       ]);
+
+      const mapaNombres = {};
+      (resPerfiles.data || []).forEach(p => { mapaNombres[p.id] = p.nombre || p.email; });
 
       const diasEntrenados = new Set();
       (resSeries.data || []).forEach(r => {
@@ -2145,8 +2147,8 @@
       (resTurnos.data || []).forEach(t => {
         if (t.fecha) {
           if (!turnosMap[t.fecha]) turnosMap[t.fecha] = [];
-          const nom = (t.perfiles_usuarios && t.perfiles_usuarios.nombre) ? t.perfiles_usuarios.nombre : 'Atleta';
-          turnosMap[t.fecha].push({ hora: t.hora, inicial: nom.charAt(0).toUpperCase(), nombre: nom });
+          const nombreCompleto = mapaNombres[t.user_id] || 'Atleta';
+          turnosMap[t.fecha].push({ hora: t.hora, nombre: nombreCompleto });
         }
       });
 
@@ -2171,14 +2173,17 @@
 
         let badgeTurno = '';
         if (confirmadosDia.length > 0) {
-          const primero = confirmadosDia[0];
-          badgeTurno = '<span class="text-[8px] bg-cyan-400 text-slate-950 px-1 rounded-full font-black leading-tight mt-0.5" title="' + primero.nombre + ' (' + primero.hora + ' hs)">' + primero.inicial + '</span>';
+          // Renderiza el primer nombre truncado si entra, o los nombres apilados estilo Harbiz
+          badgeTurno = confirmadosDia.slice(0, 2).map(c => {
+            const primerNombre = c.nombre.split(' ')[0];
+            return '<span class="text-[8px] bg-cyan-400 text-slate-950 px-1 py-0.2 rounded font-black truncate max-w-full block mt-0.5 leading-tight" title="' + c.nombre + ' (' + c.hora + ' hs)">' + primerNombre + '</span>';
+          }).join('');
         }
 
-        html += '<div class="min-h-[34px] p-0.5 flex flex-col items-center justify-center rounded-lg ' + estiloDia + ' ' + bordeHoy + '">' +
-          '<span>' + d + '</span>' +
-          badgeTurno +
-          (esHoy && confirmadosDia.length === 0 ? '<span class="w-1 h-1 bg-emerald-400 rounded-full mt-0.5"></span>' : '') +
+        html += '<div class="min-h-[46px] p-1 flex flex-col items-center justify-between rounded-xl ' + estiloDia + ' ' + bordeHoy + '">' +
+          '<span class="text-[10px] font-mono leading-none">' + d + '</span>' +
+          '<div class="w-full flex flex-col gap-0.5 overflow-hidden">' + badgeTurno + '</div>' +
+          (esHoy && confirmadosDia.length === 0 ? '<span class="w-1 h-1 bg-emerald-400 rounded-full"></span>' : '') +
           '</div>';
       }
       cont.innerHTML = html;
@@ -2186,7 +2191,6 @@
       document.getElementById('stat-racha').innerText = calcularRacha(diasEntrenados) + ' sem';
     }
 
-    // 12. PANEL DEL COACH Y GESTIÓN
     async function cargarVistaCoach() {
       if (!sb) return;
       const { data: atletas } = await sb.from('perfiles_usuarios').select('*').eq('rol', 'alumno');
@@ -2393,7 +2397,7 @@
       tableHtml += '<th class="p-2 border border-slate-800 text-center text-cyan-300">SEM 6 (95%+ 🔥)</th>';
       tableHtml += '</tr></thead>';
 
-      tableHtml += '<tbody class="divide-y divide-slate-800 text-slate-300">';
+      tableHtml += '<tbody class="divide-y border-slate-800 text-slate-300">';
       detalles.forEach(ej => {
         tableHtml += '<tr class="hover:bg-slate-800/40">';
         tableHtml += '<td class="p-2 border border-slate-800"><div class="font-bold text-white">' + escaparHTML(ej.ejercicio) + '</div><div class="text-[9px] text-amber-300">' + escaparHTML(def(ej.bloque, '')) + '</div></td>';
@@ -2416,7 +2420,6 @@
       document.getElementById('modal-planilla-drive').classList.add('hidden');
     }
 
-    // 13. EXPOSICIÓN GLOBAL DE FUNCIONES A WINDOW (CERO REFERENCEERROR)
     window.ejecutarAuth = ejecutarAuth;
     window.cambiarModoAuth = cambiarModoAuth;
     window.recuperarPassword = recuperarPassword;
@@ -2458,7 +2461,6 @@
     window.guardarFechaSesion = guardarFechaSesion;
     window.cambiarSemana = cambiarSemana;
 
-    // AUTO-RECUPERACIÓN DE SESIÓN AL INICIAR
     function iniciarApp() {
       if (sb) {
         sb.auth.getSession().then(({ data: { session } }) => {
