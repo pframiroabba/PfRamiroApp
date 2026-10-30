@@ -9,22 +9,27 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PF Ramiro">
-  <meta name="theme-color" content="#020617">
+  <meta name="theme-color" content="#070a12">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    body {
+      background-color: #070a12;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
     button, input, select, textarea {
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
     .serie-done-box {
-      background-color: rgba(16, 185, 129, 0.15) !important;
+      background-color: rgba(16, 185, 129, 0.12) !important;
       border-color: rgba(16, 185, 129, 0.5) !important;
     }
     .serie-skipped-box {
-      background-color: rgba(225, 29, 72, 0.15) !important;
+      background-color: rgba(225, 29, 72, 0.12) !important;
       border-color: rgba(225, 29, 72, 0.5) !important;
     }
     .tab-dia-active {
@@ -40,7 +45,7 @@
       border-color: #10b981 !important;
     }
     .avatar-circulo {
-      width: 44px; height: 44px; border-radius: 9999px; object-fit: cover;
+      width: 42px; height: 42px; border-radius: 9999px; object-fit: cover;
       display: flex; align-items: center; justify-content: center;
       background-color: #0f172a; border: 2px solid #10b981; flex-shrink: 0;
     }
@@ -75,17 +80,30 @@
       transform: scale(1.05);
     }
 
+    /* MENÚ LATERAL DRAWER */
+    #sidebar-menu {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .sidebar-abierto {
+      transform: translateX(0) !important;
+    }
+
+    /* DOCK INFERIOR ALUMNO */
+    .dock-alumno-item-activo {
+      color: #10b981 !important;
+    }
+
     @media print {
       header, #timer-box, #dashboard-alumno, #seccion-admin, button, .no-print, .tabs-dias-container,
-      #modal-discos, #modal-creador-rapido, #modal-modo-activo, #modal-video-player, #modal-pr-celebracion, #modal-planilla-drive, #modal-ficha-atleta {
+      #modal-discos, #modal-creador-rapido, #modal-modo-activo, #modal-video-player, #modal-ficha-atleta,
+      #sidebar-menu, #dock-alumno, #backdrop-sidebar {
         display: none !important;
       }
       body { background: white !important; color: black !important; }
-      .print-clean { border: 1px solid #ccc !important; background: transparent !important; color: black !important; box-shadow: none !important; }
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-32 antialiased">
+<body class="min-h-screen pb-32 antialiased">
 
   <!-- CONSOLA DE DIAGNÓSTICO EN PANTALLA -->
   <div id="debug-error-box" class="hidden fixed top-2 left-2 right-2 bg-red-950 border-2 border-red-500 text-red-200 p-3 rounded-2xl z-50 text-xs font-mono shadow-2xl space-y-1">
@@ -97,9 +115,79 @@
   </div>
 
   <!-- TOAST DE AUTOGUARDADO -->
-  <div id="toast-guardado" class="fixed top-16 right-4 bg-emerald-500 text-slate-950 text-xs font-black px-3 py-1.5 rounded-xl shadow-xl z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex items-center gap-1.5">
+  <div id="toast-guardado" class="fixed top-20 right-4 bg-emerald-500 text-slate-950 text-xs font-black px-3.5 py-2 rounded-xl shadow-2xl z-50 transition-opacity duration-300 opacity-0 pointer-events-none flex items-center gap-1.5">
     <span id="toast-texto">✓ Guardado en Supabase</span>
   </div>
+
+  <!-- BACKDROP MENU LATERAL -->
+  <div id="backdrop-sidebar" onclick="toggleSidebarMenu(false)" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 transition-opacity duration-300"></div>
+
+  <!-- MENÚ LATERAL DESPLEGABLE ATHRIX STYLE (DRAWER) -->
+  <aside id="sidebar-menu" class="fixed top-0 bottom-0 left-0 w-72 bg-slate-950 border-r border-slate-800/80 z-50 flex flex-col justify-between -translate-x-full shadow-2xl">
+    <div>
+      <!-- Header del drawer -->
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-slate-900 border border-emerald-500/40 flex items-center justify-center font-black text-emerald-400 text-sm">PF</div>
+          <div>
+            <h3 class="text-sm font-black text-white leading-tight">ATHRIX • PF RAMI</h3>
+            <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Coach Pro</span>
+          </div>
+        </div>
+        <button type="button" onclick="toggleSidebarMenu(false)" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-900 text-sm cursor-pointer">✕</button>
+      </div>
+
+      <!-- Organización activa (Koena) -->
+      <div class="p-3 mx-3 my-2 bg-slate-900/70 border border-slate-800 rounded-2xl flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-[10px] font-bold">🏢</div>
+          <div class="text-left">
+            <span class="text-xs font-bold text-white block leading-tight">Koena Fitness</span>
+            <span class="text-[9px] text-slate-400">Propietario / Coach</span>
+          </div>
+        </div>
+        <span class="text-[9px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded font-mono font-bold">Activo</span>
+      </div>
+
+      <!-- Rutas de navegación Coach -->
+      <nav class="p-3 space-y-1 text-xs font-semibold">
+        <button type="button" onclick="navegarDrawer('inicio')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white bg-slate-900 border border-slate-800 hover:bg-slate-800/80 transition text-left cursor-pointer">
+          <span class="text-sm">🏠</span> Inicio & Turnos
+        </button>
+        <button type="button" onclick="navegarDrawer('atletas')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-900 transition text-left cursor-pointer">
+          <span class="text-sm">👥</span> Atletas & Alumnos
+        </button>
+        <button type="button" onclick="navegarDrawer('biblioteca')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-900 transition text-left cursor-pointer">
+          <span class="text-sm">📚</span> Biblioteca de Ejercicios
+        </button>
+        <button type="button" onclick="abrirVistaPlanillaDrive(); toggleSidebarMenu(false);" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-emerald-400 hover:bg-emerald-500/10 transition text-left cursor-pointer">
+          <span class="text-sm">📋</span> Vista Planilla Drive
+        </button>
+        <button type="button" onclick="abrirModalDiscos(0); toggleSidebarMenu(false);" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-900 transition text-left cursor-pointer">
+          <span class="text-sm">⚖️</span> Calculadora de Discos
+        </button>
+      </nav>
+    </div>
+
+    <!-- Footer del menú drawer con usuario logueado -->
+    <div class="p-3 border-t border-slate-800/80 bg-slate-900/40 space-y-2">
+      <button type="button" onclick="simularVistaAtleta()" class="w-full flex items-center justify-between bg-slate-900 hover:bg-slate-800 border border-slate-700/80 px-3 py-2 rounded-xl text-xs text-slate-300 cursor-pointer">
+        <span class="flex items-center gap-2"><span>📱</span> Ver app como atleta</span>
+        <span class="text-[10px] text-slate-400">➔</span>
+      </button>
+
+      <div class="flex items-center justify-between pt-1">
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-bold text-xs" id="drawer-user-avatar">R</div>
+          <div class="min-w-0">
+            <span class="text-xs font-black text-white block truncate" id="drawer-user-nombre">Ramiro Abbattista</span>
+            <span class="text-[10px] text-slate-400 block truncate" id="drawer-user-email">pf.ramiroabba@gmail.com</span>
+          </div>
+        </div>
+        <button type="button" onclick="cerrarSesion()" class="text-red-400 hover:text-red-300 p-1.5 rounded-lg hover:bg-red-500/10 cursor-pointer" title="Cerrar sesión">✕</button>
+      </div>
+    </div>
+  </aside>
 
   <!-- MODAL VISTA PLANILLA DRIVE -->
   <div id="modal-planilla-drive" class="hidden fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex flex-col p-3 md:p-6">
@@ -110,11 +198,10 @@
       </div>
       <button type="button" onclick="cerrarVistaPlanillaDrive()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 px-3 py-1.5 rounded-xl cursor-pointer">Cerrar ✕</button>
     </div>
-    <div id="tabla-sábana-contenedor" class="flex-1 overflow-x-auto overflow-y-auto border border-slate-800 rounded-2xl bg-slate-900/60 p-2 text-xs">
-    </div>
+    <div id="tabla-sábana-contenedor" class="flex-1 overflow-x-auto overflow-y-auto border border-slate-800 rounded-2xl bg-slate-900/60 p-2 text-xs"></div>
   </div>
 
-  <!-- MODAL FICHA DE ATLETA AMPLIADA (BIOMETRÍA, SALUD & NOTAS) -->
+  <!-- MODAL FICHA DE ATLETA -->
   <div id="modal-ficha-atleta" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 max-w-lg w-full rounded-3xl p-5 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -128,7 +215,6 @@
         <button type="button" onclick="cerrarFichaAtleta()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 p-1.5 rounded-xl cursor-pointer">✕</button>
       </div>
       
-      <!-- ADMINISTRATIVO -->
       <div class="space-y-2.5 bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs">
         <span class="text-[10px] uppercase font-black text-slate-400 block tracking-wider">Gestión & Cuota</span>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -159,7 +245,6 @@
         </div>
       </div>
 
-      <!-- BIOMETRÍA & OBJETIVOS -->
       <div class="space-y-2.5 bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs">
         <span class="text-[10px] uppercase font-black text-emerald-400 block tracking-wider">Objetivos & Composición</span>
         <div class="grid grid-cols-3 gap-2">
@@ -182,13 +267,11 @@
         </div>
       </div>
 
-      <!-- SALUD & LESIONES -->
       <div class="space-y-1.5 bg-slate-950 p-3.5 rounded-2xl border border-amber-500/30 text-xs">
         <span class="text-[10px] uppercase font-black text-amber-400 block tracking-wider">⚠️ Antecedentes / Salud / Lesiones</span>
-        <textarea id="ficha-txt-lesion" rows="2" placeholder="Ej: Molestia en hombro derecho ya recuperada. Reforzar movilidad escapular y calentamiento con YTWL." class="w-full bg-slate-900 border border-slate-700 text-amber-200 rounded-xl p-2 text-xs focus:border-amber-400 focus:outline-none"></textarea>
+        <textarea id="ficha-txt-lesion" rows="2" placeholder="Ej: Molestia en hombro derecho ya recuperada. Reforzar movilidad escapular." class="w-full bg-slate-900 border border-slate-700 text-amber-200 rounded-xl p-2 text-xs focus:border-amber-400 focus:outline-none"></textarea>
       </div>
 
-      <!-- NOTA DEL COACH PARA ESTE ATLETA -->
       <div class="space-y-2 bg-slate-950 p-3.5 rounded-2xl border border-cyan-500/30 text-xs">
         <div class="flex items-center justify-between">
           <span class="text-[10px] uppercase font-black text-cyan-400 block tracking-wider">📌 Nota Directa del Coach</span>
@@ -197,7 +280,7 @@
             <span>Visible en su app</span>
           </label>
         </div>
-        <textarea id="ficha-txt-nota-coach" rows="2" placeholder="Ej: Muy buena semana. El lunes subimos un poco la carga en piernas y arrancamos semana 2." class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2 text-xs focus:border-cyan-400 focus:outline-none"></textarea>
+        <textarea id="ficha-txt-nota-coach" rows="2" placeholder="Ej: Muy buena semana. El lunes subimos un poco la carga en piernas." class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2 text-xs focus:border-cyan-400 focus:outline-none"></textarea>
       </div>
 
       <div class="grid grid-cols-2 gap-2 pt-1">
@@ -469,40 +552,55 @@
   </div>
 
   <!-- CRONÓMETRO FLOTANTE -->
-  <div id="timer-box" class="hidden fixed bottom-4 right-4 bg-slate-900 border-2 border-emerald-500 shadow-2xl rounded-2xl p-4 z-50 flex items-center gap-4">
+  <div id="timer-box" class="hidden fixed bottom-20 right-4 bg-slate-900/95 backdrop-blur border-2 border-emerald-500 shadow-2xl rounded-2xl p-3.5 z-50 flex items-center gap-3">
     <div>
-      <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Descanso</span>
-      <span id="timer-display" class="text-3xl font-black text-emerald-400 font-mono">01:30</span>
+      <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Descanso</span>
+      <span id="timer-display" class="text-2xl font-black text-emerald-400 font-mono">01:30</span>
     </div>
-    <div class="flex gap-1.5">
-      <button type="button" id="btn-timer-toggle" onclick="pausarReanudarTimer()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white cursor-pointer">Pausa</button>
-      <button type="button" onclick="cerrarTimer()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-2.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer">✕</button>
+    <div class="flex gap-1">
+      <button type="button" id="btn-timer-toggle" onclick="pausarReanudarTimer()" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg text-xs font-bold text-white cursor-pointer">Pausa</button>
+      <button type="button" onclick="cerrarTimer()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-2 py-1.5 rounded-lg text-xs font-bold cursor-pointer">✕</button>
     </div>
   </div>
 
-  <!-- ENCABEZADO CON LOGO OFICIAL -->
-  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 md:px-8 py-3 flex justify-between items-center sticky top-0 z-40">
+  <!-- ENCABEZADO MINIMALISTA ESTILO ATHRIX -->
+  <header class="bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 md:px-8 py-2.5 flex justify-between items-center sticky top-0 z-40">
     <div class="flex items-center gap-3">
-      <img src="logo-icono.webp" alt="PF Ramiro" class="avatar-circulo object-cover" onerror="this.onerror=null; this.src=''; this.innerHTML='🏋️‍♂️';">
-      <div>
-        <h1 class="text-base font-black tracking-wide text-white leading-tight">PF RAMIRO ABBATTISTA</h1>
-        <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest block">Rendimiento & Fuerza</span>
+      <!-- Botón Menú Hamburguesa Drawer -->
+      <button type="button" onclick="toggleSidebarMenu(true)" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white cursor-pointer hover:bg-slate-800 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+        </svg>
+      </button>
+
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center font-black text-emerald-400 text-xs">PF</div>
+        <div>
+          <h1 class="text-xs font-black tracking-wider text-white uppercase leading-tight">PF RAMIRO</h1>
+          <span class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest block">Rendimiento & Fuerza</span>
+        </div>
       </div>
     </div>
     
     <div class="flex items-center gap-2">
-      <button type="button" onclick="abrirVistaPlanillaDrive()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 text-xs px-2.5 py-1.5 rounded-lg font-bold transition cursor-pointer">📋 Vista Planilla</button>
-      <button type="button" onclick="abrirModalDiscos(0)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs px-2.5 py-1.5 rounded-lg font-bold transition cursor-pointer">⚖️ Cargas</button>
+      <!-- Selector de entorno rápido -->
+      <div class="hidden sm:flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-xl text-xs">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span id="header-entorno-tag" class="font-bold text-slate-300 text-[11px]">Koena Fitness</span>
+      </div>
+
+      <button type="button" onclick="abrirModalDiscos(0)" class="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs px-2.5 py-1.5 rounded-xl font-bold transition cursor-pointer">⚖️ Cargas</button>
+      
       <div id="usuario-info" class="hidden items-center gap-2">
-        <span id="tag-rol-user" class="text-[10px] font-black uppercase px-2 py-0.5 rounded border border-emerald-500/40 text-emerald-400">Alumno</span>
-        <button type="button" onclick="cerrarSesion()" class="bg-red-500/20 text-red-300 hover:bg-red-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer">Salir</button>
+        <div onclick="toggleSidebarMenu(true)" class="w-8 h-8 rounded-full bg-slate-900 border border-emerald-500/60 flex items-center justify-center font-bold text-xs text-white cursor-pointer" id="header-avatar">R</div>
       </div>
     </div>
   </header>
 
   <!-- PANTALLA AUTH -->
-  <main id="seccion-auth" class="max-w-md mx-auto mt-10 p-6 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl text-center space-y-6">
+  <main id="seccion-auth" class="max-w-md mx-auto mt-10 p-6 bg-slate-900/90 rounded-3xl border border-slate-800 shadow-2xl text-center space-y-6">
     <div>
+      <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-2xl font-black mb-3">PF</div>
       <h2 class="text-2xl font-black text-white tracking-wide">Acceso al Sistema</h2>
       <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold text-emerald-400">Plataforma Cloud Blindada</p>
     </div>
@@ -543,30 +641,36 @@
   <!-- PANTALLA PRINCIPAL -->
   <main id="seccion-panel" class="hidden max-w-5xl mx-auto p-4 md:p-6 space-y-6">
 
-    <!-- PORTAL INDIVIDUAL DEL ALUMNO (ESTILO HARBIZ) -->
-    <div id="dashboard-alumno" class="bg-gradient-to-r from-slate-900 to-slate-950 p-5 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block">Atleta Conectado</span>
-            <span class="text-[9px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded font-bold border border-cyan-500/30">Coach: Ramiro Abbattista</span>
-          </div>
-          <h3 class="text-xl font-black text-white mt-0.5" id="dash-alumno-nombre">Bienvenido</h3>
+    <!-- SALUDO SUPERIOR ESTILO ATHRIX ("Hola, Ramiro 👋") -->
+    <div class="flex items-center justify-between pb-1">
+      <div>
+        <h2 class="text-2xl font-black text-white flex items-center gap-2" id="saludo-principal-nombre">Hola, Ramiro 👋</h2>
+        <p class="text-xs text-slate-400 mt-0.5" id="saludo-principal-sub">Esto es lo que está pasando hoy en Koena.</p>
+      </div>
+      <button type="button" onclick="iniciarModoActivo()" class="bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black px-4 py-2 rounded-2xl text-xs uppercase tracking-wider transition shadow-lg flex items-center gap-1.5 cursor-pointer">
+        <span>⚡</span> Entrenar Ahora
+      </button>
+    </div>
+
+    <!-- PORTAL INDIVIDUAL DEL ALUMNO (ATHRIX/HARBIZ CARD) -->
+    <div id="dashboard-alumno" class="bg-slate-900/70 p-5 rounded-3xl border border-slate-800 shadow-2xl space-y-4">
+      <div class="grid grid-cols-3 gap-2.5">
+        <div class="bg-slate-950/80 p-3 rounded-2xl border border-slate-800/80">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block">Racha</span>
+          <span id="stat-racha" class="text-base font-black text-emerald-400">0 sem</span>
         </div>
-        <div class="flex items-center gap-3">
-          <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
-            <span class="text-base">🔥</span>
-            <div>
-              <span class="text-[9px] text-slate-400 uppercase font-bold block">Racha Semanal</span>
-              <span id="stat-racha" class="text-xs font-black text-emerald-400">0 sem</span>
-            </div>
-          </div>
-          <button type="button" onclick="iniciarModoActivo()" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-950 font-black px-4 py-2 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">⚡ Entreno Activo</button>
+        <div class="bg-slate-950/80 p-3 rounded-2xl border border-slate-800/80">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block">Adherencia</span>
+          <span class="text-base font-black text-white">75%</span>
+        </div>
+        <div class="bg-slate-950/80 p-3 rounded-2xl border border-slate-800/80">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block">Entorno</span>
+          <span class="text-base font-black text-cyan-400" id="stat-entorno-box">Koena</span>
         </div>
       </div>
 
-      <!-- NOTA DEL COACH EN PORTADA (ESTILO ATHRIX) -->
-      <div id="banner-nota-coach" class="hidden bg-slate-950/90 border border-emerald-500/40 p-3.5 rounded-2xl flex items-start gap-3 shadow-md">
+      <!-- NOTA DEL COACH EN PORTADA -->
+      <div id="banner-nota-coach" class="hidden bg-slate-950 border border-emerald-500/40 p-3.5 rounded-2xl flex items-start gap-3 shadow-md">
         <span class="text-xl shrink-0">📋</span>
         <div class="flex-1">
           <div class="flex items-center justify-between">
@@ -643,7 +747,7 @@
             </div>
           </div>
 
-          <!-- BLOQUE EXCLUSIVO PARA COACH (ESTILO HARBIZ) -->
+          <!-- BLOQUE EXCLUSIVO PARA COACH -->
           <div id="vista-turnos-coach-koena" class="hidden space-y-2">
             <span class="text-[10px] font-black uppercase text-cyan-400 tracking-wider block">Atletas con asistencia confirmada (Sede Koena):</span>
             <div id="lista-asistencias-coach" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"></div>
@@ -714,7 +818,7 @@
         </div>
       </div>
 
-      <!-- CALENDARIO VISUAL HARBIZ CON NOMBRES DE ATLETAS -->
+      <!-- CALENDARIO VISUAL ATHRIX/HARBIZ -->
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
           <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">📅 Calendario de Adherencia & Turnos Confirmados:</span>
@@ -725,7 +829,7 @@
     </div>
 
     <!-- PANEL EXCLUSIVO DEL COACH -->
-    <div id="seccion-admin" class="hidden space-y-4 bg-slate-900 border border-blue-500/40 p-5 rounded-3xl">
+    <div id="seccion-admin" class="hidden space-y-4 bg-slate-900/90 border border-blue-500/30 p-5 rounded-3xl">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <div>
           <h3 class="text-base font-black text-blue-400 flex items-center gap-2">🛡️ Panel del Coach — Harbiz Suite</h3>
@@ -766,6 +870,26 @@
       <div id="lista-rutinas" class="space-y-6"></div>
     </div>
   </main>
+
+  <!-- BARRA DE NAVEGACIÓN INFERIOR (DOCK INTERACTIVO ALUMNO) -->
+  <div id="dock-alumno" class="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-lg border-t border-slate-800/80 px-6 py-2.5 z-40 flex items-center justify-around">
+    <button type="button" onclick="cambiarSeccionDock('inicio')" id="dock-btn-inicio" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-white transition dock-alumno-item-activo">
+      <span class="text-lg">🏠</span>
+      <span class="text-[10px] font-bold">Inicio</span>
+    </button>
+    <button type="button" onclick="cambiarSeccionDock('entreno')" id="dock-btn-entreno" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-white transition">
+      <span class="text-lg">🏋️‍♂️</span>
+      <span class="text-[10px] font-bold">Entreno</span>
+    </button>
+    <button type="button" onclick="abrirVistaPlanillaDrive()" id="dock-btn-progreso" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-white transition">
+      <span class="text-lg">📈</span>
+      <span class="text-[10px] font-bold">Planilla</span>
+    </button>
+    <button type="button" onclick="toggleSidebarMenu(true)" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-white transition">
+      <span class="text-lg">⚙️</span>
+      <span class="text-[10px] font-bold">Menú</span>
+    </button>
+  </div>
 
   <script>
     function def(valor, porDefecto) {
@@ -898,6 +1022,54 @@
       setTimeout(() => t.classList.add('opacity-0'), 1500);
     }
 
+    /* CONTROL DEL MENÚ DRAWER */
+    function toggleSidebarMenu(abrir) {
+      const sb = document.getElementById('sidebar-menu');
+      const bg = document.getElementById('backdrop-sidebar');
+      if (abrir) {
+        sb.classList.add('sidebar-abierto');
+        bg.classList.remove('hidden');
+      } else {
+        sb.classList.remove('sidebar-abierto');
+        bg.classList.add('hidden');
+      }
+    }
+
+    function navegarDrawer(seccion) {
+      toggleSidebarMenu(false);
+      if (seccion === 'atletas') {
+        const secAdmin = document.getElementById('seccion-admin');
+        if (secAdmin) secAdmin.scrollIntoView({ behavior: 'smooth' });
+      } else if (seccion === 'inicio') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (seccion === 'biblioteca') {
+        abrirModalCreadorRapido();
+      }
+    }
+
+    function simularVistaAtleta() {
+      toggleSidebarMenu(false);
+      mostrarToast("Modo vista previa de atleta activado");
+      const secAdmin = document.getElementById('seccion-admin');
+      if (secAdmin) secAdmin.classList.toggle('hidden');
+    }
+
+    function cambiarSeccionDock(seccion) {
+      const btnIni = document.getElementById('dock-btn-inicio');
+      const btnEnt = document.getElementById('dock-btn-entreno');
+      btnIni.classList.remove('dock-alumno-item-activo');
+      btnEnt.classList.remove('dock-alumno-item-activo');
+
+      if (seccion === 'inicio') {
+        btnIni.classList.add('dock-alumno-item-activo');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (seccion === 'entreno') {
+        btnEnt.classList.add('dock-alumno-item-activo');
+        const listaR = document.getElementById('lista-rutinas');
+        if (listaR) listaR.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
     function nombreEj(planId, idx) {
       const r = rutinasActivas.find(x => String(x.id) === String(planId));
       if (r && r.ejercicios_detalle && r.ejercicios_detalle[idx] && r.ejercicios_detalle[idx].ejercicio) {
@@ -939,17 +1111,23 @@
       const tabOnline = document.getElementById('tab-mod-online');
       const pagKoena = document.getElementById('pagina-modalidad-koena');
       const pagOnline = document.getElementById('pagina-modalidad-online');
+      const tagHeader = document.getElementById('header-entorno-tag');
+      const statEntorno = document.getElementById('stat-entorno-box');
 
       if (tipo === 'KOENA') {
         tabKoena.className = "w-1/2 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-cyan-500 text-slate-950 cursor-pointer shadow-md";
         tabOnline.className = "w-1/2 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white cursor-pointer";
         pagKoena.classList.remove('hidden');
         pagOnline.classList.add('hidden');
+        if (tagHeader) tagHeader.innerText = "Koena Fitness";
+        if (statEntorno) statEntorno.innerText = "Koena";
       } else {
         tabOnline.className = "w-1/2 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-emerald-500 text-slate-950 cursor-pointer shadow-md";
         tabKoena.className = "w-1/2 py-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white cursor-pointer";
         pagOnline.classList.remove('hidden');
         pagKoena.classList.add('hidden');
+        if (tagHeader) tagHeader.innerText = "Online 1 a 1";
+        if (statEntorno) statEntorno.innerText = "Online";
       }
     }
 
@@ -1053,6 +1231,7 @@
       document.getElementById('seccion-auth').classList.remove('hidden');
       document.getElementById('seccion-panel').classList.add('hidden');
       document.getElementById('usuario-info').classList.add('hidden');
+      toggleSidebarMenu(false);
     }
 
     async function cargarPerfilYRoles() {
@@ -1065,7 +1244,7 @@
         document.getElementById('usuario-info').classList.add('flex');
         
         const fallbackNombre = usuarioActual.email ? usuarioActual.email.split('@')[0] : 'Ramiro Abbattista';
-        document.getElementById('dash-alumno-nombre').innerText = 'Hola, ' + fallbackNombre;
+        document.getElementById('saludo-principal-nombre').innerText = 'Hola, ' + fallbackNombre + ' 👋';
 
         const { data: perfil } = await sb
           .from('perfiles_usuarios')
@@ -1074,12 +1253,20 @@
           .maybeSingle();
 
         perfilActual = def(perfil, { rol: 'coach', nombre: fallbackNombre, entorno: 'KOENA' });
-        if (perfilActual.nombre) {
-          document.getElementById('dash-alumno-nombre').innerText = 'Hola, ' + perfilActual.nombre;
-        }
-        document.getElementById('tag-rol-user').innerText = def(perfilActual.rol, 'coach').toUpperCase();
+        
+        const nombreDisplay = perfilActual.nombre || fallbackNombre;
+        document.getElementById('saludo-principal-nombre').innerText = 'Hola, ' + nombreDisplay + ' 👋';
+        
+        const avatarLetra = nombreDisplay.charAt(0).toUpperCase();
+        const elHAv = document.getElementById('header-avatar');
+        if (elHAv) elHAv.innerText = avatarLetra;
+        const elDAv = document.getElementById('drawer-user-avatar');
+        if (elDAv) elDAv.innerText = avatarLetra;
 
-        // MOSTRAR BANNER DE NOTA DEL COACH EN PORTADA DEL ALUMNO
+        document.getElementById('drawer-user-nombre').innerText = nombreDisplay;
+        document.getElementById('drawer-user-email').innerText = def(usuarioActual.email, '');
+
+        // BANNER DE NOTA DEL COACH EN PORTADA
         const bNota = document.getElementById('banner-nota-coach');
         if (perfilActual.nota_coach && perfilActual.nota_coach_visible !== false) {
           document.getElementById('banner-nota-texto').innerText = perfilActual.nota_coach;
@@ -1088,7 +1275,7 @@
           bNota.classList.add('hidden');
         }
 
-        // MOSTRAR ALERTA DE LESIÓN/BIOMECÁNICA
+        // BANNER DE LESIÓN/BIOMECÁNICA
         const bLesion = document.getElementById('banner-lesion-atleta');
         if (perfilActual.lesion_info) {
           document.getElementById('banner-lesion-texto').innerText = perfilActual.lesion_info;
@@ -1253,7 +1440,7 @@
       }
     }
 
-    // FEEDBACK & RPE PERCIBIDO GLOBAL DE LA SESIÓN (ESTILO ATHRIX)
+    // FEEDBACK & RPE PERCIBIDO GLOBAL DE LA SESIÓN
     async function guardarFeedbackSesion(planId, sem) {
       if (!usuarioActual || !sb) return;
       const rpePercibido = parseInt(document.getElementById('sesion-rpe-global').value) || 8;
@@ -2195,7 +2382,7 @@
         html += '</div>';
       });
 
-      // SECCIÓN FEEDBACK Y RPE DE SESIÓN (ESTILO ATHRIX)
+      // SECCIÓN FEEDBACK Y RPE DE SESIÓN
       const feedbackPrevio = def(mapaSeries['998_1'], {});
       const rpePrevioVal = feedbackPrevio.rir_real || 8;
 
@@ -2468,7 +2655,7 @@
     }
 
     function entrarPortalAlumno(alId, alNombre) {
-      document.getElementById('dash-alumno-nombre').innerText = 'Ficha: ' + alNombre;
+      document.getElementById('saludo-principal-nombre').innerText = 'Ficha: ' + alNombre;
       cargarRutinasAlumnoPorId(alId);
       mostrarToast("Accediendo a ficha de " + alNombre);
     }
@@ -2657,6 +2844,10 @@
     window.guardarFechaSesion = guardarFechaSesion;
     window.guardarFeedbackSesion = guardarFeedbackSesion;
     window.cambiarSemana = cambiarSemana;
+    window.toggleSidebarMenu = toggleSidebarMenu;
+    window.navegarDrawer = navegarDrawer;
+    window.simularVistaAtleta = simularVistaAtleta;
+    window.cambiarSeccionDock = cambiarSeccionDock;
 
     function iniciarApp() {
       if (sb) {
