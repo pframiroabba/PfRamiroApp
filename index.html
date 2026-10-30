@@ -15,7 +15,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    button, input, select {
+    button, input, select, textarea {
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
@@ -114,9 +114,9 @@
     </div>
   </div>
 
-  <!-- MODAL FICHA DE ATLETA -->
+  <!-- MODAL FICHA DE ATLETA AMPLIADA (BIOMETRÍA, SALUD & NOTAS) -->
   <div id="modal-ficha-atleta" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 max-w-md w-full rounded-3xl p-5 shadow-2xl space-y-4">
+    <div class="bg-slate-900 border border-slate-700 max-w-lg w-full rounded-3xl p-5 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div class="flex items-center gap-2.5">
           <div class="w-10 h-10 rounded-full bg-slate-950 border border-emerald-500 flex items-center justify-center font-black text-emerald-400 text-sm" id="ficha-avatar">A</div>
@@ -128,29 +128,76 @@
         <button type="button" onclick="cerrarFichaAtleta()" class="text-slate-400 hover:text-white font-bold text-sm bg-slate-800 p-1.5 rounded-xl cursor-pointer">✕</button>
       </div>
       
-      <div class="space-y-3 bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs">
-        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-          <span class="text-slate-400 font-bold">Estado de Cuota / Pago:</span>
-          <select id="ficha-sel-pago" class="bg-slate-900 border border-slate-700 text-white rounded-lg p-1 font-bold">
-            <option value="al_dia">🟢 Al Día</option>
-            <option value="pendiente">🔴 Pendiente / Moroso</option>
-          </select>
+      <!-- ADMINISTRATIVO -->
+      <div class="space-y-2.5 bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs">
+        <span class="text-[10px] uppercase font-black text-slate-400 block tracking-wider">Gestión & Cuota</span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold block mb-1">Estado de Cuota:</span>
+            <select id="ficha-sel-pago" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-1.5 font-bold">
+              <option value="al_dia">🟢 Al Día</option>
+              <option value="pendiente">🔴 Pendiente / Moroso</option>
+            </select>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold block mb-1">Vencimiento:</span>
+            <input type="date" id="ficha-inp-vence" class="w-full bg-slate-900 border border-slate-700 text-emerald-400 rounded-lg p-1.5 font-mono font-bold">
+          </div>
         </div>
-        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-          <span class="text-slate-400 font-bold">Vencimiento de Cuota:</span>
-          <input type="date" id="ficha-inp-vence" class="bg-slate-900 border border-slate-700 text-emerald-400 rounded-lg p-1 font-mono font-bold">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-slate-800/80">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold block mb-1">Entorno asignado:</span>
+            <select id="ficha-sel-entorno" class="w-full bg-slate-900 border border-slate-700 text-cyan-300 font-bold rounded-lg p-1.5 text-xs">
+              <option value="KOENA">Koena (Presencial)</option>
+              <option value="ONLINE">Personalizado Online</option>
+            </select>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold block mb-1">WhatsApp:</span>
+            <span id="ficha-txt-tel" class="font-mono text-white font-bold block pt-1">Sin registrar</span>
+          </div>
         </div>
-        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-          <span class="text-slate-400 font-bold">WhatsApp:</span>
-          <span id="ficha-txt-tel" class="font-mono text-white font-bold">Sin registrar</span>
+      </div>
+
+      <!-- BIOMETRÍA & OBJETIVOS -->
+      <div class="space-y-2.5 bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs">
+        <span class="text-[10px] uppercase font-black text-emerald-400 block tracking-wider">Objetivos & Composición</span>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="text-[10px] text-slate-400 block mb-1">Peso Act (kg)</label>
+            <input type="number" step="0.5" id="ficha-inp-peso-act" placeholder="78" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-1.5 font-bold text-center">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 block mb-1">Peso Obj (kg)</label>
+            <input type="number" step="0.5" id="ficha-inp-peso-obj" placeholder="82" class="w-full bg-slate-900 border border-emerald-500/40 text-emerald-300 rounded-lg p-1.5 font-bold text-center">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400 block mb-1">Altura (cm)</label>
+            <input type="number" id="ficha-inp-altura" placeholder="178" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-1.5 font-bold text-center">
+          </div>
         </div>
-        <div class="flex justify-between items-center">
-          <span class="text-slate-400 font-bold">Entorno asignado:</span>
-          <select id="ficha-sel-entorno" class="bg-slate-900 border border-slate-700 text-cyan-300 font-bold rounded-lg p-1 text-xs">
-            <option value="KOENA">Koena (Presencial)</option>
-            <option value="ONLINE">Personalizado Online</option>
-          </select>
+        <div>
+          <label class="text-[10px] text-slate-400 block mb-1">Días preferidos de entreno:</label>
+          <input type="text" id="ficha-inp-dias-pref" placeholder="Lun, Mar, Jue, Sáb (4 días)" class="w-full bg-slate-900 border border-slate-700 text-white rounded-lg p-1.5 font-bold">
         </div>
+      </div>
+
+      <!-- SALUD & LESIONES -->
+      <div class="space-y-1.5 bg-slate-950 p-3.5 rounded-2xl border border-amber-500/30 text-xs">
+        <span class="text-[10px] uppercase font-black text-amber-400 block tracking-wider">⚠️ Antecedentes / Salud / Lesiones</span>
+        <textarea id="ficha-txt-lesion" rows="2" placeholder="Ej: Molestia en hombro derecho ya recuperada. Reforzar movilidad escapular y calentamiento con YTWL." class="w-full bg-slate-900 border border-slate-700 text-amber-200 rounded-xl p-2 text-xs focus:border-amber-400 focus:outline-none"></textarea>
+      </div>
+
+      <!-- NOTA DEL COACH PARA ESTE ATLETA -->
+      <div class="space-y-2 bg-slate-950 p-3.5 rounded-2xl border border-cyan-500/30 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] uppercase font-black text-cyan-400 block tracking-wider">📌 Nota Directa del Coach</span>
+          <label class="flex items-center gap-1.5 cursor-pointer text-[10px] text-slate-300">
+            <input type="checkbox" id="ficha-chk-visible" class="accent-emerald-500 rounded cursor-pointer" checked>
+            <span>Visible en su app</span>
+          </label>
+        </div>
+        <textarea id="ficha-txt-nota-coach" rows="2" placeholder="Ej: Muy buena semana. El lunes subimos un poco la carga en piernas y arrancamos semana 2." class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-2 text-xs focus:border-cyan-400 focus:outline-none"></textarea>
       </div>
 
       <div class="grid grid-cols-2 gap-2 pt-1">
@@ -515,6 +562,27 @@
             </div>
           </div>
           <button type="button" onclick="iniciarModoActivo()" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-950 font-black px-4 py-2 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">⚡ Entreno Activo</button>
+        </div>
+      </div>
+
+      <!-- NOTA DEL COACH EN PORTADA (ESTILO ATHRIX) -->
+      <div id="banner-nota-coach" class="hidden bg-slate-950/90 border border-emerald-500/40 p-3.5 rounded-2xl flex items-start gap-3 shadow-md">
+        <span class="text-xl shrink-0">📋</span>
+        <div class="flex-1">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-black tracking-wider text-emerald-400">Nota del Coach (Ramiro)</span>
+            <span class="text-[9px] text-slate-400 font-mono" id="banner-nota-fecha">Hoy</span>
+          </div>
+          <p id="banner-nota-texto" class="text-xs text-slate-200 mt-1 leading-relaxed font-medium"></p>
+        </div>
+      </div>
+
+      <!-- ALERTA BIOMÉDICA / LESIÓN ACTIVA DEL ATLETA -->
+      <div id="banner-lesion-atleta" class="hidden bg-amber-950/30 border border-amber-500/40 p-3 rounded-2xl flex items-center gap-3">
+        <span class="text-lg shrink-0">⚠️</span>
+        <div class="text-xs">
+          <span class="text-[10px] uppercase font-black text-amber-400 block tracking-wider">Cuidado Biomecánico & Movilidad:</span>
+          <span id="banner-lesion-texto" class="text-amber-200/90 font-medium"></span>
         </div>
       </div>
 
@@ -974,7 +1042,7 @@
       const email = document.getElementById('auth-email').value.trim();
       if (!email) return alert('Escribí tu correo primero.');
       if (!sb) return alert('Conectando... intentá en un segundo.');
-      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+      const { error } = await sb.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
       document.getElementById('auth-mensaje').innerText = error ? error.message : 'Te enviamos un enlace para restablecer contraseña.';
     }
 
@@ -1010,6 +1078,24 @@
           document.getElementById('dash-alumno-nombre').innerText = 'Hola, ' + perfilActual.nombre;
         }
         document.getElementById('tag-rol-user').innerText = def(perfilActual.rol, 'coach').toUpperCase();
+
+        // MOSTRAR BANNER DE NOTA DEL COACH EN PORTADA DEL ALUMNO
+        const bNota = document.getElementById('banner-nota-coach');
+        if (perfilActual.nota_coach && perfilActual.nota_coach_visible !== false) {
+          document.getElementById('banner-nota-texto').innerText = perfilActual.nota_coach;
+          bNota.classList.remove('hidden');
+        } else {
+          bNota.classList.add('hidden');
+        }
+
+        // MOSTRAR ALERTA DE LESIÓN/BIOMECÁNICA
+        const bLesion = document.getElementById('banner-lesion-atleta');
+        if (perfilActual.lesion_info) {
+          document.getElementById('banner-lesion-texto').innerText = perfilActual.lesion_info;
+          bLesion.classList.remove('hidden');
+        } else {
+          bLesion.classList.add('hidden');
+        }
 
         if (perfilActual.entorno === 'ONLINE') {
           cambiarPaginaModalidad('ONLINE');
@@ -1167,7 +1253,34 @@
       }
     }
 
-    // 5. CONTROL DE 1RM INTERACTIVO
+    // FEEDBACK & RPE PERCIBIDO GLOBAL DE LA SESIÓN (ESTILO ATHRIX)
+    async function guardarFeedbackSesion(planId, sem) {
+      if (!usuarioActual || !sb) return;
+      const rpePercibido = parseInt(document.getElementById('sesion-rpe-global').value) || 8;
+      const notaAlumno = document.getElementById('sesion-nota-alumno').value.trim();
+
+      const { error } = await sb.from('registros_series').upsert({
+        planificacion_id: String(planId),
+        user_id: usuarioActual.id,
+        ejercicio_index: 998,
+        ejercicio: 'FEEDBACK_SESION',
+        semana_num: sem,
+        serie_num: 1,
+        rir_real: rpePercibido,
+        carga: null,
+        completada: true,
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'planificacion_id,user_id,ejercicio_index,semana_num,serie_num' });
+
+      if (!error) {
+        mostrarToast("✓ Feedback enviado a Ramiro (RPE " + rpePercibido + "/10)");
+      } else {
+        alert("Error al guardar feedback: " + error.message);
+      }
+    }
+
+    // CONTROL DE 1RM INTERACTIVO
     function renderizarTablaControlRM() {
       const tbody = document.getElementById('tabla-control-rm-body');
       if (!tbody) return;
@@ -1219,7 +1332,7 @@
       mostrarToast('✓ 1RM actualizado a ' + item.rm + ' kg');
     }
 
-    // 6. MOTOR INTELIGENTE DE CÁLCULO DE CARGAS SUGERIDAS (1RM -> SEMANA)
+    // MOTOR DE CÁLCULO DE CARGAS SUGERIDAS (1RM -> SEMANA)
     function resolverCargaKilos(ejercicioNombre, textoPrescripcion) {
       const nom = (ejercicioNombre || '').toLowerCase();
       
@@ -1274,7 +1387,7 @@
       if (rutina) activarDia(rutina.id);
     }
 
-    // 7. CREADOR Y DISEÑADOR DE RUTINAS DEL COACH
+    // CREADOR Y DISEÑADOR DE RUTINAS DEL COACH
     function abrirModalCreadorRapido() {
       document.getElementById('modal-creador-rapido').classList.remove('hidden');
       actualizarListaEjerciciosPorCategoria();
@@ -1742,7 +1855,7 @@
       document.getElementById('modal-video-player').classList.add('hidden');
     }
 
-    // CONFIRMAR TURNO ALUMNO BLINDADO (SIN DEPENDER DE ONCONFLICT O CON COMPATIBILIDAD PLENA)
+    // CONFIRMAR TURNO ALUMNO BLINDADO
     async function confirmarTurnoKoena(asiste) {
       if (!usuarioActual || !sb) return;
       const fecha = document.getElementById('koena-fecha-turno').value;
@@ -1751,7 +1864,6 @@
 
       const estado = asiste ? 'confirmado' : 'cancelado';
 
-      // 1. Verificamos si ya existe el turno para evitar fallos de duplicado en bases sin UNIQUE
       const { data: turnoPrevio } = await sb.from('turnos_asistencia')
         .select('id')
         .eq('user_id', usuarioActual.id)
@@ -1811,7 +1923,6 @@
       }
     }
 
-    // CARGA DE ASISTENCIAS DEL COACH DIRECTA Y ROBUSTA
     async function cargarAsistenciasKoenaCoach() {
       if (!sb) return;
       const hoy = obtenerFechaLocalString();
@@ -2084,6 +2195,38 @@
         html += '</div>';
       });
 
+      // SECCIÓN FEEDBACK Y RPE DE SESIÓN (ESTILO ATHRIX)
+      const feedbackPrevio = def(mapaSeries['998_1'], {});
+      const rpePrevioVal = feedbackPrevio.rir_real || 8;
+
+      html += '<div class="bg-slate-900 border border-slate-800 p-4 rounded-3xl space-y-3 mt-4">';
+      html += '<div class="flex items-center justify-between border-b border-slate-800 pb-2.5">';
+      html += '<span class="text-xs font-black uppercase text-emerald-400 tracking-wider flex items-center gap-1.5"><span>💬</span> Feedback de la Sesión al Coach</span>';
+      html += '<span class="text-[10px] text-slate-400 font-mono">Semana ' + semanaActiva + '</span>';
+      html += '</div>';
+
+      html += '<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">';
+      html += '<div>';
+      html += '<label class="text-[10px] text-slate-400 font-bold block mb-1">RPE Percibido Global (1 a 10):</label>';
+      html += '<select id="sesion-rpe-global" class="w-full bg-slate-950 border border-slate-700 text-emerald-300 rounded-xl p-2 font-mono font-bold text-xs">';
+      for (let r = 1; r <= 10; r++) {
+        const selRPE = r === rpePrevioVal ? 'selected' : '';
+        html += '<option value="' + r + '" ' + selRPE + '>RPE ' + r + ' ' + (r >= 9 ? '🔥 Máximo' : r >= 7 ? '⚡ Exigente' : '👌 Cómodo') + '</option>';
+      }
+      html += '</select>';
+      html += '</div>';
+
+      html += '<div class="sm:col-span-2">';
+      html += '<label class="text-[10px] text-slate-400 font-bold block mb-1">Sensaciones / Molestias / Observaciones:</label>';
+      html += '<input type="text" id="sesion-nota-alumno" placeholder="Ej: Me sentí fuerte en sentadilla, la última serie de banca costó." class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl p-2 text-xs focus:border-emerald-500 focus:outline-none">';
+      html += '</div>';
+      html += '</div>';
+
+      html += '<button type="button" onclick="guardarFeedbackSesion(\'' + rutina.id + '\', ' + semanaActiva + ')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer flex items-center justify-center gap-2">';
+      html += '<span>✓</span> Guardar Sensaciones de la Sesión';
+      html += '</button>';
+      html += '</div>';
+
       html += '</div>';
       cont.innerHTML = html;
       enlazarEventosDinamicos();
@@ -2249,17 +2392,22 @@
         itemHtml += '<div class="flex items-center gap-1.5 mt-0.5">' + tagPago + '</div></div></div>';
         itemHtml += '<span class="text-[10px] px-2 py-0.5 rounded font-bold ' + tagClase + '">' + tagTexto + '</span></div>';
         itemHtml += '<div class="text-slate-400">Últimos 14 días: <strong class="text-white">' + (st ? st.dias.size : 0) + '</strong> sesiones • <strong class="text-white">' + (st ? st.n : 0) + '</strong> series</div>';
+        
+        if (a.lesion_info) {
+          itemHtml += '<div class="text-[10px] text-amber-300/90 bg-amber-500/10 p-1.5 rounded-lg border border-amber-500/20">⚠️ ' + escaparHTML(a.lesion_info) + '</div>';
+        }
+
         itemHtml += '<div class="text-slate-500 flex justify-between items-center pt-1 border-t border-slate-900">';
         itemHtml += '<span>WhatsApp: ' + escaparHTML(def(a.telefono, 'Sin cargar')) + '</span>';
         itemHtml += '<div class="flex gap-1.5">';
-        itemHtml += '<button type="button" onclick="abrirFichaAtleta(\'' + a.id + '\', \'' + escaparHTML(def(a.nombre, a.email)) + '\', \'' + escaparHTML(def(a.email, '')) + '\', \'' + escaparHTML(def(a.telefono, '')) + '\', \'' + def(a.estado_pago, 'al_dia') + '\', \'' + def(a.vencimiento_cuota, '') + '\', \'' + def(a.entorno, 'KOENA') + '\')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded-lg text-[10px] cursor-pointer">👤 Ficha</button>';
+        itemHtml += '<button type="button" onclick="abrirFichaAtleta(\'' + a.id + '\', \'' + escaparHTML(def(a.nombre, a.email)) + '\', \'' + escaparHTML(def(a.email, '')) + '\', \'' + escaparHTML(def(a.telefono, '')) + '\', \'' + def(a.estado_pago, 'al_dia') + '\', \'' + def(a.vencimiento_cuota, '') + '\', \'' + def(a.entorno, 'KOENA') + '\', \'' + def(a.peso_actual, '') + '\', \'' + def(a.peso_objetivo, '') + '\', \'' + def(a.altura, '') + '\', \'' + escaparHTML(def(a.dias_preferidos, '')) + '\', \'' + escaparHTML(def(a.lesion_info, '')) + '\', \'' + escaparHTML(def(a.nota_coach, '')) + '\', ' + (a.nota_coach_visible !== false) + ')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded-lg text-[10px] cursor-pointer">👤 Ficha</button>';
         itemHtml += '<button type="button" onclick="entrarPortalAlumno(\'' + a.id + '\', \'' + escaparHTML(def(a.nombre, a.email)) + '\')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-2 py-1 rounded-lg text-[10px] cursor-pointer">Ver Plan ➔</button>';
         itemHtml += '</div></div></div>';
         return itemHtml;
       }).join('');
     }
 
-    function abrirFichaAtleta(id, nombre, email, tel, pago, vence, entorno) {
+    function abrirFichaAtleta(id, nombre, email, tel, pago, vence, entorno, pesoAct, pesoObj, altura, diasPref, lesion, notaCoach, notaVisible) {
       atletaSeleccionadoFicha = id;
       document.getElementById('ficha-avatar').innerText = (nombre || 'A').charAt(0).toUpperCase();
       document.getElementById('ficha-nombre').innerText = nombre;
@@ -2268,6 +2416,15 @@
       document.getElementById('ficha-sel-pago').value = pago || 'al_dia';
       document.getElementById('ficha-inp-vence').value = vence || '';
       document.getElementById('ficha-sel-entorno').value = entorno || 'KOENA';
+      
+      document.getElementById('ficha-inp-peso-act').value = pesoAct || '';
+      document.getElementById('ficha-inp-peso-obj').value = pesoObj || '';
+      document.getElementById('ficha-inp-altura').value = altura || '';
+      document.getElementById('ficha-inp-dias-pref').value = diasPref || '';
+      document.getElementById('ficha-txt-lesion').value = lesion || '';
+      document.getElementById('ficha-txt-nota-coach').value = notaCoach || '';
+      document.getElementById('ficha-chk-visible').checked = notaVisible !== false;
+
       document.getElementById('modal-ficha-atleta').classList.remove('hidden');
     }
 
@@ -2281,12 +2438,31 @@
       const vencimiento_cuota = document.getElementById('ficha-inp-vence').value || null;
       const entorno = document.getElementById('ficha-sel-entorno').value;
 
+      const peso_actual = parseFloat(document.getElementById('ficha-inp-peso-act').value) || null;
+      const peso_objetivo = parseFloat(document.getElementById('ficha-inp-peso-obj').value) || null;
+      const altura = parseFloat(document.getElementById('ficha-inp-altura').value) || null;
+      const dias_preferidos = document.getElementById('ficha-inp-dias-pref').value.trim() || null;
+      const lesion_info = document.getElementById('ficha-txt-lesion').value.trim() || null;
+      const nota_coach = document.getElementById('ficha-txt-nota-coach').value.trim() || null;
+      const nota_coach_visible = document.getElementById('ficha-chk-visible').checked;
+
       const { error } = await sb.from('perfiles_usuarios')
-        .update({ estado_pago, vencimiento_cuota, entorno })
+        .update({
+          estado_pago,
+          vencimiento_cuota,
+          entorno,
+          peso_actual,
+          peso_objetivo,
+          altura,
+          dias_preferidos,
+          lesion_info,
+          nota_coach,
+          nota_coach_visible
+        })
         .eq('id', atletaSeleccionadoFicha);
 
       if (error) return alert("Error al guardar: " + error.message);
-      mostrarToast("✓ Ficha de atleta actualizada");
+      mostrarToast("✓ Ficha y notas actualizadas");
       cerrarFichaAtleta();
       cargarVistaCoach();
     }
@@ -2312,10 +2488,10 @@
     function exportarBaseAlumnosCSV() {
       if (!sb) return;
       sb.from('perfiles_usuarios').select('*').then(({ data }) => {
-        let csv = "Nombre,Email,Telefono,Modalidad,EstadoPago,Vencimiento\n";
+        let csv = "Nombre,Email,Telefono,Modalidad,EstadoPago,Vencimiento,PesoAct,PesoObj,Lesion\n";
         (data || []).forEach(p => {
           const l = s => String(def(s, '')).replace(/^[=+\-@]/, "'").replace(/"/g, '""');
-          csv += '"' + l(p.nombre) + '","' + l(p.email) + '","' + l(p.telefono) + '","' + l(p.entorno) + '","' + l(p.estado_pago) + '","' + l(p.vencimiento_cuota) + '"\n';
+          csv += '"' + l(p.nombre) + '","' + l(p.email) + '","' + l(p.telefono) + '","' + l(p.entorno) + '","' + l(p.estado_pago) + '","' + l(p.vencimiento_cuota) + '","' + l(p.peso_actual) + '","' + l(p.peso_objetivo) + '","' + l(p.lesion_info) + '"\n';
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const a = document.createElement('a');
@@ -2479,6 +2655,7 @@
     window.togglePlegarBloque = togglePlegarBloque;
     window.actualizarTestRM = actualizarTestRM;
     window.guardarFechaSesion = guardarFechaSesion;
+    window.guardarFeedbackSesion = guardarFeedbackSesion;
     window.cambiarSemana = cambiarSemana;
 
     function iniciarApp() {
